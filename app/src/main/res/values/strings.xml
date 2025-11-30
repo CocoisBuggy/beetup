@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Beetup</string>
+    <string name="todays_activity">Today\'s Activity</string>
+    <string name="add_exercise_entry">Add Exercise</string>
 </resources>

@@ -11,8 +11,10 @@ import androidx.room.TypeConverters
         BeetMagnitude::class,
         BeetResistance::class,
         BeetExerciseLog::class,
+        BeetActivityResistance::class,
+        ValidBeetResistances::class
     ],
-    version = 3
+    version = 1
 )
 @TypeConverters(Converters::class)
 abstract class BeetData : RoomDatabase() {

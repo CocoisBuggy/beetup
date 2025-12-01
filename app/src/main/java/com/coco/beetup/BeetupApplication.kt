@@ -20,6 +20,7 @@ class BeetupApplication : Application() {
             BeetData::class.java,
             "beet_database"
         )
+            .fallbackToDestructiveMigration(dropAllTables = true)
             .build();
 
         applicationScope.launch {
@@ -43,32 +44,28 @@ class BeetupApplication : Application() {
             )
             db.beetExerciseDao().insert(
                 BeetExercise(
-                    1,
+                    0,
                     "Pull Up",
                     "Pull up exercise",
                     magnitudeKind = 1,
-                    resistanceKind = 2
                 ),
                 BeetExercise(
-                    1,
+                    0,
                     "Push Up",
                     "Push up exercise",
                     magnitudeKind = 1,
-                    resistanceKind = 2
                 ),
                 BeetExercise(
-                    1,
+                    0,
                     "Right hand max edge",
                     "Using an an edge and chalk, lift the weight",
                     magnitudeKind = 1,
-                    resistanceKind = 2
                 ),
                 BeetExercise(
-                    1,
+                    0,
                     "Left hand max edge",
                     "Using an an edge and chalk, lift the weight",
                     magnitudeKind = 1,
-                    resistanceKind = 2
                 ),
             )
         }

@@ -61,12 +61,6 @@ fun BeetHome(nav: NavHostController, viewModel: BeetViewModel) {
                 val newExercise = BeetExerciseLog(
                     id = 0,
                     exerciseId = category.id,
-                    logDate = Date(),
-                    magnitude = 0,
-                    resistance = 0,
-                    difficulty = null,
-                    comment = null,
-                    logDay = (Date().time / 86_400_000L).toInt()
                 )
                 viewModel.insertActivity(newExercise)
                 showCategoryDialog = false

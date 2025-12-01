@@ -18,6 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,16 +28,52 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.coco.beetup.R
+import com.coco.beetup.core.data.BeetExerciseLog
+import com.coco.beetup.ui.components.CategorySelectionDialog
 import com.coco.beetup.ui.components.DeletableExerciseEntry
 import com.coco.beetup.ui.components.FloatingActivityToolbar
 import com.coco.beetup.ui.components.SelectionAppBar
 import com.coco.beetup.ui.components.WelcomeCard
+import com.coco.beetup.ui.viewmodel.BeetViewModel
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BeetHome(nav: NavHostController) {
-    var selectedItems by remember { mutableStateOf<Set<String>>(emptySet()) }
+fun BeetHome(nav: NavHostController, viewModel: BeetViewModel) {
+    val exerciseCategories by viewModel.allExercises.collectAsState(initial = emptyList())
+    val todaysExercise by viewModel.todaysLogs.collectAsState(initial = emptyList())
+
+    var selectedItems by remember { mutableStateOf<Set<BeetExerciseLog>>(emptySet()) }
     var multiSelectionEnabled by remember { mutableStateOf(false) }
+    var showCategoryDialog by remember { mutableStateOf(false) }
+
+
+    val onDeleteSelected = {
+        viewModel.deleteActivity(selectedItems)
+        selectedItems = emptySet()
+        multiSelectionEnabled = false
+    }
+
+    if (showCategoryDialog) {
+        CategorySelectionDialog(
+            categories = exerciseCategories,
+            onCategorySelected = { category ->
+                val newExercise = BeetExerciseLog(
+                    id = 0,
+                    exerciseId = category.id,
+                    logDate = Date(),
+                    magnitude = 0,
+                    resistance = 0,
+                    difficulty = null,
+                    comment = null,
+                    logDay = (Date().time / 86_400_000L).toInt()
+                )
+                viewModel.insertActivity(newExercise)
+                showCategoryDialog = false
+            },
+            onDismiss = { showCategoryDialog = false }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -47,9 +84,7 @@ fun BeetHome(nav: NavHostController) {
                         selectedItems = emptySet()
                         multiSelectionEnabled = false
                     },
-                    onDeleteSelected = {
-                        // This will be passed down to the list to handle deletion
-                    }
+                    onDeleteSelected = onDeleteSelected
                 )
             } else {
                 TopAppBar(
@@ -67,7 +102,7 @@ fun BeetHome(nav: NavHostController) {
                     FloatingActivityToolbar()
                 }
             } else {
-                FloatingActionButton(onClick = { /* TODO: Handle new entry creation */ }) {
+                FloatingActionButton(onClick = { showCategoryDialog = true }) {
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = stringResource(id = R.string.add_exercise_entry)
@@ -76,22 +111,6 @@ fun BeetHome(nav: NavHostController) {
             }
         },
     ) { innerPadding ->
-        var itemList by remember { mutableStateOf((1..20).map { "Item #$it" }) }
-
-        val onDeleteSelected = {
-            itemList = itemList.filterNot { it in selectedItems }
-            selectedItems = emptySet()
-            multiSelectionEnabled = false
-        }
-
-        if (multiSelectionEnabled) {
-            SelectionAppBar(
-                selectedItemCount = selectedItems.size,
-                onClearSelection = { selectedItems = emptySet() },
-                onDeleteSelected = onDeleteSelected
-            )
-        }
-
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -102,26 +121,23 @@ fun BeetHome(nav: NavHostController) {
                 WelcomeCard(nav)
             }
 
-            items(itemList, key = { it }) { item ->
+            items(todaysExercise, key = { it.id }) { item ->
                 val isSelected = item in selectedItems
+                val exercise = exerciseCategories.find { it.id == item.exerciseId }
 
                 DeletableExerciseEntry(
-                    itemText = item,
+                    itemText = exercise?.exerciseName ?: "Unknown",
                     isSelected = isSelected,
-                    onDelete = {
-                        itemList = itemList.filterNot { it == item }
-                    },
+                    onDelete = { viewModel.deleteActivity(listOf(item)) },
                     onToggleSelection = {
-                        if (multiSelectionEnabled) {
-                            selectedItems = if (isSelected) {
+                        selectedItems = if (multiSelectionEnabled) {
+                            if (isSelected) {
                                 selectedItems - item
                             } else {
                                 selectedItems + item
                             }
                         } else {
-                            // When multiselection is prohibited, we expect that every toggle
-                            // should UNSET all set, and then set the clicked item
-                            selectedItems = setOf(item)
+                            if (item in selectedItems) emptySet() else setOf(item)
                         }
                     },
                     onToggleMultiSelection = { multiSelectionEnabled = !multiSelectionEnabled },
@@ -131,8 +147,3 @@ fun BeetHome(nav: NavHostController) {
         }
     }
 }
-
-
-
-
-

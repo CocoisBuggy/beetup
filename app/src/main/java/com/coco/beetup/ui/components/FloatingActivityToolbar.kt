@@ -39,7 +39,7 @@ fun FloatingActivityToolbar() {
                 modifier = Modifier
                     .height(32.dp)
                     .width(1.dp),
-                color = MaterialTheme.colorScheme.onTertiaryContainer
+                color = MaterialTheme.colorScheme.onTertiary
             )
             Spacer(Modifier.width(8.dp))
             IconButton(onClick = { /* TODO: Handle Delete */ }) {

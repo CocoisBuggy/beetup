@@ -4,7 +4,19 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [BeetProfile::class], version = 1)
+@Database(
+    entities = [
+        BeetProfile::class,
+        BeetExercise::class,
+        BeetMagnitude::class,
+        BeetResistance::class,
+        BeetExerciseLog::class,
+    ],
+    version = 3
+)
 @TypeConverters(Converters::class)
 abstract class BeetData : RoomDatabase() {
+    abstract fun beetProfileDao(): BeetProfileDao
+    abstract fun beetExerciseDao(): BeetExerciseDao
+    abstract fun exerciseLogDao(): ExerciseLogDao
 }

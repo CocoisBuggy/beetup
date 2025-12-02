@@ -4,19 +4,18 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.coco.beetup.core.data.BeetExerciseLog
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DeletableExerciseEntry(
-    itemText: String,
+    item: BeetExerciseLog,
     isSelected: Boolean,
-    onDelete: () -> Unit,
     onToggleSelection: () -> Unit,
     onToggleMultiSelection: () -> Unit,
-    multiSelectionEnabled: Boolean,
 ) {
     ExerciseEntry(
-        text = itemText,
+        text = item,
         isSelected = isSelected,
         modifier = Modifier.combinedClickable(
             onClick = {

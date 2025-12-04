@@ -50,11 +50,18 @@ interface BeetExerciseDao {
 
     @Query("SELECT * FROM BeetResistance")
     fun getAllResistances(): Flow<List<BeetResistance>>
+
+    @Query(
+        "SELECT * FROM BeetExercise join BeetExerciseLog " +
+                "on BeetExercise.id = BeetExerciseLog.exerciseId " +
+                "where log_day = :day group by exerciseId"
+    )
+    fun getActiveExercisesForDay(day: Int): Flow<List<BeetExercise>>
 }
 
 @Dao
 interface ExerciseLogDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(vararg logs: BeetExerciseLog)
 
     @Delete
@@ -71,4 +78,7 @@ interface ExerciseLogDao {
 
     @Query("SELECT * FROM BeetExerciseLog WHERE exerciseId = :exerciseId")
     fun getLogsForExercise(exerciseId: Int): Flow<List<BeetExerciseLog>>
+
+    @Query("SELECT * FROM BeetExerciseLog WHERE exerciseId = :exercise and log_day = :day")
+    fun exerciseLogsFor(day: Int, exercise: Int): Flow<List<BeetExerciseLog>>
 }

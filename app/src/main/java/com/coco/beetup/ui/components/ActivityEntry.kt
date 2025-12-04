@@ -1,35 +1,43 @@
 package com.coco.beetup.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FitnessCenter
-import androidx.compose.material3.Button
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.coco.beetup.core.data.BeetExercise
+import com.coco.beetup.core.data.BeetExerciseLog
+import com.coco.beetup.ui.viewmodel.BeetViewModel
+import java.util.Date
 
 
 @Composable
-fun ExerciseEntry(
-    text: String,
-    isSelected: Boolean, // <-- New parameter
-    modifier: Modifier = Modifier // <-- New parameter
+fun ActivityEntry(
+    viewModel: BeetViewModel,
+    day: Int,
+    item: BeetExercise,
+    isSelected: Boolean,
+    modifier: Modifier = Modifier
 ) {
-    var sets by remember { mutableIntStateOf(2) }
+    val logs by viewModel.exerciseLogs(day, item.id).collectAsState(initial = emptyList())
 
     ListItem(
-        headlineContent = { Text(text) },
-        supportingContent = { Text("6 reps, $sets sets, 50kg") },
+        headlineContent = { Text("${item.exerciseName}") },
+        supportingContent = { Text("${logs.size} sets") },
         leadingContent = {
             Icon(
                 Icons.Default.FitnessCenter,
@@ -37,19 +45,24 @@ fun ExerciseEntry(
             )
         },
         trailingContent = {
-            Button(onClick = { sets++ }) {
-                Text("+1 Set")
+            AnimatedVisibility(isSelected) {
+                FilledTonalButton(
+                    onClick = {
+                        viewModel.insertActivity(logs.last().copy(id = 0, logDate = Date()))
+                    }
+                ) {
+                    Text("+1")
+                }
             }
         },
         colors = ListItemDefaults.colors(
-            // 4. Change color based on selection state
             containerColor = if (isSelected) {
                 MaterialTheme.colorScheme.primaryContainer
             } else {
                 MaterialTheme.colorScheme.surfaceContainerHigh
             }
         ),
-        modifier = modifier // Apply the combinedClickable modifier here
+        modifier = modifier
             .padding(vertical = 4.dp)
             .clip(MaterialTheme.shapes.medium)
     )

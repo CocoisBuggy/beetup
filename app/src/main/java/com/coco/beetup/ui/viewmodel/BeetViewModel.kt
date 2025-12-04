@@ -6,18 +6,15 @@ import androidx.lifecycle.viewModelScope
 import com.coco.beetup.core.data.BeetExercise
 import com.coco.beetup.core.data.BeetExerciseLog
 import com.coco.beetup.core.data.BeetRepository
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlin.collections.emptyList
 
 class BeetViewModel(private val repository: BeetRepository) : ViewModel() {
     val profile = repository.getProfile()
     val allExercises = repository.getAllExercises()
     val allLogs = repository.getAllLogs()
-    val todaysLogs = repository.todaysLogs()
-
+    val todaysLogs = repository.logsForDay()
+    val todaysExercise = repository.exercisesForDay()
+    fun exerciseLogs(day: Int, exercise: Int) = repository.exerciseLogs(day, exercise)
 
     fun insertExercise(exercise: BeetExercise) = viewModelScope.launch {
         repository.insertExercise(exercise)

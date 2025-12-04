@@ -14,6 +14,8 @@ class BeetRepository(
 
     fun getAllLogs(): Flow<List<BeetExerciseLog>> = exerciseLogDao.getAllLogs()
 
+    fun exerciseLogs(day: Int, exercise: Int) = exerciseLogDao.exerciseLogsFor(day, exercise)
+
     suspend fun insertExercise(exercise: BeetExercise) {
         beetExerciseDao.insert(exercise)
     }
@@ -30,7 +32,8 @@ class BeetRepository(
         exerciseLogDao.insert(log)
     }
 
-    fun todaysLogs() = exerciseLogDao.getLogsForDay((Date().time / 86_400_000L).toInt())
+    fun logsForDay(day: Int = (Date().time / 86_400_000L).toInt()) = exerciseLogDao.getLogsForDay(day)
+    fun exercisesForDay(day: Int = (Date().time / 86_400_000L).toInt()) = beetExerciseDao.getActiveExercisesForDay(day)
 
     suspend fun deleteLogEntries(exercises: Collection<BeetExerciseLog>) {
         exerciseLogDao.delete(exercises.toList())

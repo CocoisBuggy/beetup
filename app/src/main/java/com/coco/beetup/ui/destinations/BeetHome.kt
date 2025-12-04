@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.coco.beetup.R
+import com.coco.beetup.core.data.BeetExercise
 import com.coco.beetup.core.data.BeetExerciseLog
 import com.coco.beetup.ui.components.CategorySelectionDialog
 import com.coco.beetup.ui.components.DeletableExerciseEntry
@@ -40,16 +41,19 @@ import java.util.Date
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BeetHome(nav: NavHostController, viewModel: BeetViewModel) {
+    val day = (Date().time / 86_400_000L).toInt()
     val exerciseCategories by viewModel.allExercises.collectAsState(initial = emptyList())
-    val todaysExercise by viewModel.todaysLogs.collectAsState(initial = emptyList())
+    val todaysExercise by viewModel.todaysExercise.collectAsState(initial = emptyList())
 
-    var selectedItems by remember { mutableStateOf<Set<BeetExerciseLog>>(emptySet()) }
+    var selectedItems by remember { mutableStateOf<Set<BeetExercise>>(emptySet()) }
     var multiSelectionEnabled by remember { mutableStateOf(false) }
     var showCategoryDialog by remember { mutableStateOf(false) }
 
 
     val onDeleteSelected = {
-        viewModel.deleteActivity(selectedItems)
+        // when we delete our selected items we delete all logs for exercise of <day>
+        // with exercise id <selected.exerciseId>
+        // viewModel.deleteActivity(selectedItems)
         selectedItems = emptySet()
         multiSelectionEnabled = false
     }
@@ -117,12 +121,12 @@ fun BeetHome(nav: NavHostController, viewModel: BeetViewModel) {
 
             items(todaysExercise, key = { it.id }) { item ->
                 val isSelected = item in selectedItems
-                val exercise = exerciseCategories.find { it.id == item.exerciseId }
 
                 DeletableExerciseEntry(
-                    itemText = exercise?.exerciseName ?: "Unknown",
+                    viewModel = viewModel,
+                    day = day,
+                    item = item,
                     isSelected = isSelected,
-                    onDelete = { viewModel.deleteActivity(listOf(item)) },
                     onToggleSelection = {
                         selectedItems = if (multiSelectionEnabled) {
                             if (isSelected) {
@@ -135,7 +139,6 @@ fun BeetHome(nav: NavHostController, viewModel: BeetViewModel) {
                         }
                     },
                     onToggleMultiSelection = { multiSelectionEnabled = !multiSelectionEnabled },
-                    multiSelectionEnabled = multiSelectionEnabled
                 )
             }
         }

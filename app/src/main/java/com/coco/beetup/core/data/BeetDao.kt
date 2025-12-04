@@ -64,8 +64,7 @@ interface ExerciseLogDao {
 
   @Delete suspend fun delete(activities: List<BeetExerciseLog>)
 
-  @Query("SELECT * FROM BeetExerciseLog WHERE id = :id")
-  fun getLog(id: Int): Flow<BeetExerciseLog>
+  @Query("SELECT * FROM BeetExerciseLog WHERE id = :id") fun getLog(id: Int): Flow<BeetExerciseLog>
 
   @Query("SELECT * FROM BeetExerciseLog") fun getAllLogs(): Flow<List<BeetExerciseLog>>
 

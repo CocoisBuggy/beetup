@@ -26,7 +26,7 @@ class BeetupApplication : Application() {
                 val reader = BufferedReader(InputStreamReader(inputStream))
                 reader.useLines { lines ->
                   lines.forEach { line ->
-                    if (line.isNotBlank()) {
+                    if (line.isNotBlank() && line.startsWith("--").not()) {
                       db.execSQL(line)
                     }
                   }

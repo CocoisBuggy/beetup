@@ -12,6 +12,7 @@ data class BeetMagnitude(
     @PrimaryKey val id: Int,
     @ColumnInfo(name = "magnitude_name") val name: String,
     @ColumnInfo(name = "magnitude_description") val description: String,
+    @ColumnInfo(name = "magnitude_unit") val unit: String,
 )
 
 @Entity

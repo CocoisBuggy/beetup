@@ -1,6 +1,6 @@
-INSERT INTO BeetMagnitude VALUES(1, 'Reps', 'Number of repetitions');
-INSERT INTO BeetMagnitude VALUES(2, 'Distance', 'Distance in meters');
-INSERT INTO BeetMagnitude VALUES(3, 'Time', 'Time in seconds');
+INSERT INTO BeetMagnitude VALUES(1, 'Repetitions', 'Number of repetitions', "Reps");
+INSERT INTO BeetMagnitude VALUES(2, 'Distance', 'Distance in meters', "Meters");
+INSERT INTO BeetMagnitude VALUES(3, 'Duration', 'Time in seconds', "Seconds");
 
 INSERT INTO BeetResistance VALUES(1, 'Overhang', 'Some overhang expressed in degrees where 0 degrees is flat on the floor', 'degrees');
 INSERT INTO BeetResistance VALUES(2, 'Grams', 'Additional weight in the form of some number of grams', 'g');

@@ -49,8 +49,10 @@ class BeetViewModel(
       selectedResistances: List<BeetActivityResistance>
   ) {
     viewModelScope.launch {
+      val newActivityId = repository.insertLog(newExercise)
       repository.insertResistances(
-          selectedResistances.map { it.copy(activityId = repository.insertLog(newExercise)) })
+          selectedResistances.map { it.copy(activityId = newActivityId) },
+      )
     }
   }
 }

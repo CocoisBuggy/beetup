@@ -86,6 +86,7 @@ fun BeetHome(
         ExerciseLogDetailsDialog(
             exercise = exercise,
             magnitudeName = it.name,
+            magnitudeUnit = it.unit,
             onConfirm = { magnitude -> magnitudeForEntry = magnitude },
             onDismiss = { selectedExerciseForEntry = null },
         )

@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,10 +29,11 @@ import com.coco.beetup.core.data.BeetExercise
 fun ExerciseLogDetailsDialog(
     exercise: BeetExercise,
     magnitudeName: String,
+    magnitudeUnit: String,
     onConfirm: (magnitude: Int) -> Unit,
     onDismiss: () -> Unit,
 ) {
-  var magnitude by remember { mutableStateOf(0) }
+  var magnitude by remember { mutableIntStateOf(1) }
 
   AlertDialog(
       onDismissRequest = onDismiss,
@@ -39,7 +41,7 @@ fun ExerciseLogDetailsDialog(
       text = {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
           Text(
-              text = magnitudeName,
+              text = "$magnitudeName ($magnitudeUnit)",
               style = MaterialTheme.typography.titleMedium,
               modifier = Modifier.padding(bottom = 8.dp))
           Row(

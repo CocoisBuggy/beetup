@@ -51,7 +51,6 @@ fun BeetHome(
   val day = (Date().time / 86_400_000L).toInt()
   val exerciseCategories by viewModel.allExercises.collectAsState(initial = emptyList())
   val todaysExercise by viewModel.activityGroupsForDay(day).collectAsState(initial = emptyList())
-  val allResistances by viewModel.allResistances.collectAsState(initial = emptyList())
 
   var editMode by remember { mutableStateOf(false) }
   var selectedItems by remember { mutableStateOf<Set<ActivityGroup>>(emptySet()) }
@@ -61,6 +60,7 @@ fun BeetHome(
   var magnitudeForEntry by remember { mutableStateOf<Int?>(null) }
 
   val onDeleteSelected = {
+    viewModel.deleteActivity(selectedItems.flatMap { outer -> outer.logs.map { it.log } })
     selectedItems = emptySet()
     multiSelectionEnabled = false
   }

@@ -50,7 +50,7 @@ class BeetRepository(
   fun exercisesForDay(day: Int = (Date().time / 86_400_000L).toInt()) =
       beetExerciseDao.getActiveExercisesForDay(day)
 
-  suspend fun deleteLogEntries(exercises: Collection<BeetExerciseLog>) {
+  suspend fun deleteLogEntries(exercises: List<BeetExerciseLog>) {
     exerciseLogDao.delete(exercises.toList())
   }
 

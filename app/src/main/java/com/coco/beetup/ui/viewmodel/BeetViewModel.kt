@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.coco.beetup.core.data.BeetActivityResistance
 import com.coco.beetup.core.data.BeetExercise
 import com.coco.beetup.core.data.BeetExerciseLog
+import com.coco.beetup.core.data.BeetExerciseLogWithResistances
 import com.coco.beetup.core.data.BeetRepository
 import kotlinx.coroutines.launch
 
@@ -36,10 +37,7 @@ class BeetViewModel(
   fun deleteExercise(exercise: BeetExercise) =
       viewModelScope.launch { repository.deleteExercise(exercise) }
 
-  fun deleteExercises(exercises: Collection<BeetExercise>) =
-      viewModelScope.launch { repository.deleteExercises(exercises) }
-
-  fun deleteActivity(exercises: Collection<BeetExerciseLog>) =
+  fun deleteActivity(exercises: List<BeetExerciseLog>) =
       viewModelScope.launch { repository.deleteLogEntries(exercises) }
 
   fun activityGroupsForDay(day: Int) = repository.activityGroupsForDay(day)

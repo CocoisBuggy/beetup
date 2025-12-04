@@ -42,11 +42,7 @@ fun ResistanceSelectionDialog(
               Column {
                 ListItem(
                     headlineContent = { Text(resistance.name) },
-                    leadingContent = {
-                      Checkbox(
-                          checked = isChecked, onCheckedChange = null // Click handled by modifier
-                          )
-                    },
+                    leadingContent = { Checkbox(checked = isChecked, onCheckedChange = null) },
                     modifier =
                         Modifier.clickable {
                           if (isChecked) {
@@ -63,7 +59,7 @@ fun ResistanceSelectionDialog(
                           selectedResistances[resistance.id] = value
                         }
                       },
-                      label = { Text("${resistance.name} Value") },
+                      label = { Text("${resistance.name} Value (${resistance.unit}") },
                       keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                       modifier =
                           Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 4.dp))

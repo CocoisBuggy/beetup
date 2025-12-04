@@ -39,13 +39,13 @@ fun ActivityEntry(
       headlineContent = { Text("${activity.exercise.exerciseName}") },
       supportingContent = {
         Column {
-            var text = "${logs.size} sets"
+          var text = "${logs.size} sets"
 
-            if (logs.isNotEmpty()) {
-                text += ", ${logs.first().log.magnitude} ${activity.magnitude.name}"
-            }
+          if (logs.isNotEmpty()) {
+            text += ", ${logs.first().log.magnitude} ${activity.magnitude.name}"
+          }
 
-            Text(text)
+          Text(text)
 
           AnimatedVisibility(isSelected) {
             Column {

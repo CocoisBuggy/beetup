@@ -19,6 +19,7 @@ data class BeetResistance(
     @PrimaryKey val id: Int,
     @ColumnInfo(name = "resistance_name") val name: String,
     @ColumnInfo(name = "resistance_description") val description: String,
+    @ColumnInfo(name = "resistance_unit") val unit: String,
 )
 
 @Entity(

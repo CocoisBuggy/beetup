@@ -1,41 +1,48 @@
 package com.coco.beetup.core.data
 
-import kotlinx.coroutines.flow.Flow
 import java.util.Date
+import kotlinx.coroutines.flow.Flow
 
 class BeetRepository(
     private val beetProfileDao: BeetProfileDao,
     private val beetExerciseDao: BeetExerciseDao,
-    private val exerciseLogDao: ExerciseLogDao
+    private val exerciseLogDao: ExerciseLogDao,
 ) {
-    fun getProfile(): Flow<BeetProfile> = beetProfileDao.getProfile()
+  fun getProfile(): Flow<BeetProfile> = beetProfileDao.getProfile()
 
-    fun getAllExercises(): Flow<List<BeetExercise>> = beetExerciseDao.getAllExercises()
+  fun getAllExercises(): Flow<List<BeetExercise>> = beetExerciseDao.getAllExercises()
 
-    fun getAllLogs(): Flow<List<BeetExerciseLog>> = exerciseLogDao.getAllLogs()
+  fun getAllLogs(): Flow<List<BeetExerciseLog>> = exerciseLogDao.getAllLogs()
 
-    fun exerciseLogs(day: Int, exercise: Int) = exerciseLogDao.exerciseLogsFor(day, exercise)
+  fun exerciseLogs(
+      day: Int,
+      exercise: Int,
+  ) = exerciseLogDao.exerciseLogsFor(day, exercise)
 
-    suspend fun insertExercise(exercise: BeetExercise) {
-        beetExerciseDao.insert(exercise)
-    }
+  fun activityGroupsForDay(day: Int) = exerciseLogDao.activityGroupsForDay(day)
 
-    suspend fun deleteExercise(exercise: BeetExercise) {
-        beetExerciseDao.delete(exercise)
-    }
+  suspend fun insertExercise(exercise: BeetExercise) {
+    beetExerciseDao.insert(exercise)
+  }
 
-    suspend fun deleteExercises(exercises: Collection<BeetExercise>) {
-        beetExerciseDao.delete(exercises.toList())
-    }
+  suspend fun deleteExercise(exercise: BeetExercise) {
+    beetExerciseDao.delete(exercise)
+  }
 
-    suspend fun insertLog(log: BeetExerciseLog) {
-        exerciseLogDao.insert(log)
-    }
+  suspend fun deleteExercises(exercises: Collection<BeetExercise>) {
+    beetExerciseDao.delete(exercises.toList())
+  }
 
-    fun logsForDay(day: Int = (Date().time / 86_400_000L).toInt()) = exerciseLogDao.getLogsForDay(day)
-    fun exercisesForDay(day: Int = (Date().time / 86_400_000L).toInt()) = beetExerciseDao.getActiveExercisesForDay(day)
+  suspend fun insertLog(log: BeetExerciseLog) {
+    exerciseLogDao.insert(log)
+  }
 
-    suspend fun deleteLogEntries(exercises: Collection<BeetExerciseLog>) {
-        exerciseLogDao.delete(exercises.toList())
-    }
+  fun logsForDay(day: Int = (Date().time / 86_400_000L).toInt()) = exerciseLogDao.getLogsForDay(day)
+
+  fun exercisesForDay(day: Int = (Date().time / 86_400_000L).toInt()) =
+      beetExerciseDao.getActiveExercisesForDay(day)
+
+  suspend fun deleteLogEntries(exercises: Collection<BeetExerciseLog>) {
+    exerciseLogDao.delete(exercises.toList())
+  }
 }

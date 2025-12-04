@@ -5,80 +5,80 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BeetProfileDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(profile: BeetProfile)
+  @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun insert(profile: BeetProfile)
 
-    @Query("SELECT * FROM BeetProfile LIMIT 1")
-    fun getProfile(): Flow<BeetProfile>
+  @Query("SELECT * FROM BeetProfile LIMIT 1") fun getProfile(): Flow<BeetProfile>
 }
 
 @Dao
 interface BeetExerciseDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(vararg exercises: BeetExercise)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insert(vararg exercises: BeetExercise)
 
-    @Delete
-    suspend fun delete(exercise: BeetExercise)
+  @Delete suspend fun delete(exercise: BeetExercise)
 
-    @Delete
-    suspend fun delete(exercises: List<BeetExercise>)
+  @Delete suspend fun delete(exercises: List<BeetExercise>)
 
-    @Query("SELECT * FROM BeetExercise WHERE id = :id")
-    fun getExercise(id: Int): Flow<BeetExercise>
+  @Query("SELECT * FROM BeetExercise WHERE id = :id") fun getExercise(id: Int): Flow<BeetExercise>
 
-    @Query("SELECT * FROM BeetExercise")
-    fun getAllExercises(): Flow<List<BeetExercise>>
+  @Query("SELECT * FROM BeetExercise") fun getAllExercises(): Flow<List<BeetExercise>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(vararg magnitudes: BeetMagnitude)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insert(vararg magnitudes: BeetMagnitude)
 
-    @Query("SELECT * FROM BeetMagnitude WHERE id = :id")
-    fun getMagnitude(id: Int): Flow<BeetMagnitude>
+  @Query("SELECT * FROM BeetMagnitude WHERE id = :id")
+  fun getMagnitude(id: Int): Flow<BeetMagnitude>
 
-    @Query("SELECT * FROM BeetMagnitude")
-    fun getAllMagnitudes(): Flow<List<BeetMagnitude>>
+  @Query("SELECT * FROM BeetMagnitude") fun getAllMagnitudes(): Flow<List<BeetMagnitude>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(vararg resistances: BeetResistance)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insert(vararg resistances: BeetResistance)
 
-    @Query("SELECT * FROM BeetResistance WHERE id = :id")
-    fun getResistance(id: Int): Flow<BeetResistance>
+  @Query("SELECT * FROM BeetResistance WHERE id = :id")
+  fun getResistance(id: Int): Flow<BeetResistance>
 
-    @Query("SELECT * FROM BeetResistance")
-    fun getAllResistances(): Flow<List<BeetResistance>>
+  @Query("SELECT * FROM BeetResistance") fun getAllResistances(): Flow<List<BeetResistance>>
 
-    @Query(
-        "SELECT * FROM BeetExercise join BeetExerciseLog " +
-                "on BeetExercise.id = BeetExerciseLog.exerciseId " +
-                "where log_day = :day group by exerciseId"
-    )
-    fun getActiveExercisesForDay(day: Int): Flow<List<BeetExercise>>
+  @Query(
+      "SELECT * FROM BeetExercise join BeetExerciseLog " +
+          "on BeetExercise.id = BeetExerciseLog.exerciseId " +
+          "where log_day = :day group by exerciseId",
+  )
+  fun getActiveExercisesForDay(day: Int): Flow<List<BeetExercise>>
 }
 
 @Dao
 interface ExerciseLogDao {
-    @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(vararg logs: BeetExerciseLog)
+  @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insert(vararg logs: BeetExerciseLog)
 
-    @Delete
-    suspend fun delete(activities: List<BeetExerciseLog>)
+  @Delete suspend fun delete(activities: List<BeetExerciseLog>)
 
-    @Query("SELECT * FROM BeetExerciseLog WHERE id = :id")
-    fun getLog(id: Int): Flow<BeetExerciseLog>
+  @Query("SELECT * FROM BeetExerciseLog WHERE id = :id") fun getLog(id: Int): Flow<BeetExerciseLog>
 
-    @Query("SELECT * FROM BeetExerciseLog")
-    fun getAllLogs(): Flow<List<BeetExerciseLog>>
+  @Query("SELECT * FROM BeetExerciseLog") fun getAllLogs(): Flow<List<BeetExerciseLog>>
 
-    @Query("SELECT * FROM BeetExerciseLog where log_day = :day")
-    fun getLogsForDay(day: Int): Flow<List<BeetExerciseLog>>
+  @Query("SELECT * FROM BeetExerciseLog where log_day = :day")
+  fun getLogsForDay(day: Int): Flow<List<BeetExerciseLog>>
 
-    @Query("SELECT * FROM BeetExerciseLog WHERE exerciseId = :exerciseId")
-    fun getLogsForExercise(exerciseId: Int): Flow<List<BeetExerciseLog>>
+  @Query("SELECT * FROM BeetExerciseLog WHERE exerciseId = :exerciseId")
+  fun getLogsForExercise(exerciseId: Int): Flow<List<BeetExerciseLog>>
 
-    @Query("SELECT * FROM BeetExerciseLog WHERE exerciseId = :exercise and log_day = :day")
-    fun exerciseLogsFor(day: Int, exercise: Int): Flow<List<BeetExerciseLog>>
+  @Query("SELECT * FROM BeetExerciseLog WHERE exerciseId = :exercise and log_day = :day")
+  fun exerciseLogsFor(
+      day: Int,
+      exercise: Int,
+  ): Flow<List<BeetExerciseLogEntryExpanded>>
+
+  @Transaction
+  @Query(
+      "SELECT * FROM BeetExercise join BeetExerciseLog " +
+          "on BeetExercise.id = BeetExerciseLog.exerciseId " +
+          "where log_day = :day group by exerciseId",
+  )
+  fun activityGroupsForDay(day: Int): Flow<List<ActivityGroup>>
 }

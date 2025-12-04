@@ -22,15 +22,16 @@ data class BeetResistance(
 )
 
 @Entity(
-    foreignKeys = [
-        ForeignKey(
-            entity = BeetMagnitude::class,
-            parentColumns = ["id"],
-            childColumns = ["magnitude_kind"],
-            onDelete = ForeignKey.CASCADE
-        ),
-    ],
-    indices = [Index(value = ["magnitude_kind"])]
+    foreignKeys =
+        [
+            ForeignKey(
+                entity = BeetMagnitude::class,
+                parentColumns = ["id"],
+                childColumns = ["magnitude_kind"],
+                onDelete = ForeignKey.CASCADE,
+            ),
+        ],
+    indices = [Index(value = ["magnitude_kind"])],
 )
 data class BeetExercise(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
@@ -40,27 +41,27 @@ data class BeetExercise(
 )
 
 /**
- * The kind of resistances that are valid for some exercise can be specified and
- * updated. What this means is that there is a many-to-many relation between the
- * exercises and the various resistance kinds that can be composed for some
- * reified ACTIVITY that appears in the exercise log.
+ * The kind of resistances that are valid for some exercise can be specified and updated. What this
+ * means is that there is a many-to-many relation between the exercises and the various resistance
+ * kinds that can be composed for some reified ACTIVITY that appears in the exercise log.
  */
 @Entity(
     primaryKeys = ["exercise_id", "resistance_kind"],
-    foreignKeys = [
-        ForeignKey(
-            entity = BeetExercise::class,
-            parentColumns = ["id"],
-            childColumns = ["exercise_id"],
-            onDelete = ForeignKey.CASCADE
-        ),
-        ForeignKey(
-            entity = BeetResistance::class,
-            parentColumns = ["id"],
-            childColumns = ["resistance_kind"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ]
+    foreignKeys =
+        [
+            ForeignKey(
+                entity = BeetExercise::class,
+                parentColumns = ["id"],
+                childColumns = ["exercise_id"],
+                onDelete = ForeignKey.CASCADE,
+            ),
+            ForeignKey(
+                entity = BeetResistance::class,
+                parentColumns = ["id"],
+                childColumns = ["resistance_kind"],
+                onDelete = ForeignKey.CASCADE,
+            ),
+        ],
 )
 data class ValidBeetResistances(
     @ColumnInfo(name = "exercise_id") val exerciseInt: Int,
@@ -68,15 +69,16 @@ data class ValidBeetResistances(
 )
 
 @Entity(
-    foreignKeys = [
-        ForeignKey(
-            entity = BeetExercise::class,
-            parentColumns = ["id"],
-            childColumns = ["exerciseId"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ],
-    indices = [Index(value = ["exerciseId"])]
+    foreignKeys =
+        [
+            ForeignKey(
+                entity = BeetExercise::class,
+                parentColumns = ["id"],
+                childColumns = ["exerciseId"],
+                onDelete = ForeignKey.CASCADE,
+            ),
+        ],
+    indices = [Index(value = ["exerciseId"])],
 )
 data class BeetExerciseLog(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
@@ -91,14 +93,15 @@ data class BeetExerciseLog(
 
 @Entity(
     primaryKeys = ["activity_id", "resistance_kind"],
-    foreignKeys = [
-        ForeignKey(
-            entity = BeetExerciseLog::class,
-            parentColumns = ["id"],
-            childColumns = ["activity_id"],
-            onDelete = ForeignKey.CASCADE,
-        )
-    ]
+    foreignKeys =
+        [
+            ForeignKey(
+                entity = BeetExerciseLog::class,
+                parentColumns = ["id"],
+                childColumns = ["activity_id"],
+                onDelete = ForeignKey.CASCADE,
+            ),
+        ],
 )
 data class BeetActivityResistance(
     @ColumnInfo(name = "activity_id") val activityId: Int,

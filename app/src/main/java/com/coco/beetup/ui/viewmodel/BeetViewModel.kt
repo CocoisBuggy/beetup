@@ -8,41 +8,44 @@ import com.coco.beetup.core.data.BeetExerciseLog
 import com.coco.beetup.core.data.BeetRepository
 import kotlinx.coroutines.launch
 
-class BeetViewModel(private val repository: BeetRepository) : ViewModel() {
-    val profile = repository.getProfile()
-    val allExercises = repository.getAllExercises()
-    val allLogs = repository.getAllLogs()
-    val todaysLogs = repository.logsForDay()
-    val todaysExercise = repository.exercisesForDay()
-    fun exerciseLogs(day: Int, exercise: Int) = repository.exerciseLogs(day, exercise)
+class BeetViewModel(
+    private val repository: BeetRepository,
+) : ViewModel() {
+  val profile = repository.getProfile()
+  val allExercises = repository.getAllExercises()
+  val allLogs = repository.getAllLogs()
+  val todaysLogs = repository.logsForDay()
 
-    fun insertExercise(exercise: BeetExercise) = viewModelScope.launch {
-        repository.insertExercise(exercise)
-    }
+  fun exerciseLogs(
+      day: Int,
+      exercise: Int,
+  ) = repository.exerciseLogs(day, exercise)
 
-    fun insertActivity(activity: BeetExerciseLog) = viewModelScope.launch {
-        repository.insertLog(activity)
-    }
+  fun insertExercise(exercise: BeetExercise) =
+      viewModelScope.launch { repository.insertExercise(exercise) }
 
-    fun deleteExercise(exercise: BeetExercise) = viewModelScope.launch {
-        repository.deleteExercise(exercise)
-    }
+  fun insertActivity(activity: BeetExerciseLog) =
+      viewModelScope.launch { repository.insertLog(activity) }
 
-    fun deleteExercises(exercises: Collection<BeetExercise>) = viewModelScope.launch {
-        repository.deleteExercises(exercises)
-    }
+  fun deleteExercise(exercise: BeetExercise) =
+      viewModelScope.launch { repository.deleteExercise(exercise) }
 
-    fun deleteActivity(exercises: Collection<BeetExerciseLog>) = viewModelScope.launch {
-        repository.deleteLogEntries(exercises)
-    }
+  fun deleteExercises(exercises: Collection<BeetExercise>) =
+      viewModelScope.launch { repository.deleteExercises(exercises) }
+
+  fun deleteActivity(exercises: Collection<BeetExerciseLog>) =
+      viewModelScope.launch { repository.deleteLogEntries(exercises) }
+
+  fun activityGroupsForDay(day: Int) = repository.activityGroupsForDay(day)
 }
 
-class BeetViewModelFactory(private val repository: BeetRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(BeetViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return BeetViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
+class BeetViewModelFactory(
+    private val repository: BeetRepository,
+) : ViewModelProvider.Factory {
+  override fun <T : ViewModel> create(modelClass: Class<T>): T {
+    if (modelClass.isAssignableFrom(BeetViewModel::class.java)) {
+      @Suppress("UNCHECKED_CAST") return BeetViewModel(repository) as T
     }
+    throw IllegalArgumentException("Unknown ViewModel class")
+  }
 }

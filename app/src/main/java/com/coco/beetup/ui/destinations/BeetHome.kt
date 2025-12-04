@@ -28,7 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.coco.beetup.R
-import com.coco.beetup.core.data.BeetExercise
+import com.coco.beetup.core.data.ActivityGroup
 import com.coco.beetup.core.data.BeetExerciseLog
 import com.coco.beetup.ui.components.CategorySelectionDialog
 import com.coco.beetup.ui.components.DeletableExerciseEntry
@@ -40,107 +40,107 @@ import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BeetHome(nav: NavHostController, viewModel: BeetViewModel) {
-    val day = (Date().time / 86_400_000L).toInt()
-    val exerciseCategories by viewModel.allExercises.collectAsState(initial = emptyList())
-    val todaysExercise by viewModel.todaysExercise.collectAsState(initial = emptyList())
+fun BeetHome(
+    nav: NavHostController,
+    viewModel: BeetViewModel,
+) {
+  val day = (Date().time / 86_400_000L).toInt()
+  val exerciseCategories by viewModel.allExercises.collectAsState(initial = emptyList())
+  val todaysExercise by viewModel.activityGroupsForDay(day).collectAsState(initial = emptyList())
 
-    var selectedItems by remember { mutableStateOf<Set<BeetExercise>>(emptySet()) }
-    var multiSelectionEnabled by remember { mutableStateOf(false) }
-    var showCategoryDialog by remember { mutableStateOf(false) }
+  var editMode by remember { mutableStateOf(false) }
+  var selectedItems by remember { mutableStateOf<Set<ActivityGroup>>(emptySet()) }
+  var multiSelectionEnabled by remember { mutableStateOf(false) }
+  var showCategoryDialog by remember { mutableStateOf(false) }
 
+  val onDeleteSelected = {
+    // when we delete our selected items we delete all logs for exercise of <day>
+    // with exercise id <selected.exerciseId>
+    // viewModel.deleteActivity(selectedItems)
+    selectedItems = emptySet()
+    multiSelectionEnabled = false
+  }
 
-    val onDeleteSelected = {
-        // when we delete our selected items we delete all logs for exercise of <day>
-        // with exercise id <selected.exerciseId>
-        // viewModel.deleteActivity(selectedItems)
-        selectedItems = emptySet()
-        multiSelectionEnabled = false
-    }
-
-    if (showCategoryDialog) {
-        CategorySelectionDialog(
-            categories = exerciseCategories,
-            onCategorySelected = { category ->
-                val newExercise = BeetExerciseLog(
-                    id = 0,
-                    exerciseId = category.id,
-                )
-                viewModel.insertActivity(newExercise)
-                showCategoryDialog = false
-            },
-            onDismiss = { showCategoryDialog = false }
-        )
-    }
-
-    Scaffold(
-        topBar = {
-            if (multiSelectionEnabled) {
-                SelectionAppBar(
-                    selectedItemCount = selectedItems.size,
-                    onClearSelection = {
-                        selectedItems = emptySet()
-                        multiSelectionEnabled = false
-                    },
-                    onDeleteSelected = onDeleteSelected
-                )
-            } else {
-                TopAppBar(
-                    title = { Text(stringResource(id = R.string.todays_activity)) }
-                )
-            }
+  if (showCategoryDialog) {
+    CategorySelectionDialog(
+        categories = exerciseCategories,
+        onCategorySelected = { category ->
+          val newExercise =
+              BeetExerciseLog(
+                  id = 0,
+                  exerciseId = category.id,
+              )
+          viewModel.insertActivity(newExercise)
+          showCategoryDialog = false
         },
-        floatingActionButton = {
-            if (!multiSelectionEnabled && selectedItems.isNotEmpty()) {
-                AnimatedVisibility(
-                    visible = true,
-                    enter = slideInHorizontally { it } + fadeIn(),
-                    exit = slideOutHorizontally { it } + fadeOut()
-                ) {
-                    FloatingActivityToolbar()
-                }
-            } else {
-                FloatingActionButton(onClick = { showCategoryDialog = true }) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(id = R.string.add_exercise_entry)
-                    )
-                }
-            }
-        },
-    ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp)
-        ) {
-            item {
-                WelcomeCard(nav)
-            }
+        onDismiss = { showCategoryDialog = false },
+    )
+  }
 
-            items(todaysExercise, key = { it.id }) { item ->
-                val isSelected = item in selectedItems
-
-                DeletableExerciseEntry(
-                    viewModel = viewModel,
-                    day = day,
-                    item = item,
-                    isSelected = isSelected,
-                    onToggleSelection = {
-                        selectedItems = if (multiSelectionEnabled) {
-                            if (isSelected) {
-                                selectedItems - item
-                            } else {
-                                selectedItems + item
-                            }
-                        } else {
-                            if (item in selectedItems) emptySet() else setOf(item)
-                        }
-                    },
-                    onToggleMultiSelection = { multiSelectionEnabled = !multiSelectionEnabled },
-                )
-            }
+  Scaffold(
+      topBar = {
+        if (multiSelectionEnabled) {
+          SelectionAppBar(
+              selectedItemCount = selectedItems.size,
+              onClearSelection = {
+                selectedItems = emptySet()
+                multiSelectionEnabled = false
+              },
+              onDeleteSelected = onDeleteSelected,
+          )
+        } else {
+          TopAppBar(
+              title = { Text(stringResource(id = R.string.todays_activity)) },
+          )
         }
+      },
+      floatingActionButton = {
+        if (!multiSelectionEnabled && selectedItems.isNotEmpty()) {
+          AnimatedVisibility(
+              visible = true,
+              enter = slideInHorizontally { it } + fadeIn(),
+              exit = slideOutHorizontally { it } + fadeOut(),
+          ) {
+            FloatingActivityToolbar({ editMode = !editMode }, editMode)
+          }
+        } else {
+          FloatingActionButton(onClick = { showCategoryDialog = true }) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = stringResource(id = R.string.add_exercise_entry),
+            )
+          }
+        }
+      },
+  ) { innerPadding ->
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 16.dp),
+    ) {
+      item { WelcomeCard(nav) }
+
+      items(todaysExercise, key = { it.exercise.id }) { item ->
+        val isSelected = item in selectedItems
+
+        DeletableExerciseEntry(
+            viewModel = viewModel,
+            day = day,
+            item = item,
+            isSelected = isSelected,
+            onToggleSelection = {
+              selectedItems =
+                  if (multiSelectionEnabled) {
+                    if (isSelected) {
+                      selectedItems - item
+                    } else {
+                      selectedItems + item
+                    }
+                  } else {
+                    if (item in selectedItems) emptySet() else setOf(item)
+                  }
+            },
+            onToggleMultiSelection = { multiSelectionEnabled = !multiSelectionEnabled },
+        )
+      }
     }
+  }
 }

@@ -1,14 +1,13 @@
 package com.coco.beetup.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -18,8 +17,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.coco.beetup.core.data.BeetExercise
+import com.coco.beetup.core.data.ActivityGroup
 import com.coco.beetup.core.data.BeetExerciseLog
 import com.coco.beetup.ui.viewmodel.BeetViewModel
 import java.util.Date
@@ -29,15 +29,29 @@ import java.util.Date
 fun ActivityEntry(
     viewModel: BeetViewModel,
     day: Int,
-    item: BeetExercise,
+    activity: ActivityGroup,
     isSelected: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val logs by viewModel.exerciseLogs(day, item.id).collectAsState(initial = emptyList())
+    val logs by viewModel.exerciseLogs(day, activity.exercise.id).collectAsState(initial = emptyList())
 
     ListItem(
-        headlineContent = { Text("${item.exerciseName}") },
-        supportingContent = { Text("${logs.size} sets") },
+        headlineContent = { Text("${activity.exercise.exerciseName}") },
+        supportingContent = {
+            Column {
+                Text("${logs.size} sets")
+
+                AnimatedVisibility(isSelected) {
+                    Column {
+                        for (log in logs) {
+                            ListItem(
+                                headlineContent = { Text("${log.record.magnitude}") }
+                            )
+                        }
+                    }
+                }
+            }
+        },
         leadingContent = {
             Icon(
                 Icons.Default.FitnessCenter,
@@ -48,7 +62,11 @@ fun ActivityEntry(
             AnimatedVisibility(isSelected) {
                 FilledTonalButton(
                     onClick = {
-                        viewModel.insertActivity(logs.last().copy(id = 0, logDate = Date()))
+                        if (logs.isNotEmpty()) {
+                            viewModel.insertActivity(logs.last().record.copy(id = 0, logDate = Date()))
+                        } else {
+                            viewModel.insertActivity(BeetExerciseLog(exerciseId = activity.exercise.id, logDate = Date()))
+                        }
                     }
                 ) {
                     Text("+1")
@@ -56,14 +74,15 @@ fun ActivityEntry(
             }
         },
         colors = ListItemDefaults.colors(
-            containerColor = if (isSelected) {
-                MaterialTheme.colorScheme.primaryContainer
-            } else {
-                MaterialTheme.colorScheme.surfaceContainerHigh
-            }
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
         ),
         modifier = modifier
             .padding(vertical = 4.dp)
             .clip(MaterialTheme.shapes.medium)
+            .border(
+                width = 1.dp,
+                color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                shape = MaterialTheme.shapes.medium
+            )
     )
 }

@@ -11,4 +11,4 @@ data class BeetProfile(
     @ColumnInfo(name = "weight") val weight: Int,
     @ColumnInfo(name = "height") val height: Int,
     @ColumnInfo(name = "birth_year") val birthYear: Int,
-    )
+)

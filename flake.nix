@@ -30,6 +30,7 @@
             android-studio
             gradle
             git
+            ktfmt
           ];
 
           shellHook = ''

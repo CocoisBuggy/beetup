@@ -17,25 +17,26 @@ import androidx.compose.runtime.Composable
 fun SelectionAppBar(
     selectedItemCount: Int,
     onClearSelection: () -> Unit,
-    onDeleteSelected: () -> Unit
+    onDeleteSelected: () -> Unit,
 ) {
-    TopAppBar(
-        title = { Text("$selectedItemCount selected") },
-        navigationIcon = {
-            IconButton(onClick = onClearSelection) {
-                Icon(Icons.Default.Close, contentDescription = "Clear selection")
-            }
-        },
-        actions = {
-            IconButton(onClick = onDeleteSelected) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete selected items")
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-        )
-    )
+  TopAppBar(
+      title = { Text("$selectedItemCount selected") },
+      navigationIcon = {
+        IconButton(onClick = onClearSelection) {
+          Icon(Icons.Default.Close, contentDescription = "Clear selection")
+        }
+      },
+      actions = {
+        IconButton(onClick = onDeleteSelected) {
+          Icon(Icons.Default.Delete, contentDescription = "Delete selected items")
+        }
+      },
+      colors =
+          TopAppBarDefaults.topAppBarColors(
+              containerColor = MaterialTheme.colorScheme.primaryContainer,
+              titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+              actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+              navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+          ),
+  )
 }

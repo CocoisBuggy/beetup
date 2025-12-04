@@ -23,43 +23,40 @@ import com.coco.beetup.core.data.BeetExercise
 fun CategorySelectionDialog(
     categories: List<BeetExercise>,
     onCategorySelected: (BeetExercise) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
-    var searchQuery by remember { mutableStateOf("") }
-    val filteredCategories = if (searchQuery.isBlank()) {
+  var searchQuery by remember { mutableStateOf("") }
+  val filteredCategories =
+      if (searchQuery.isBlank()) {
         categories
-    } else {
+      } else {
         categories.filter { it.exerciseName.contains(searchQuery, ignoreCase = true) }
-    }
+      }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Select Exercise") },
-        text = {
-            Column {
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    label = { Text("Search") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                LazyColumn {
-                    items(filteredCategories) { category ->
-                        Text(
-                            text = category.exerciseName,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onCategorySelected(category) }
-                                .padding(16.dp)
-                        )
-                    }
-                }
+  AlertDialog(
+      onDismissRequest = onDismiss,
+      title = { Text("Select Exercise") },
+      text = {
+        Column {
+          OutlinedTextField(
+              value = searchQuery,
+              onValueChange = { searchQuery = it },
+              label = { Text("Search") },
+              modifier = Modifier.fillMaxWidth(),
+          )
+          LazyColumn {
+            items(filteredCategories) { category ->
+              Text(
+                  text = category.exerciseName,
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .clickable { onCategorySelected(category) }
+                          .padding(16.dp),
+              )
             }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
-            }
+          }
         }
-    )
+      },
+      confirmButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+  )
 }

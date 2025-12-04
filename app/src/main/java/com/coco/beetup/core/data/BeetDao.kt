@@ -50,15 +50,22 @@ interface BeetExerciseDao {
           "where log_day = :day group by exerciseId",
   )
   fun getActiveExercisesForDay(day: Int): Flow<List<BeetExercise>>
+
+  @Query(
+      "SELECT * FROM ValidBeetResistances " +
+          " JOIN BeetResistance ON ValidBeetResistances.resistance_kind = BeetResistance.id" +
+          " WHERE exercise_id = :exercise")
+  fun validResistancesFor(exercise: Int): Flow<List<BeetResistance>>
 }
 
 @Dao
 interface ExerciseLogDao {
-  @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insert(vararg logs: BeetExerciseLog)
+  @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insert(logs: BeetExerciseLog): Long
 
   @Delete suspend fun delete(activities: List<BeetExerciseLog>)
 
-  @Query("SELECT * FROM BeetExerciseLog WHERE id = :id") fun getLog(id: Int): Flow<BeetExerciseLog>
+  @Query("SELECT * FROM BeetExerciseLog WHERE id = :id")
+  fun getLog(id: Int): Flow<BeetExerciseLog>
 
   @Query("SELECT * FROM BeetExerciseLog") fun getAllLogs(): Flow<List<BeetExerciseLog>>
 
@@ -72,7 +79,7 @@ interface ExerciseLogDao {
   fun exerciseLogsFor(
       day: Int,
       exercise: Int,
-  ): Flow<List<BeetExerciseLogEntryExpanded>>
+  ): Flow<List<BeetExerciseLogWithResistances>>
 
   @Transaction
   @Query(
@@ -81,4 +88,7 @@ interface ExerciseLogDao {
           "where log_day = :day group by exerciseId",
   )
   fun activityGroupsForDay(day: Int): Flow<List<ActivityGroup>>
+
+  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  suspend fun insert(vararg resistances: BeetActivityResistance)
 }

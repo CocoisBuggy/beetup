@@ -62,9 +62,10 @@ data class BeetExercise(
                 onDelete = ForeignKey.CASCADE,
             ),
         ],
+    indices = [Index(value = ["resistance_kind"])],
 )
 data class ValidBeetResistances(
-    @ColumnInfo(name = "exercise_id") val exerciseInt: Int,
+    @ColumnInfo(name = "exercise_id") val exerciseId: Int,
     @ColumnInfo(name = "resistance_kind") val resistanceKind: Int,
 )
 
@@ -101,7 +102,14 @@ data class BeetExerciseLog(
                 childColumns = ["activity_id"],
                 onDelete = ForeignKey.CASCADE,
             ),
+            ForeignKey(
+                entity = BeetResistance::class,
+                parentColumns = ["id"],
+                childColumns = ["resistance_kind"],
+                onDelete = ForeignKey.CASCADE,
+            ),
         ],
+    indices = [Index(value = ["resistance_kind"])],
 )
 data class BeetActivityResistance(
     @ColumnInfo(name = "activity_id") val activityId: Int,

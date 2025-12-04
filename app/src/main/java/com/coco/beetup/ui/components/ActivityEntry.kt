@@ -24,7 +24,6 @@ import com.coco.beetup.core.data.BeetExerciseLog
 import com.coco.beetup.ui.viewmodel.BeetViewModel
 import java.util.Date
 
-
 @Composable
 fun ActivityEntry(
     viewModel: BeetViewModel,
@@ -33,56 +32,48 @@ fun ActivityEntry(
     isSelected: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val logs by viewModel.exerciseLogs(day, activity.exercise.id).collectAsState(initial = emptyList())
+  val logs by
+      viewModel.exerciseLogs(day, activity.exercise.id).collectAsState(initial = emptyList())
 
-    ListItem(
-        headlineContent = { Text("${activity.exercise.exerciseName}") },
-        supportingContent = {
+  ListItem(
+      headlineContent = { Text("${activity.exercise.exerciseName}") },
+      supportingContent = {
+        Column {
+          Text("${logs.size} sets")
+
+          AnimatedVisibility(isSelected) {
             Column {
-                Text("${logs.size} sets")
-
-                AnimatedVisibility(isSelected) {
-                    Column {
-                        for (log in logs) {
-                            ListItem(
-                                headlineContent = { Text("${log.record.magnitude}") }
-                            )
-                        }
-                    }
-                }
+              for (log in logs) {
+                ListItem(headlineContent = { Text("${log.log.magnitude}") })
+              }
             }
-        },
-        leadingContent = {
-            Icon(
-                Icons.Default.FitnessCenter,
-                contentDescription = "Exercise Icon"
-            )
-        },
-        trailingContent = {
-            AnimatedVisibility(isSelected) {
-                FilledTonalButton(
-                    onClick = {
-                        if (logs.isNotEmpty()) {
-                            viewModel.insertActivity(logs.last().record.copy(id = 0, logDate = Date()))
-                        } else {
-                            viewModel.insertActivity(BeetExerciseLog(exerciseId = activity.exercise.id, logDate = Date()))
-                        }
-                    }
-                ) {
-                    Text("+1")
+          }
+        }
+      },
+      leadingContent = { Icon(Icons.Default.FitnessCenter, contentDescription = "Exercise Icon") },
+      trailingContent = {
+        AnimatedVisibility(isSelected) {
+          FilledTonalButton(
+              onClick = {
+                if (logs.isNotEmpty()) {
+                  viewModel.insertActivity(logs.last().log.copy(id = 0, logDate = Date()))
+                } else {
+                  viewModel.insertActivity(
+                      BeetExerciseLog(exerciseId = activity.exercise.id, logDate = Date()))
                 }
-            }
-        },
-        colors = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-        ),
-        modifier = modifier
-            .padding(vertical = 4.dp)
-            .clip(MaterialTheme.shapes.medium)
-            .border(
-                width = 1.dp,
-                color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
-                shape = MaterialTheme.shapes.medium
-            )
-    )
+              }) {
+                Text("+1")
+              }
+        }
+      },
+      colors =
+          ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+      modifier =
+          modifier
+              .padding(vertical = 4.dp)
+              .clip(MaterialTheme.shapes.medium)
+              .border(
+                  width = 1.dp,
+                  color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                  shape = MaterialTheme.shapes.medium))
 }

@@ -19,7 +19,11 @@ class BeetRepository(
       exercise: Int,
   ) = exerciseLogDao.exerciseLogsFor(day, exercise)
 
+  fun getMagnitude(id: Int) = beetExerciseDao.getMagnitude(id)
+
   fun activityGroupsForDay(day: Int) = exerciseLogDao.activityGroupsForDay(day)
+
+  fun allResistances() = beetExerciseDao.getAllResistances()
 
   suspend fun insertExercise(exercise: BeetExercise) {
     beetExerciseDao.insert(exercise)
@@ -33,8 +37,12 @@ class BeetRepository(
     beetExerciseDao.delete(exercises.toList())
   }
 
-  suspend fun insertLog(log: BeetExerciseLog) {
-    exerciseLogDao.insert(log)
+  suspend fun insertLog(log: BeetExerciseLog): Int {
+    return exerciseLogDao.insert(log).toInt()
+  }
+
+  suspend fun insertResistances(resistances: List<BeetActivityResistance>) {
+    exerciseLogDao.insert(*resistances.toTypedArray())
   }
 
   fun logsForDay(day: Int = (Date().time / 86_400_000L).toInt()) = exerciseLogDao.getLogsForDay(day)
@@ -45,4 +53,6 @@ class BeetRepository(
   suspend fun deleteLogEntries(exercises: Collection<BeetExerciseLog>) {
     exerciseLogDao.delete(exercises.toList())
   }
+
+  fun validResistancesFor(exercise: Int) = beetExerciseDao.validResistancesFor(exercise)
 }

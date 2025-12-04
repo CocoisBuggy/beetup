@@ -2,78 +2,38 @@ package com.coco.beetup
 
 import android.app.Application
 import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.coco.beetup.core.data.BeetData
-import com.coco.beetup.core.data.BeetExercise
-import com.coco.beetup.core.data.BeetMagnitude
 import com.coco.beetup.core.data.BeetRepository
-import com.coco.beetup.core.data.BeetResistance
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 class BeetupApplication : Application() {
-  private val applicationScope = CoroutineScope(SupervisorJob())
 
   val database: BeetData by lazy {
-    val db =
-        Room.databaseBuilder(
-                applicationContext,
-                BeetData::class.java,
-                "beet_database",
-            )
-            .build()
-
-    applicationScope.launch {
-      db.beetExerciseDao()
-          .insert(
-              BeetMagnitude(1, "Reps", "Number of repetitions"),
-              BeetMagnitude(2, "Distance", "Distance in meters"),
-              BeetMagnitude(3, "Time", "Time in seconds"),
-          )
-      db.beetExerciseDao()
-          .insert(
-              BeetResistance(
-                  1,
-                  "Overhang",
-                  "Some overhang expressed in degrees where 0 degrees is flat on the floor",
-              ),
-              BeetResistance(
-                  2,
-                  "Grams",
-                  "Additional weight in the form of some number of grams",
-              ),
-              BeetResistance(3, "Elastic", "Elastic of some resistance factor"),
-          )
-      db.beetExerciseDao()
-          .insert(
-              BeetExercise(
-                  0,
-                  "Pull Up",
-                  "Pull up exercise",
-                  magnitudeKind = 1,
-              ),
-              BeetExercise(
-                  0,
-                  "Push Up",
-                  "Push up exercise",
-                  magnitudeKind = 1,
-              ),
-              BeetExercise(
-                  0,
-                  "Right hand max edge",
-                  "Using an an edge and chalk, lift the weight",
-                  magnitudeKind = 1,
-              ),
-              BeetExercise(
-                  0,
-                  "Left hand max edge",
-                  "Using an an edge and chalk, lift the weight",
-                  magnitudeKind = 1,
-              ),
-          )
-    }
-
-    return@lazy db
+    Room.databaseBuilder(
+            applicationContext,
+            BeetData::class.java,
+            "beet_database",
+        )
+        .addCallback(
+            object : RoomDatabase.Callback() {
+              override fun onCreate(db: SupportSQLiteDatabase) {
+                super.onCreate(db)
+                // Read and execute SQL statements from the raw resource file
+                val inputStream = resources.openRawResource(R.raw.defaults)
+                val reader = BufferedReader(InputStreamReader(inputStream))
+                reader.useLines { lines ->
+                  lines.forEach { line ->
+                    if (line.isNotBlank()) {
+                      db.execSQL(line)
+                    }
+                  }
+                }
+              }
+            })
+        .build()
   }
 
   val repository: BeetRepository by lazy {

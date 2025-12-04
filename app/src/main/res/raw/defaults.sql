@@ -1,0 +1,10 @@
+INSERT INTO BeetMagnitude VALUES(1, 'Reps', 'Number of repetitions');
+INSERT INTO BeetMagnitude VALUES(2, 'Distance', 'Distance in meters');
+INSERT INTO BeetMagnitude VALUES(3, 'Time', 'Time in seconds');
+INSERT INTO BeetResistance VALUES(1, 'Overhang', 'Some overhang expressed in degrees where 0 degrees is flat on the floor');
+INSERT INTO BeetResistance VALUES(2, 'Grams', 'Additional weight in the form of some number of grams');
+INSERT INTO BeetResistance VALUES(3, 'Elastic', 'Elastic of some resistance factor');
+INSERT INTO BeetExercise VALUES(1, 'Pull Up', 'Pull up exercise', 1);
+INSERT INTO BeetExercise VALUES(2, 'Push Up', 'Push up exercise', 1);
+INSERT INTO BeetExercise VALUES(3, 'Right hand max edge', 'Using an an edge and chalk, lift the weight', 1);
+INSERT INTO BeetExercise VALUES(4, 'Left hand max edge', 'Using an an edge and chalk, lift the weight', 1);

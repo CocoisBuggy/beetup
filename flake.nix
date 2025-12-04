@@ -31,6 +31,7 @@
             gradle
             git
             ktfmt
+            sqlitebrowser
           ];
 
           shellHook = ''

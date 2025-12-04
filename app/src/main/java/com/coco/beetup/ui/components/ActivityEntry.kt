@@ -39,12 +39,33 @@ fun ActivityEntry(
       headlineContent = { Text("${activity.exercise.exerciseName}") },
       supportingContent = {
         Column {
-          Text("${logs.size} sets")
+            var text = "${logs.size} sets"
+
+            if (logs.isNotEmpty()) {
+                text += ", ${logs.first().log.magnitude} ${activity.magnitude.name}"
+            }
+
+            Text(text)
 
           AnimatedVisibility(isSelected) {
             Column {
-              for (log in logs) {
-                ListItem(headlineContent = { Text("${log.log.magnitude}") })
+              for (logEntry in logs) {
+                val resistances =
+                    logEntry.resistances.joinToString(separator = ", ") {
+                      "${it.entry.resistanceValue} ${it.extra.name}"
+                    }
+                ListItem(
+                    headlineContent = {
+                      Text(
+                          text = "${activity.magnitude.name}: ${logEntry.log.magnitude}",
+                          style = MaterialTheme.typography.bodyLarge)
+                    },
+                    supportingContent =
+                        if (resistances.isNotEmpty()) {
+                          { Text(text = resistances, style = MaterialTheme.typography.bodySmall) }
+                        } else null,
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    modifier = Modifier.padding(start = 16.dp))
               }
             }
           }

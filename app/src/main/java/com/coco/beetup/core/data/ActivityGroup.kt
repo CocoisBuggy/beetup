@@ -1,21 +1,21 @@
 package com.coco.beetup.core.data
 
 import androidx.room.Embedded
-import androidx.room.Junction
 import androidx.room.Relation
+
+data class BeetExpandedResistance(
+    @Embedded val entry: BeetActivityResistance,
+    @Relation(parentColumn = "resistance_kind", entityColumn = "id") val extra: BeetResistance
+)
 
 data class BeetExerciseLogWithResistances(
     @Embedded val log: BeetExerciseLog,
     @Relation(
-        entity = BeetResistance::class,
+        entity = BeetActivityResistance::class,
         parentColumn = "id",
-        entityColumn = "id",
-        associateBy =
-            Junction(
-                value = BeetActivityResistance::class,
-                parentColumn = "activity_id",
-                entityColumn = "resistance_kind"))
-    val resistances: List<BeetResistance>
+        entityColumn = "resistance_kind",
+    )
+    val resistances: List<BeetExpandedResistance>
 )
 
 data class ActivityGroup(

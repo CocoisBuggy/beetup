@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,7 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.coco.beetup.R
-import com.coco.beetup.core.data.ActivityGroup
+import com.coco.beetup.core.data.ActivityKey
 import com.coco.beetup.core.data.BeetActivityResistance
 import com.coco.beetup.core.data.BeetExercise
 import com.coco.beetup.core.data.BeetExerciseLog
@@ -44,17 +45,24 @@ fun BeetHome(
   val todaysActivity by viewModel.activityGroupsForDay(day).collectAsState(initial = emptyList())
 
   var editMode by remember { mutableStateOf(false) }
-  var selectedItems by remember { mutableStateOf<Set<ActivityGroup>>(emptySet()) }
+  var selectedItems by remember { mutableStateOf<Set<ActivityKey>>(emptySet()) }
   var multiSelectionEnabled by remember { mutableStateOf(false) }
   var showCategoryDialog by remember { mutableStateOf(false) }
   var selectedExerciseForEntry by remember { mutableStateOf<BeetExercise?>(null) }
   var magnitudeForEntry by remember { mutableStateOf<Int?>(null) }
+  val selectedActivityGroups by
+      remember(todaysActivity, selectedItems) {
+        derivedStateOf {
+          todaysActivity.filter { it.key in selectedItems }.toSet()
+        }
+      }
 
   val onDeleteSelected = {
-    Log.i("BeetHome", "Deleting ${selectedItems.size} items")
-    Log.d("BeetHome", "Deleting $selectedItems")
+    val itemsToDelete = todaysActivity.filter { it.key in selectedItems }
+    Log.i("BeetHome", "Deleting ${itemsToDelete.size} items")
+    Log.d("BeetHome", "Deleting $itemsToDelete")
 
-    viewModel.deleteActivity(selectedItems.flatMap { outer -> outer.logs.map { it.log } })
+    viewModel.deleteActivity(itemsToDelete.flatMap { outer -> outer.logs.map { it.log } })
     selectedItems = emptySet()
     multiSelectionEnabled = false
   }
@@ -130,7 +138,7 @@ fun BeetHome(
       floatingActionButton = {
         if (!multiSelectionEnabled) {
           MorphFab(
-              selectedItems = selectedItems,
+              selectedItems = selectedActivityGroups,
               editMode = editMode,
               multiSelectionEnabled = multiSelectionEnabled,
               onAddActivityClick = { showCategoryDialog = true },
@@ -138,8 +146,7 @@ fun BeetHome(
               onDeleteSelected = onDeleteSelected,
               onBifurcate = {},
               onMinus = {
-                selectedItems.forEach {
-                  // Pop the last-added item item off
+                  selectedActivityGroups.forEach {
                   it.logs.lastOrNull()?.let { last -> viewModel.deleteActivity(listOf(last.log)) }
                 }
               },
@@ -151,7 +158,7 @@ fun BeetHome(
         modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 16.dp),
     ) {
       items(todaysActivity) { item ->
-        val isSelected = item in selectedItems
+        val isSelected = item.key in selectedItems
 
         DeletableExerciseEntry(
             viewModel = viewModel,
@@ -161,12 +168,12 @@ fun BeetHome(
               selectedItems =
                   if (multiSelectionEnabled) {
                     if (isSelected) {
-                      selectedItems - item
+                      selectedItems - item.key
                     } else {
-                      selectedItems + item
+                      selectedItems + item.key
                     }
                   } else {
-                    if (item in selectedItems) emptySet() else setOf(item)
+                    if (item.key in selectedItems) emptySet() else setOf(item.key)
                   }
             },
             onToggleMultiSelection = { multiSelectionEnabled = !multiSelectionEnabled },

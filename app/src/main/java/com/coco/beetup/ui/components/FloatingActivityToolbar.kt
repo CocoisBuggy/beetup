@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 fun FloatingActivityToolbar(
     onEditModeToggle: () -> Unit,
     editMode: Boolean,
+    onDeleteSelected: () -> Unit,
 ) {
   Row(verticalAlignment = Alignment.CenterVertically) {
     if (editMode) {
@@ -38,6 +39,6 @@ fun FloatingActivityToolbar(
         color = MaterialTheme.colorScheme.onTertiary,
     )
     Spacer(Modifier.width(8.dp))
-    IconButton(onClick = { /* TODO: Handle Delete */ }) { Icon(Icons.Default.Delete, "Delete") }
+    IconButton(onClick = onDeleteSelected) { Icon(Icons.Default.Delete, "Delete") }
   }
 }

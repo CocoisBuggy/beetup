@@ -1,5 +1,6 @@
 package com.coco.beetup.ui.destinations
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -50,6 +51,9 @@ fun BeetHome(
   var magnitudeForEntry by remember { mutableStateOf<Int?>(null) }
 
   val onDeleteSelected = {
+    Log.i("BeetHome", "Deleting ${selectedItems.size} items")
+    Log.d("BeetHome", "Deleting $selectedItems")
+
     viewModel.deleteActivity(selectedItems.flatMap { outer -> outer.logs.map { it.log } })
     selectedItems = emptySet()
     multiSelectionEnabled = false
@@ -124,13 +128,16 @@ fun BeetHome(
         }
       },
       floatingActionButton = {
-        MorphFab(
-            selectedItems = selectedItems,
-            editMode = editMode,
-            multiSelectionEnabled = multiSelectionEnabled,
-            onAddActivityClick = { showCategoryDialog = true },
-            onEditModeToggle = { editMode = !editMode },
-        )
+        if (!multiSelectionEnabled) {
+          MorphFab(
+              selectedItems = selectedItems,
+              editMode = editMode,
+              multiSelectionEnabled = multiSelectionEnabled,
+              onAddActivityClick = { showCategoryDialog = true },
+              onEditModeToggle = { editMode = !editMode },
+              onDeleteSelected = onDeleteSelected
+          )
+        }
       },
   ) { innerPadding ->
     LazyColumn(

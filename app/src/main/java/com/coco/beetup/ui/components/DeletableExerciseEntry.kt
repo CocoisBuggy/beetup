@@ -23,7 +23,10 @@ fun DeletableExerciseEntry(
       modifier =
           Modifier.combinedClickable(
               onClick = { onToggleSelection() },
-              onLongClick = { onToggleMultiSelection() },
+              onLongClick = {
+                onToggleMultiSelection()
+                onToggleSelection()
+              },
           ),
   )
 }

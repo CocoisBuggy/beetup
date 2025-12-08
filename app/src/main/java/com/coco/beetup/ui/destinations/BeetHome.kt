@@ -135,7 +135,13 @@ fun BeetHome(
               multiSelectionEnabled = multiSelectionEnabled,
               onAddActivityClick = { showCategoryDialog = true },
               onEditModeToggle = { editMode = !editMode },
-              onDeleteSelected = onDeleteSelected
+              onDeleteSelected = onDeleteSelected,
+              onBifurcate = {},
+              onMinus = {
+                selectedItems.forEach {
+                  it.logs.lastOrNull()?.let { last -> viewModel.deleteActivity(listOf(last.log)) }
+                }
+              },
           )
         }
       },

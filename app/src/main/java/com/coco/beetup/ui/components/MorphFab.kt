@@ -26,6 +26,8 @@ fun MorphFab(
     onAddActivityClick: () -> Unit,
     onEditModeToggle: () -> Unit,
     onDeleteSelected: () -> Unit,
+    onBifurcate: () -> Unit,
+    onMinus: () -> Unit,
 ) {
   FloatingActionButton({
     if (!multiSelectionEnabled && selectedItems.isEmpty()) onAddActivityClick()
@@ -39,7 +41,13 @@ fun MorphFab(
               .using(SizeTransform(clip = true))
         }) { isExpanded ->
           if (isExpanded) {
-            FloatingActivityToolbar(onEditModeToggle, editMode, onDeleteSelected)
+            FloatingActivityToolbar(
+                editMode,
+                onEditModeToggle,
+                onDeleteSelected,
+                onBifurcate,
+                onMinus,
+            )
           } else {
             Icon(
                 imageVector = Icons.Default.Add,

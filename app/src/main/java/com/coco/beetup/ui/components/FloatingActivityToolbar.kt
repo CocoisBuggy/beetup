@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.CallSplit
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.RemoveCircleOutline
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,9 +21,11 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun FloatingActivityToolbar(
-    onEditModeToggle: () -> Unit,
     editMode: Boolean,
+    onEditModeToggle: () -> Unit,
     onDeleteSelected: () -> Unit,
+    onBifurcate: () -> Unit,
+    onMinus: () -> Unit,
 ) {
   Row(verticalAlignment = Alignment.CenterVertically) {
     if (editMode) {
@@ -30,9 +33,8 @@ fun FloatingActivityToolbar(
     } else {
       IconButton(onClick = onEditModeToggle) { Icon(Icons.Default.Edit, "Edit") }
     }
-    IconButton(onClick = { /* TODO: Handle Edit */ }) {
-      Icon(Icons.AutoMirrored.Filled.CallSplit, "Bifurcate")
-    }
+    IconButton(onClick = onBifurcate) { Icon(Icons.AutoMirrored.Filled.CallSplit, "Bifurcate") }
+    IconButton(onClick = onMinus) { Icon(Icons.Default.RemoveCircleOutline, "Remove") }
     Spacer(Modifier.width(16.dp))
     VerticalDivider(
         modifier = Modifier.height(32.dp).width(1.dp),

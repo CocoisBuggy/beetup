@@ -30,9 +30,6 @@ class BeetViewModel(
   fun insertExercise(exercise: BeetExercise) =
       viewModelScope.launch { repository.insertExercise(exercise) }
 
-  fun insertActivity(activity: BeetExerciseLog) =
-      viewModelScope.launch { repository.insertLog(activity) }
-
   fun deleteExercise(exercise: BeetExercise) =
       viewModelScope.launch { repository.deleteExercise(exercise) }
 
@@ -46,10 +43,7 @@ class BeetViewModel(
       selectedResistances: List<BeetActivityResistance>
   ) {
     viewModelScope.launch {
-      val newActivityId = repository.insertLog(newExercise)
-      repository.insertResistances(
-          selectedResistances.map { it.copy(activityId = newActivityId) },
-      )
+      repository.insertActivityAndResistances(newExercise, selectedResistances)
     }
   }
 }

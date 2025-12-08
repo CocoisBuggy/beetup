@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -59,7 +60,7 @@ interface BeetExerciseDao {
 
 @Dao
 interface ExerciseLogDao {
-  @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insert(logs: BeetExerciseLog): Long
+  @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertLog(log: BeetExerciseLog): Long
 
   @Delete suspend fun delete(activities: List<BeetExerciseLog>)
 
@@ -92,4 +93,15 @@ interface ExerciseLogDao {
 
   @Insert(onConflict = OnConflictStrategy.IGNORE)
   suspend fun insertResistances(resistances: List<BeetActivityResistance>)
+
+  @Transaction
+  suspend fun insertActivityAndResistances(
+      log: BeetExerciseLog,
+      resistances: List<BeetActivityResistance>
+  ) {
+    val logId = insertLog(log)
+    if (resistances.isNotEmpty()) {
+      insertResistances(resistances.map { it.copy(activityId = logId.toInt()) })
+    }
+  }
 }

@@ -105,10 +105,6 @@ class BeetRepository(
     beetExerciseDao.delete(exercises.toList())
   }
 
-  suspend fun insertLog(log: BeetExerciseLog): Int {
-    return exerciseLogDao.insert(log).toInt()
-  }
-
   suspend fun insertResistances(resistances: List<BeetActivityResistance>) {
     exerciseLogDao.insertResistances(resistances)
   }
@@ -123,4 +119,11 @@ class BeetRepository(
   }
 
   fun validResistancesFor(exercise: Int) = beetExerciseDao.validResistancesFor(exercise)
+
+  suspend fun insertActivityAndResistances(
+      newExercise: BeetExerciseLog,
+      selectedResistances: List<BeetActivityResistance>
+  ) {
+    exerciseLogDao.insertActivityAndResistances(newExercise, selectedResistances)
+  }
 }

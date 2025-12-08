@@ -139,6 +139,7 @@ fun BeetHome(
               onBifurcate = {},
               onMinus = {
                 selectedItems.forEach {
+                  // Pop the last-added item item off
                   it.logs.lastOrNull()?.let { last -> viewModel.deleteActivity(listOf(last.log)) }
                 }
               },

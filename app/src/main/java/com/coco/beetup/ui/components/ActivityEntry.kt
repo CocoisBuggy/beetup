@@ -149,6 +149,10 @@ fun ActivityEntry(
                     },
                     enabled = false)
               }
+
+              if (activity.logs.isEmpty()) {
+                AssistChip({}, label = { Text("No Resistance") }, enabled = false)
+              }
             }
           }
         },

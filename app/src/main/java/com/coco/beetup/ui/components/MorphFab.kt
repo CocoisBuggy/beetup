@@ -42,11 +42,11 @@ fun MorphFab(
         }) { isExpanded ->
           if (isExpanded) {
             FloatingActivityToolbar(
-                editMode,
-                onEditModeToggle,
-                onDeleteSelected,
-                onBifurcate,
-                onMinus,
+                editMode = editMode,
+                onEditModeToggle = onEditModeToggle,
+                onDeleteSelected = onDeleteSelected,
+                onBifurcate = onBifurcate,
+                onMinus = onMinus,
             )
           } else {
             Icon(

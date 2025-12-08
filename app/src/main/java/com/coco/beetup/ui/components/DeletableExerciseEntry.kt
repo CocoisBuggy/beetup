@@ -11,7 +11,6 @@ import com.coco.beetup.ui.viewmodel.BeetViewModel
 @Composable
 fun DeletableExerciseEntry(
     viewModel: BeetViewModel,
-    day: Int,
     item: ActivityGroup,
     isSelected: Boolean,
     onToggleSelection: () -> Unit,
@@ -20,7 +19,6 @@ fun DeletableExerciseEntry(
   ActivityEntry(
       viewModel = viewModel,
       activity = item,
-      day = day,
       isSelected = isSelected,
       modifier =
           Modifier.combinedClickable(

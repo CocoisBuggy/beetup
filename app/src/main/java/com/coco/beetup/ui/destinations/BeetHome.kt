@@ -1,19 +1,10 @@
 package com.coco.beetup.ui.destinations
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -35,10 +26,9 @@ import com.coco.beetup.core.data.BeetExerciseLog
 import com.coco.beetup.ui.components.CategorySelectionDialog
 import com.coco.beetup.ui.components.DeletableExerciseEntry
 import com.coco.beetup.ui.components.ExerciseLogDetailsDialog
-import com.coco.beetup.ui.components.FloatingActivityToolbar
+import com.coco.beetup.ui.components.MorphFab
 import com.coco.beetup.ui.components.ResistanceSelectionDialog
 import com.coco.beetup.ui.components.SelectionAppBar
-import com.coco.beetup.ui.components.WelcomeCard
 import com.coco.beetup.ui.viewmodel.BeetViewModel
 import java.util.Date
 
@@ -50,7 +40,7 @@ fun BeetHome(
 ) {
   val day = (Date().time / 86_400_000L).toInt()
   val exerciseCategories by viewModel.allExercises.collectAsState(initial = emptyList())
-  val todaysExercise by viewModel.activityGroupsForDay(day).collectAsState(initial = emptyList())
+  val todaysActivity by viewModel.activityGroupsForDay(day).collectAsState(initial = emptyList())
 
   var editMode by remember { mutableStateOf(false) }
   var selectedItems by remember { mutableStateOf<Set<ActivityGroup>>(emptySet()) }
@@ -134,35 +124,23 @@ fun BeetHome(
         }
       },
       floatingActionButton = {
-        if (!multiSelectionEnabled && selectedItems.isNotEmpty()) {
-          AnimatedVisibility(
-              visible = true,
-              enter = slideInHorizontally { it } + fadeIn(),
-              exit = slideOutHorizontally { it } + fadeOut(),
-          ) {
-            FloatingActivityToolbar({ editMode = !editMode }, editMode)
-          }
-        } else {
-          FloatingActionButton(onClick = { showCategoryDialog = true }) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = stringResource(id = R.string.add_exercise_entry),
-            )
-          }
-        }
+        MorphFab(
+            selectedItems = selectedItems,
+            editMode = editMode,
+            multiSelectionEnabled = multiSelectionEnabled,
+            onAddActivityClick = { showCategoryDialog = true },
+            onEditModeToggle = { editMode = !editMode },
+        )
       },
   ) { innerPadding ->
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 16.dp),
     ) {
-      item { WelcomeCard(nav) }
-
-      items(todaysExercise, key = { it.exercise.id }) { item ->
+      items(todaysActivity) { item ->
         val isSelected = item in selectedItems
 
         DeletableExerciseEntry(
             viewModel = viewModel,
-            day = day,
             item = item,
             isSelected = isSelected,
             onToggleSelection = {

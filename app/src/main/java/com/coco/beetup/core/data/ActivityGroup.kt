@@ -18,9 +18,28 @@ data class BeetExerciseLogWithResistances(
     val resistances: List<BeetExpandedResistance>
 )
 
+data class ActivityKey(
+    val exerciseId: Int,
+    val magValue: Int,
+    val resistances: List<Pair<Int, Int>>
+)
+
 data class ActivityGroup(
-    @Embedded val exercise: BeetExercise,
-    @Relation(parentColumn = "magnitude_kind", entityColumn = "id") val magnitude: BeetMagnitude,
-    @Relation(entity = BeetExerciseLog::class, parentColumn = "id", entityColumn = "exerciseId")
+    val exercise: BeetExercise,
+    val magnitude: BeetMagnitude,
     val logs: List<BeetExerciseLogWithResistances>
+) {
+  val key: ActivityKey =
+      ActivityKey(
+          exerciseId = exercise.id,
+          magValue = magnitude.id,
+          resistances =
+              logs.first().resistances.map { Pair(it.extra.id, it.entry.resistanceValue) })
+}
+
+data class ActivityGroupFlatRow(
+    @Embedded val log: BeetExerciseLog,
+    @Relation(parentColumn = "exerciseId", entityColumn = "id") val exercise: BeetExercise,
+    @Relation(parentColumn = "id", entityColumn = "activity_id")
+    val resistanceEntry: List<BeetActivityResistance>,
 )

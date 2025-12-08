@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.coco.beetup.core.data.BeetActivityResistance
 import com.coco.beetup.core.data.BeetExercise
 import com.coco.beetup.core.data.BeetExerciseLog
-import com.coco.beetup.core.data.BeetExerciseLogWithResistances
 import com.coco.beetup.core.data.BeetRepository
 import kotlinx.coroutines.launch
 

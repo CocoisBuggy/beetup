@@ -84,11 +84,11 @@ data class ValidBeetResistances(
     indices = [Index(value = ["exerciseId"])],
 )
 data class BeetExerciseLog(
+    @ColumnInfo val exerciseId: Int,
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "log_date") val logDate: Date = Date(),
-    @ColumnInfo(name = "log_day") val logDay: Int = (Date().time / 86_400_000L).toInt(),
-    @ColumnInfo val exerciseId: Int,
     /** Day of all time (unix day) */
+    @ColumnInfo(name = "log_day") val logDay: Int = (Date().time / 86_400_000L).toInt(),
     @ColumnInfo(name = "magnitude", defaultValue = "1") val magnitude: Int = 0,
     @ColumnInfo(name = "difficulty") val difficulty: Difficulty? = null,
     @ColumnInfo(name = "comment") val comment: String? = null,

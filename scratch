@@ -1,0 +1,19 @@
+	ActivityGroupFlatRow(
+		log=BeetExerciseLog(exerciseId=1, id=18, logDate=Mon Dec 08 08:35:17 GMT+02:00 2025, logDay=20430, magnitude=3, difficulty=null, comment=null),
+		exercise=BeetExercise(id=1, exerciseName=Pull Up, exerciseDescription=Pull up exercise, magnitudeKind=1), resistanceEntry=null),
+		
+	ActivityGroupFlatRow(
+		log=BeetExerciseLog(exerciseId=1, id=22, logDate=Mon Dec 08 09:13:10 GMT+02:00 2025, logDay=20430, magnitude=7, difficulty=null, comment=null),
+		exercise=BeetExercise(id=1, exerciseName=Pull Up, exerciseDescription=Pull up exercise, magnitudeKind=1), resistanceEntry=null),
+		
+	ActivityGroupFlatRow(
+		log=BeetExerciseLog(exerciseId=4, id=56, logDate=Mon Dec 08 11:43:47 GMT+02:00 2025, logDay=20430, magnitude=5, difficulty=null, comment=null),
+		exercise=BeetExercise(id=4, exerciseName=Left hand max edge, exerciseDescription=Using an an edge and chalk, lift the weight, magnitudeKind=1), resistanceEntry=null),
+		
+	ActivityGroupFlatRow(
+		log=BeetExerciseLog(exerciseId=4, id=56, logDate=Mon Dec 08 11:43:47 GMT+02:00 2025, logDay=20430, magnitude=5, difficulty=null, comment=null),
+		exercise=BeetExercise(id=4, exerciseName=Left hand max edge, exerciseDescription=Using an an edge and chalk, lift the weight, magnitudeKind=1), resistanceEntry=null),
+		
+	ActivityGroupFlatRow(
+		log=BeetExerciseLog(exerciseId=5, id=54, logDate=Mon Dec 08 11:36:09 GMT+02:00 2025, logDay=20430, magnitude=3, difficulty=null, comment=null),
+		exercise=BeetExercise(id=5, exerciseName=Squat, exerciseDescription=Bodyweight or weighted squat, magnitudeKind=1), resistanceEntry=null)

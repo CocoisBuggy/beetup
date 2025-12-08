@@ -5,7 +5,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -80,14 +79,17 @@ interface ExerciseLogDao {
       exercise: Int,
   ): Flow<List<BeetExerciseLogWithResistances>>
 
-  @Transaction
   @Query(
-      "SELECT * FROM BeetExercise join BeetExerciseLog " +
-          "on BeetExercise.id = BeetExerciseLog.exerciseId " +
-          "where log_day = :day group by exerciseId",
-  )
-  fun activityGroupsForDay(day: Int): Flow<List<ActivityGroup>>
+      """
+        SELECT *
+        FROM BeetExerciseLog L
+        JOIN BeetExercise E ON E.id = L.exerciseId
+        JOIN BeetActivityResistance R ON R.activity_id = L.id
+        WHERE L.log_day = :day
+        ORDER BY E.id, L.magnitude, R.resistance_kind
+    """)
+  fun getAllFlatActivityDataForDay(day: Int): Flow<List<ActivityGroupFlatRow>>
 
   @Insert(onConflict = OnConflictStrategy.IGNORE)
-  suspend fun insert(vararg resistances: BeetActivityResistance)
+  suspend fun insertResistances(resistances: List<BeetActivityResistance>)
 }

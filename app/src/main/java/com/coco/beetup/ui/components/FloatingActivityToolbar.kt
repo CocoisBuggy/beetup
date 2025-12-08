@@ -8,7 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.CallSplit
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,25 +23,21 @@ fun FloatingActivityToolbar(
     onEditModeToggle: () -> Unit,
     editMode: Boolean,
 ) {
-  ExtendedFloatingActionButton(
-      onClick = { /* No action needed on the container itself */ },
-  ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-      if (editMode) {
-        FilledTonalIconButton(onClick = onEditModeToggle) { Icon(Icons.Default.Edit, "Edit") }
-      } else {
-        IconButton(onClick = onEditModeToggle) { Icon(Icons.Default.Edit, "Edit") }
-      }
-      IconButton(onClick = { /* TODO: Handle Edit */ }) {
-        Icon(Icons.AutoMirrored.Filled.CallSplit, "Bifurcate")
-      }
-      Spacer(Modifier.width(16.dp))
-      VerticalDivider(
-          modifier = Modifier.height(32.dp).width(1.dp),
-          color = MaterialTheme.colorScheme.onTertiary,
-      )
-      Spacer(Modifier.width(8.dp))
-      IconButton(onClick = { /* TODO: Handle Delete */ }) { Icon(Icons.Default.Delete, "Delete") }
+  Row(verticalAlignment = Alignment.CenterVertically) {
+    if (editMode) {
+      FilledTonalIconButton(onClick = onEditModeToggle) { Icon(Icons.Default.Edit, "Edit") }
+    } else {
+      IconButton(onClick = onEditModeToggle) { Icon(Icons.Default.Edit, "Edit") }
     }
+    IconButton(onClick = { /* TODO: Handle Edit */ }) {
+      Icon(Icons.AutoMirrored.Filled.CallSplit, "Bifurcate")
+    }
+    Spacer(Modifier.width(16.dp))
+    VerticalDivider(
+        modifier = Modifier.height(32.dp).width(1.dp),
+        color = MaterialTheme.colorScheme.onTertiary,
+    )
+    Spacer(Modifier.width(8.dp))
+    IconButton(onClick = { /* TODO: Handle Delete */ }) { Icon(Icons.Default.Delete, "Delete") }
   }
 }

@@ -18,9 +18,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.coco.beetup.core.data.ActivityGroup
 
 @Composable
 fun FloatingActivityToolbar(
+    item: ActivityGroup?,
     editMode: Boolean,
     onEditModeToggle: () -> Unit,
     onDeleteSelected: () -> Unit,
@@ -34,7 +36,9 @@ fun FloatingActivityToolbar(
       IconButton(onClick = onEditModeToggle) { Icon(Icons.Default.Edit, "Edit") }
     }
     IconButton(onClick = onBifurcate) { Icon(Icons.AutoMirrored.Filled.CallSplit, "Bifurcate") }
-    IconButton(onClick = onMinus) { Icon(Icons.Default.RemoveCircleOutline, "Remove") }
+    IconButton(onClick = onMinus, enabled = (item?.logs?.size ?: 0) > 1) {
+      Icon(Icons.Default.RemoveCircleOutline, "Remove")
+    }
     Spacer(Modifier.width(16.dp))
     VerticalDivider(
         modifier = Modifier.height(32.dp).width(1.dp),

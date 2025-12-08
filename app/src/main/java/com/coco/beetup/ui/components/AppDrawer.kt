@@ -52,6 +52,7 @@ fun AppDrawer(
                 label = { Text(text = label) },
                 selected = route == currentRoute,
                 onClick = {
+                  if (route != "Home") return@NavigationDrawerItem
                   scope.launch { drawerState.close() }
                   navController.navigate(route)
                   currentRoute = route

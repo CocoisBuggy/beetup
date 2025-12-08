@@ -30,6 +30,7 @@ fun MorphFab(
     onMinus: () -> Unit,
 ) {
   FloatingActionButton({
+    // The add action only fires when there are no items selected
     if (!multiSelectionEnabled && selectedItems.isEmpty()) onAddActivityClick()
   }) {
     AnimatedContent(
@@ -42,6 +43,7 @@ fun MorphFab(
         }) { isExpanded ->
           if (isExpanded) {
             FloatingActivityToolbar(
+                item = selectedItems.toList().firstOrNull(),
                 editMode = editMode,
                 onEditModeToggle = onEditModeToggle,
                 onDeleteSelected = onDeleteSelected,

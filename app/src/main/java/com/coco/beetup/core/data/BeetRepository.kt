@@ -59,7 +59,8 @@ class BeetRepository(
                   resistances =
                       rowsForExercise
                           .flatMap { it.resistanceEntry }
-                          .map { Pair(it.resistanceKind, it.resistanceValue) },
+                          .map { Pair(it.resistanceKind, it.resistanceValue) }
+                          .distinct(),
               )
 
           activityGroups[key] =
@@ -75,7 +76,8 @@ class BeetRepository(
                                       entry = flatRow,
                                       extra = extraResistancesMap[flatRow.resistanceKind]!!,
                                   )
-                                })
+                                }
+                                .distinct())
                   }
           exerciseByKey[key] = exercise
         }

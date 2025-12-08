@@ -83,8 +83,8 @@ interface ExerciseLogDao {
       """
         SELECT *
         FROM BeetExerciseLog L
-        JOIN BeetExercise E ON E.id = L.exerciseId
-        JOIN BeetActivityResistance R ON R.activity_id = L.id
+        INNER JOIN BeetExercise E ON E.id = L.exerciseId
+        LEFT JOIN BeetActivityResistance R ON R.activity_id = L.id
         WHERE L.log_day = :day
         ORDER BY E.id, L.magnitude, R.resistance_kind
     """)

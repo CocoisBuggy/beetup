@@ -86,7 +86,7 @@ class BeetRepository(
           ActivityGroup(
               exercise = exerciseByKey[key]!!,
               magnitude = extraMagnitudes[key.magValue]!!,
-              logs = value,
+              logs = value.distinctBy { it.log.id },
           )
         }
       }
@@ -110,9 +110,6 @@ class BeetRepository(
   }
 
   fun logsForDay(day: Int = (Date().time / 86_400_000L).toInt()) = exerciseLogDao.getLogsForDay(day)
-
-  fun exercisesForDay(day: Int = (Date().time / 86_400_000L).toInt()) =
-      beetExerciseDao.getActiveExercisesForDay(day)
 
   suspend fun deleteLogEntries(exercises: List<BeetExerciseLog>) {
     exerciseLogDao.delete(exercises.toList())

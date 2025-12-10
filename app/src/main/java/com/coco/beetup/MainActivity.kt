@@ -5,16 +5,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.coco.beetup.ui.components.AppDrawer
+import com.coco.beetup.ui.components.BeetRaw
+import com.coco.beetup.ui.components.Home
 import com.coco.beetup.ui.destinations.BeetHome
+import com.coco.beetup.ui.destinations.BeetRawView
 import com.coco.beetup.ui.theme.AppTheme
 import com.coco.beetup.ui.viewmodel.BeetViewModel
 import com.coco.beetup.ui.viewmodel.BeetViewModelFactory
-import kotlinx.serialization.Serializable
-
-@Serializable object Home
 
 class MainActivity : ComponentActivity() {
   private val viewModel: BeetViewModel by viewModels {
@@ -27,9 +31,14 @@ class MainActivity : ComponentActivity() {
     setContent {
       AppTheme(dynamicColor = false) {
         val navController = rememberNavController()
+        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+        val scope = rememberCoroutineScope()
 
-        NavHost(navController = navController, startDestination = Home) {
-          composable<Home> { BeetHome(navController, viewModel) }
+        AppDrawer(drawerState = drawerState, scope = scope, navController = navController) {
+          NavHost(navController = navController, startDestination = Home) {
+            composable<Home> { BeetHome(navController, viewModel, drawerState) }
+            composable<BeetRaw> { BeetRawView(navController, viewModel, drawerState) }
+          }
         }
       }
     }

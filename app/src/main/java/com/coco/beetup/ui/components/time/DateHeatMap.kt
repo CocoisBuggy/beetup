@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Today
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,8 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.coco.beetup.core.data.ActivityOverview
+import com.coco.beetup.ui.components.grain.PulsingSunnyShape
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
@@ -32,20 +36,15 @@ import java.util.Locale
  */
 @Composable
 fun DateHeatMap(
-    activeDates: Set<LocalDate>,
+    activeDates: List<ActivityOverview>,
     modifier: Modifier = Modifier,
     activeColor: Color = MaterialTheme.colorScheme.primaryContainer
 ) {
   val today = LocalDate.now()
-
-  // --- MODIFICATION START ---
-  // Calculate the default start date (4 weeks ago).
   val fourWeeksAgo = today.minusWeeks(4)
+  val earliestActiveDate = activeDates.minOfOrNull { it.date }
+  val maxActivity = activeDates.maxOfOrNull { it.count } ?: 0
 
-  // Find the earliest active date, if any.
-  val earliestActiveDate = activeDates.minOrNull()
-
-  // Determine the actual start date for the heatmap.
   val startDate =
       if (earliestActiveDate != null && earliestActiveDate.isAfter(fourWeeksAgo)) {
         // If the user's first activity is within the last 4 weeks,
@@ -56,8 +55,6 @@ fun DateHeatMap(
         // Otherwise, stick to the default 4-week view.
         fourWeeksAgo
       }
-  // --- MODIFICATION END ---
-
   // Remember the calculated data to avoid re-computing on every recomposition
   val heatmapData =
       remember(startDate, today, activeDates) { generateHeatmapData(startDate, today, activeDates) }
@@ -65,14 +62,24 @@ fun DateHeatMap(
   Column(modifier = modifier) {
     // Render each month's section
     heatmapData.forEach { (yearMonth, days) ->
-      MonthSection(yearMonth = yearMonth, days = days, activeColor = activeColor)
+      MonthSection(
+          yearMonth = yearMonth,
+          days = days,
+          activeColor = activeColor,
+          maxActivity = maxActivity,
+      )
     }
   }
 }
 
 /** A section of the heatmap representing a single month. */
 @Composable
-private fun MonthSection(yearMonth: YearMonth, days: List<HeatmapDay>, activeColor: Color) {
+private fun MonthSection(
+    yearMonth: YearMonth,
+    days: List<ActivityOverview>,
+    activeColor: Color,
+    maxActivity: Int
+) {
   val monthName = remember {
     val formatter = DateTimeFormatter.ofPattern("MMMM yyyy")
     yearMonth.format(formatter)
@@ -101,55 +108,60 @@ private fun MonthSection(yearMonth: YearMonth, days: List<HeatmapDay>, activeCol
     }
     // Grid for the days
     LazyGridFor(items = days, numCols = 7) { day ->
-      HeatmapCell(day = day, activeColor = activeColor)
+      HeatmapCell(day = day, activeColor = activeColor, maxActivity = maxActivity)
     }
   }
 }
 
 /** A single cell in the heatmap grid. */
 @Composable
-private fun HeatmapCell(day: HeatmapDay, activeColor: Color) {
+private fun HeatmapCell(day: ActivityOverview, activeColor: Color, maxActivity: Int) {
   val color =
-      when (day.status) {
-        HeatmapDayStatus.ACTIVE -> activeColor
-        HeatmapDayStatus.INACTIVE -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        HeatmapDayStatus.EMPTY -> Color.Transparent
+      when (day.count) {
+        -1 -> Color.Transparent
+        0 -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        else -> activeColor.copy(alpha = day.count.toFloat() / maxActivity)
       }
 
-  Box(
-      modifier =
-          Modifier.padding(2.dp).aspectRatio(1f).clip(RoundedCornerShape(12.dp)).background(color))
+  if (day.date.isEqual(LocalDate.now())) {
+    PulsingSunnyShape(
+        day.count,
+        Modifier.padding(2.dp).aspectRatio(1f),
+    ) {
+        Icon(Icons.Default.Today, contentDescription = "TodayIcon")
+    }
+  } else {
+    Box(
+        modifier =
+            Modifier.padding(2.dp)
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(12.dp))
+                .background(color))
+  }
 }
-
-private enum class HeatmapDayStatus {
-  ACTIVE,
-  INACTIVE,
-  EMPTY
-}
-
-private data class HeatmapDay(val date: LocalDate, val status: HeatmapDayStatus)
 
 private fun generateHeatmapData(
     startDate: LocalDate,
     endDate: LocalDate,
-    activeDates: Set<LocalDate>
-): Map<YearMonth, List<HeatmapDay>> {
-  val data = mutableMapOf<YearMonth, MutableList<HeatmapDay>>()
+    activeDates: List<ActivityOverview>,
+): Map<YearMonth, List<ActivityOverview>> {
+  val data = mutableMapOf<YearMonth, MutableList<ActivityOverview>>()
   var currentDate = startDate
 
   while (!currentDate.isAfter(endDate)) {
     val monthData = data.getOrPut(YearMonth.from(currentDate)) { mutableListOf() }
-    val status =
-        if (currentDate in activeDates) HeatmapDayStatus.ACTIVE else HeatmapDayStatus.INACTIVE
-    monthData.add(HeatmapDay(currentDate, status))
+    val actual = activeDates.find { it.date == currentDate }
+    monthData.add(actual ?: ActivityOverview(currentDate, 0))
     currentDate = currentDate.plusDays(1)
   }
 
-  val alignedData = mutableMapOf<YearMonth, List<HeatmapDay>>()
+  val alignedData = mutableMapOf<YearMonth, List<ActivityOverview>>()
+
   data.forEach { (yearMonth, days) ->
     val firstDayOfMonth = days.first().date
     val emptyDaysCount = (firstDayOfMonth.dayOfWeek.value % 7)
-    val placeholders = List(emptyDaysCount) { HeatmapDay(firstDayOfMonth, HeatmapDayStatus.EMPTY) }
+    val placeholders: List<ActivityOverview> =
+        List(emptyDaysCount) { ActivityOverview(firstDayOfMonth, -1) }
     alignedData[yearMonth] = placeholders + days
   }
 
@@ -173,23 +185,4 @@ private fun <T> LazyGridFor(items: List<T>, numCols: Int, itemContent: @Composab
       }
     }
   }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun DateHeatmapPreview() {
-  val sampleActiveDates = remember {
-    setOf(
-        LocalDate.now(),
-        LocalDate.now().minusDays(1),
-        LocalDate.now().minusDays(2),
-        LocalDate.now().minusDays(5),
-        LocalDate.now().minusDays(10),
-        LocalDate.now().minusDays(11),
-        LocalDate.now().minusDays(15),
-        LocalDate.now().minusDays(20),
-        LocalDate.now().minusDays(25),
-    )
-  }
-  MaterialTheme { DateHeatMap(activeDates = sampleActiveDates, modifier = Modifier.padding(16.dp)) }
 }

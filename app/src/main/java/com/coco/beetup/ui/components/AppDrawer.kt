@@ -3,6 +3,7 @@ package com.coco.beetup.ui.components
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DataObject
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.QueryStats
@@ -19,10 +20,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+
+@Serializable sealed interface Screen
+
+@Serializable object Home : Screen
+
+@Serializable object History : Screen
+
+@Serializable object Stats : Screen
+
+@Serializable object Settings : Screen
+
+@Serializable object BeetRaw : Screen
 
 @Composable
 fun AppDrawer(
@@ -31,14 +46,15 @@ fun AppDrawer(
     navController: NavHostController,
     content: @Composable () -> Unit
 ) {
-  var currentRoute by remember { mutableStateOf("home") }
+  var currentRoute by remember { mutableStateOf<Screen>(Home) }
 
-  val navItems =
+  val navItems: List<Triple<Screen, String, ImageVector>> =
       listOf(
-          Triple("home", "Home", Icons.Default.Home),
-          Triple("history", "History", Icons.Default.History),
-          Triple("stats", "Stats", Icons.Default.QueryStats),
-          Triple("settings", "Settings", Icons.Default.Settings),
+          Triple(Home, "Home", Icons.Default.Home),
+          Triple(History, "History", Icons.Default.History),
+          Triple(Stats, "Stats", Icons.Default.QueryStats),
+          Triple(Settings, "Settings", Icons.Default.Settings),
+          Triple(BeetRaw, "Raw", Icons.Default.DataObject),
       )
 
   ModalNavigationDrawer(
@@ -52,7 +68,6 @@ fun AppDrawer(
                 label = { Text(text = label) },
                 selected = route == currentRoute,
                 onClick = {
-                  if (route != "Home") return@NavigationDrawerItem
                   scope.launch { drawerState.close() }
                   navController.navigate(route)
                   currentRoute = route

@@ -6,7 +6,10 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import java.util.Date
 import kotlinx.coroutines.flow.Flow
+
+data class ActivityOverviewPrimitive(val date: Date, val count: Int)
 
 @Dao
 interface BeetProfileDao {
@@ -104,4 +107,13 @@ interface ExerciseLogDao {
       insertResistances(resistances.map { it.copy(activityId = logId.toInt()) })
     }
   }
+
+  @Query(
+      """
+          SELECT log_date as date, COUNT(*) as count 
+          FROM BeetExerciseLog 
+          WHERE log_day >= :since 
+          GROUP BY log_day
+          """)
+  fun activityOverview(since: Int): Flow<List<ActivityOverviewPrimitive>>
 }

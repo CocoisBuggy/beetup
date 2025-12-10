@@ -1,12 +1,21 @@
 package com.coco.beetup.core.data
 
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Date
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 
 private fun List<BeetResistance>.toMap(): Map<Int, BeetResistance> = this.associateBy { it.id }
 
 private fun List<BeetMagnitude>.toMagMap(): Map<Int, BeetMagnitude> = this.associateBy { it.id }
+
+data class ActivityOverview(val date: LocalDate, val count: Int)
+
+fun Date.toLocalDate(): LocalDate {
+  return this.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+}
 
 class BeetRepository(
     private val beetProfileDao: BeetProfileDao,
@@ -122,5 +131,12 @@ class BeetRepository(
       selectedResistances: List<BeetActivityResistance>
   ) {
     exerciseLogDao.insertActivityAndResistances(newExercise, selectedResistances)
+  }
+
+  fun activityOverview(): Flow<List<ActivityOverview>> {
+    val thirtyDaysAgo = (Date().time / 86_400_000L).toInt() - 30
+    return exerciseLogDao.activityOverview(thirtyDaysAgo).map {
+      it.map { item -> ActivityOverview(item.date.toLocalDate(), item.count) }
+    }
   }
 }

@@ -46,6 +46,9 @@ class BeetViewModel(
       repository.insertActivityAndResistances(newExercise, selectedResistances)
     }
   }
+
+  /** Count log items grouped into day buckets */
+  fun activityOverview() = repository.activityOverview()
 }
 
 class BeetViewModelFactory(

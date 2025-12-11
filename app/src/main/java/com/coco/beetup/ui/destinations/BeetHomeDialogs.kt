@@ -20,10 +20,9 @@ fun BeetHomeDialogs(
     onExerciseSelected: (BeetExercise) -> Unit,
     magnitudeForEntry: Int?,
     onMagnitudeSet: (Int) -> Unit,
-    onDismissExerciseDetails: () -> Unit
+    onDismissExerciseDetails: () -> Unit,
+    exerciseCategories: List<BeetExercise>
 ) {
-  val exerciseCategories by viewModel.allExercises.collectAsState(initial = emptyList())
-
   if (showCategoryDialog) {
     CategorySelectionDialog(
         categories = exerciseCategories,

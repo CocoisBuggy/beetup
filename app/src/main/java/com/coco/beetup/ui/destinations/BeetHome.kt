@@ -34,6 +34,7 @@ fun BeetHome(
     scope: CoroutineScope = rememberCoroutineScope(),
 ) {
   val day = (Date().time / 86_400_000L).toInt()
+  val exerciseCategories by viewModel.allExercises.collectAsState(initial = emptyList())
   val todaysActivity by viewModel.activityGroupsForDay(day).collectAsState(initial = emptyList())
   val activityOverview by viewModel.activityOverview().collectAsState(initial = null)
   val exerciseDateOverview by viewModel.exerciseDateOverview().collectAsState(initial = null)
@@ -71,6 +72,7 @@ fun BeetHome(
       magnitudeForEntry = magnitudeForEntry,
       onMagnitudeSet = { magnitude -> magnitudeForEntry = magnitude },
       onDismissExerciseDetails = { selectedExerciseForEntry = null },
+      exerciseCategories = exerciseCategories,
   )
 
   Scaffold(
@@ -97,7 +99,10 @@ fun BeetHome(
               onAddActivityClick = { showCategoryDialog = true },
               onEditModeToggle = { editMode = !editMode },
               onDeleteSelected = onDeleteSelected,
-              onBifurcate = {},
+              onBifurcate = {
+                selectedExerciseForEntry =
+                    exerciseCategories.find { it.id == selectedItems.first().exerciseId }
+              },
               onMinus = {
                 selectedActivityGroups.forEach {
                   it.logs.lastOrNull()?.let { last -> viewModel.deleteActivity(listOf(last.log)) }

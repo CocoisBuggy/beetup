@@ -15,18 +15,18 @@ fun DeletableExerciseEntry(
     isSelected: Boolean,
     onToggleSelection: () -> Unit,
     onToggleMultiSelection: () -> Unit,
+    modifier: Modifier
 ) {
   ActivityEntry(
       viewModel = viewModel,
       activity = item,
       isSelected = isSelected,
       modifier =
-          Modifier.combinedClickable(
+          modifier.combinedClickable(
               onClick = { onToggleSelection() },
               onLongClick = {
                 onToggleMultiSelection()
                 onToggleSelection()
               },
-          ),
-  )
+          ))
 }

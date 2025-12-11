@@ -36,6 +36,7 @@ fun BeetHome(
   val day = (Date().time / 86_400_000L).toInt()
   val todaysActivity by viewModel.activityGroupsForDay(day).collectAsState(initial = emptyList())
   val activityOverview by viewModel.activityOverview().collectAsState(initial = null)
+  val exerciseDateOverview by viewModel.exerciseDateOverview().collectAsState(initial = null)
 
   var editMode by remember { mutableStateOf(false) }
   var selectedItems by remember { mutableStateOf<Set<ActivityKey>>(emptySet()) }
@@ -110,6 +111,7 @@ fun BeetHome(
         modifier = Modifier.padding(innerPadding),
         todaysActivity = todaysActivity,
         activityDates = activityOverview,
+        exerciseDates = exerciseDateOverview,
         selectedItems = selectedItems,
         onToggleSelection = {
           selectedItems =

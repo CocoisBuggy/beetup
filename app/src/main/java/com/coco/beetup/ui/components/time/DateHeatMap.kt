@@ -20,6 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.coco.beetup.core.data.ActivityOverview
@@ -38,7 +40,8 @@ import java.util.Locale
 fun DateHeatMap(
     activeDates: List<ActivityOverview>,
     modifier: Modifier = Modifier,
-    activeColor: Color = MaterialTheme.colorScheme.primaryContainer
+    activeColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    onDatePositioned: (id: Any, coordinates: LayoutCoordinates) -> Unit
 ) {
   val today = LocalDate.now()
   val fourWeeksAgo = today.minusWeeks(4)
@@ -67,6 +70,7 @@ fun DateHeatMap(
           days = days,
           activeColor = activeColor,
           maxActivity = maxActivity,
+          onDatePositioned = onDatePositioned,
       )
     }
   }
@@ -78,7 +82,8 @@ private fun MonthSection(
     yearMonth: YearMonth,
     days: List<ActivityOverview>,
     activeColor: Color,
-    maxActivity: Int
+    maxActivity: Int,
+    onDatePositioned: (id: Any, coordinates: LayoutCoordinates) -> Unit
 ) {
   val monthName = remember {
     val formatter = DateTimeFormatter.ofPattern("MMMM yyyy")
@@ -108,14 +113,24 @@ private fun MonthSection(
     }
     // Grid for the days
     LazyGridFor(items = days, numCols = 7) { day ->
-      HeatmapCell(day = day, activeColor = activeColor, maxActivity = maxActivity)
+      HeatmapCell(
+          day = day,
+          activeColor = activeColor,
+          maxActivity = maxActivity,
+          onDatePositioned = onDatePositioned,
+      )
     }
   }
 }
 
 /** A single cell in the heatmap grid. */
 @Composable
-private fun HeatmapCell(day: ActivityOverview, activeColor: Color, maxActivity: Int) {
+private fun HeatmapCell(
+    day: ActivityOverview,
+    activeColor: Color,
+    maxActivity: Int,
+    onDatePositioned: (id: Any, coordinates: LayoutCoordinates) -> Unit
+) {
   val color =
       when (day.count) {
         -1 -> Color.Transparent
@@ -128,7 +143,7 @@ private fun HeatmapCell(day: ActivityOverview, activeColor: Color, maxActivity: 
         day.count,
         Modifier.padding(2.dp).aspectRatio(1f),
     ) {
-        Icon(Icons.Default.Today, contentDescription = "TodayIcon")
+      Icon(Icons.Default.Today, contentDescription = "TodayIcon")
     }
   } else {
     Box(
@@ -136,7 +151,8 @@ private fun HeatmapCell(day: ActivityOverview, activeColor: Color, maxActivity: 
             Modifier.padding(2.dp)
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(12.dp))
-                .background(color))
+                .background(color)
+                .onGloballyPositioned { coordinates -> onDatePositioned(day.date, coordinates) })
   }
 }
 

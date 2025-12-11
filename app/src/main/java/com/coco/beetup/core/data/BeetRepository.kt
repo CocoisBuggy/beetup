@@ -139,4 +139,16 @@ class BeetRepository(
       it.map { item -> ActivityOverview(item.date.toLocalDate(), item.count) }
     }
   }
+
+  fun exerciseDateOverview(): Flow<Map<Int, List<LocalDate>>> {
+    val thirtyDaysAgo = (Date().time / 86_400_000L).toInt() - 30
+    val map = mutableMapOf<Int, List<LocalDate>>()
+
+    return exerciseLogDao.exerciseDateOverview(thirtyDaysAgo).map {
+      it.forEach { item ->
+        map[item.exercise] = map.getOrDefault(item.exercise, emptyList()) + item.date.toLocalDate()
+      }
+      return@map map
+    }
+  }
 }

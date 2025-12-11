@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialShapes.Companion.Cookie4Sided
-import androidx.compose.material3.MaterialShapes.Companion.Gem
 import androidx.compose.material3.MaterialShapes.Companion.Square
 import androidx.compose.material3.MaterialShapes.Companion.Sunny
 import androidx.compose.material3.MaterialShapes.Companion.VerySunny
@@ -52,7 +51,7 @@ fun PulsingSunnyShape(
             spring(
                 dampingRatio = Spring.DampingRatioHighBouncy,
                 stiffness = Spring.StiffnessLow,
-                )
+            )
           }) { state ->
             when (state) {
               ShapeState.Sunny -> 0f
@@ -64,7 +63,7 @@ fun PulsingSunnyShape(
 
   Surface(
       modifier = modifier.size(150.dp),
-      color= MaterialTheme.colorScheme.primaryContainer,
+      color = MaterialTheme.colorScheme.primaryContainer,
       shape = animatedShape,
       shadowElevation = 8.dp) {
         Box(contentAlignment = Alignment.Center) { content() }

@@ -49,6 +49,8 @@ class BeetViewModel(
 
   /** Count log items grouped into day buckets */
   fun activityOverview() = repository.activityOverview()
+
+  fun exerciseDateOverview() = repository.exerciseDateOverview()
 }
 
 class BeetViewModelFactory(

@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.Flow
 
 data class ActivityOverviewPrimitive(val date: Date, val count: Int)
 
+data class ExerciseOccurredOnDatePrimitive(val date: Date, val exercise: Int)
+
 @Dao
 interface BeetProfileDao {
   @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun insert(profile: BeetProfile)
@@ -116,4 +118,13 @@ interface ExerciseLogDao {
           GROUP BY log_day
           """)
   fun activityOverview(since: Int): Flow<List<ActivityOverviewPrimitive>>
+
+  @Query(
+      """
+          SELECT log_date as date, exerciseId as exercise
+          FROM BeetExerciseLog 
+          WHERE log_day >= :since 
+          GROUP BY log_day, exerciseId
+          """)
+  fun exerciseDateOverview(since: Int): Flow<List<ExerciseOccurredOnDatePrimitive>>
 }

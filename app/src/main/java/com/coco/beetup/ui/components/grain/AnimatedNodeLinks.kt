@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
@@ -25,6 +26,7 @@ import kotlin.collections.forEach
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.random.Random
 
 @Composable
 fun AnimatedNodeLinks(
@@ -34,16 +36,30 @@ fun AnimatedNodeLinks(
     selectedItems: Set<ActivityKey>,
     scrollState: ScrollState
 ) {
+  val randomPairs = remember {
+    (0..20).map { Pair(Random.nextInt(-200, 200), Random.nextInt(-300, 300)) }
+  }
   val color = MaterialTheme.colorScheme.secondary
-
-  val expressiveSpring =
-      spring<Float>(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow)
-
   val lineProgress: Float by
       animateFloatAsState(
           targetValue = if (selectedItems.isEmpty()) 0f else 1f,
-          animationSpec = expressiveSpring,
+          animationSpec =
+              spring(
+                  dampingRatio = Spring.DampingRatioLowBouncy,
+                  stiffness = Spring.StiffnessLow,
+              ),
           label = "lineProgressAnimation",
+      )
+
+  val circleBump: Float by
+      animateFloatAsState(
+          targetValue = if (selectedItems.isEmpty()) 0f else 1f,
+          animationSpec =
+              spring(
+                  dampingRatio = Spring.DampingRatioMediumBouncy,
+                  stiffness = Spring.StiffnessLow,
+              ),
+          label = "circleBumpAnimation",
       )
 
   Canvas(modifier = Modifier.fillMaxSize()) {
@@ -61,12 +77,12 @@ fun AnimatedNodeLinks(
               x = finalStartOffset.x + (startLayoutCoords.size.width / 2f), y = finalStartOffset.y)
 
       drawCircle(
-          radius = 8.dp.toPx(),
+          radius = 8.dp.toPx() * circleBump,
           center = startPoint,
           color = color,
       )
 
-      exerciseDates[activityKey.exerciseId]?.forEach { date ->
+      exerciseDates[activityKey.exerciseId]?.forEachIndexed { idx, date ->
         val endLayoutCoords = nodes.nodePositions[date] ?: return@forEach
         val endOffset = parentCoords.localPositionOf(endLayoutCoords, Offset.Zero)
 
@@ -77,26 +93,37 @@ fun AnimatedNodeLinks(
                 x = finalEndOffset.x + (endLayoutCoords.size.width / 2f),
                 y = finalEndOffset.y + endLayoutCoords.size.height)
 
-        val midpoint =
-            Offset(x = (startPoint.x + endPoint.x) / 2f, y = (startPoint.y + endPoint.y) / 2f)
-
         val angle = atan2(endPoint.y - startPoint.y, endPoint.x - startPoint.x)
         val perpendicularAngle = angle - (Math.PI / 2).toFloat()
-        val controlPoint =
-            if (endPoint.x <= startPoint.x)
-                Offset(
-                    x = midpoint.x + cos(perpendicularAngle) * curveOffsetDistance,
-                    y = midpoint.y + sin(perpendicularAngle) * curveOffsetDistance)
-            else {
-              Offset(
-                  x = midpoint.x - cos(perpendicularAngle) * curveOffsetDistance,
-                  y = midpoint.y + sin(perpendicularAngle) * curveOffsetDistance)
-            }
+
+        val point1OnLine = startPoint + (endPoint - startPoint) / 3f
+        val point2OnLine = startPoint + (endPoint - startPoint) * (2f / 3f)
+
+        val cosPerpendicular = cos(perpendicularAngle) * curveOffsetDistance
+        val sinPerpendicular = sin(perpendicularAngle) * curveOffsetDistance
+
+        val xOffset = if (endPoint.x <= startPoint.x) cosPerpendicular else -cosPerpendicular
+
+        val controlPoint1 =
+            Offset(
+                x = point1OnLine.x + xOffset + randomPairs[idx].first,
+                y = point1OnLine.y + sinPerpendicular)
+
+        val controlPoint2 =
+            Offset(
+                x = point2OnLine.x + xOffset + randomPairs[idx].second,
+                y = point2OnLine.y + sinPerpendicular)
 
         val path =
             Path().apply {
               moveTo(startPoint.x, startPoint.y)
-              quadraticTo(controlPoint.x, controlPoint.y, endPoint.x, endPoint.y)
+              cubicTo(
+                  controlPoint1.x,
+                  controlPoint1.y,
+                  controlPoint2.x,
+                  controlPoint2.y,
+                  endPoint.x,
+                  endPoint.y)
             }
 
         val pathMeasure = PathMeasure()

@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialShapes.Companion.Cookie4Sided
-import androidx.compose.material3.MaterialShapes.Companion.Square
+import androidx.compose.material3.MaterialShapes.Companion.Cookie6Sided
 import androidx.compose.material3.MaterialShapes.Companion.Sunny
 import androidx.compose.material3.MaterialShapes.Companion.VerySunny
 import androidx.compose.material3.MaterialTheme
@@ -40,7 +40,7 @@ fun PulsingSunnyShape(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-  val shapeMorph = remember { Morph(Square, Cookie4Sided) }
+  val shapeMorph = remember { Morph(Cookie6Sided, Cookie4Sided) }
 
   val targetState = if (triggerValue % 2 != 0) ShapeState.VerySunny else ShapeState.Sunny
   val transition = updateTransition(targetState = targetState, label = "OfficialMorphTransition")

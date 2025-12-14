@@ -17,9 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.coco.beetup.core.data.ActivityKey
 import com.coco.beetup.core.data.BeetExercise
-import com.coco.beetup.ui.components.ActivityList
 import com.coco.beetup.ui.components.MorphFab
 import com.coco.beetup.ui.components.SelectionAppBar
+import com.coco.beetup.ui.components.activity.ActivityList
 import com.coco.beetup.ui.components.nav.BeetTopBar
 import com.coco.beetup.ui.viewmodel.BeetViewModel
 import java.util.Date
@@ -35,7 +35,7 @@ fun BeetHome(
 ) {
   val day = (Date().time / 86_400_000L).toInt()
   val exerciseCategories by viewModel.allExercises.collectAsState(initial = emptyList())
-  val todaysActivity by viewModel.activityGroupsForDay(day).collectAsState(initial = emptyList())
+  val activityGroups by viewModel.activityGroupsForDay(day).collectAsState(initial = emptyList())
   val activityOverview by viewModel.activityOverview().collectAsState(initial = null)
   val exerciseDateOverview by viewModel.exerciseDateOverview().collectAsState(initial = null)
 
@@ -46,12 +46,12 @@ fun BeetHome(
   var selectedExerciseForEntry by remember { mutableStateOf<BeetExercise?>(null) }
   var magnitudeForEntry by remember { mutableStateOf<Int?>(null) }
   val selectedActivityGroups by
-      remember(todaysActivity, selectedItems) {
-        derivedStateOf { todaysActivity.filter { it.key in selectedItems }.toSet() }
+      remember(activityGroups, selectedItems) {
+        derivedStateOf { activityGroups.filter { it.key in selectedItems }.toSet() }
       }
 
   val onDeleteSelected = {
-    val itemsToDelete = todaysActivity.filter { it.key in selectedItems }
+    val itemsToDelete = activityGroups.filter { it.key in selectedItems }
     Log.i("BeetHome", "Deleting ${"$"}{itemsToDelete.size} items")
     Log.d("BeetHome", "Deleting ${"$"}itemsToDelete")
 
@@ -61,6 +61,7 @@ fun BeetHome(
   }
 
   BeetHomeDialogs(
+      activityGroups = activityGroups,
       viewModel = viewModel,
       showCategoryDialog = showCategoryDialog,
       onDismissCategoryDialog = { showCategoryDialog = false },
@@ -73,7 +74,9 @@ fun BeetHome(
       onMagnitudeSet = { magnitude -> magnitudeForEntry = magnitude },
       onDismissExerciseDetails = { selectedExerciseForEntry = null },
       exerciseCategories = exerciseCategories,
-  )
+      editMode = editMode,
+      onEditCommit = { editMode = false },
+      selectedItems = selectedItems)
 
   Scaffold(
       topBar = {
@@ -114,7 +117,7 @@ fun BeetHome(
   ) { innerPadding ->
     ActivityList(
         modifier = Modifier.padding(innerPadding),
-        todaysActivity = todaysActivity,
+        todaysActivity = activityGroups,
         activityDates = activityOverview,
         exerciseDates = exerciseDateOverview,
         selectedItems = selectedItems,

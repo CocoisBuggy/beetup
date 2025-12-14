@@ -1,4 +1,4 @@
-package com.coco.beetup.ui.components
+package com.coco.beetup.ui.components.activity
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column

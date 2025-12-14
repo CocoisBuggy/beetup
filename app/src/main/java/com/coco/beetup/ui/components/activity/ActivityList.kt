@@ -1,4 +1,4 @@
-package com.coco.beetup.ui.components
+package com.coco.beetup.ui.components.activity
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
@@ -47,7 +47,7 @@ fun ActivityList(
   val nodePositionState = remember { NodePositionState() }
   var columnCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
 
-  Box(modifier = modifier) {
+  Box(modifier = modifier.padding(4.dp)) {
     val scrollState = rememberScrollState()
 
     Column(

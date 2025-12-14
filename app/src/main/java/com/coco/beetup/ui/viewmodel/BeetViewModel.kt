@@ -1,5 +1,6 @@
 package com.coco.beetup.ui.viewmodel
 
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -51,6 +52,13 @@ class BeetViewModel(
   fun activityOverview() = repository.activityOverview()
 
   fun exerciseDateOverview() = repository.exerciseDateOverview()
+
+  suspend fun updateLogAndResistances(
+      log: BeetExerciseLog,
+      selectedResistances: SnapshotStateMap<Int, String>
+  ) {
+    repository.updateLogAndResistances(log, selectedResistances)
+  }
 }
 
 class BeetViewModelFactory(

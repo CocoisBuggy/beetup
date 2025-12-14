@@ -3,16 +3,22 @@ package com.coco.beetup.ui.destinations
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import com.coco.beetup.core.data.ActivityGroup
+import com.coco.beetup.core.data.ActivityKey
 import com.coco.beetup.core.data.BeetActivityResistance
 import com.coco.beetup.core.data.BeetExercise
 import com.coco.beetup.core.data.BeetExerciseLog
-import com.coco.beetup.ui.components.CategorySelectionDialog
-import com.coco.beetup.ui.components.ExerciseLogDetailsDialog
-import com.coco.beetup.ui.components.ResistanceSelectionDialog
+import com.coco.beetup.ui.components.activity.CategorySelectionDialog
+import com.coco.beetup.ui.components.activity.EditDialog
+import com.coco.beetup.ui.components.activity.ExerciseLogDetailsDialog
+import com.coco.beetup.ui.components.activity.ResistanceSelectionDialog
 import com.coco.beetup.ui.viewmodel.BeetViewModel
 
 @Composable
 fun BeetHomeDialogs(
+    activityGroups: List<ActivityGroup>,
+    selectedItems: Set<ActivityKey>,
     viewModel: BeetViewModel,
     showCategoryDialog: Boolean,
     onDismissCategoryDialog: () -> Unit,
@@ -21,8 +27,29 @@ fun BeetHomeDialogs(
     magnitudeForEntry: Int?,
     onMagnitudeSet: (Int) -> Unit,
     onDismissExerciseDetails: () -> Unit,
-    exerciseCategories: List<BeetExercise>
+    exerciseCategories: List<BeetExercise>,
+    editMode: Boolean,
+    onEditCommit: () -> Unit
 ) {
+
+  selectedItems.firstOrNull()?.let { key ->
+    if (editMode) {
+      val activity = remember { activityGroups.find { it.key == key }!! }
+      val allowedResistances by
+          viewModel
+              .validResistancesFor(activity.key.exerciseId)
+              .collectAsState(initial = emptyList())
+
+      EditDialog(
+          viewModel = viewModel,
+          onDismiss = onEditCommit,
+          onCommit = onEditCommit,
+          forItem = activity,
+          allowedResistances = allowedResistances,
+      )
+    }
+  }
+
   if (showCategoryDialog) {
     CategorySelectionDialog(
         categories = exerciseCategories,

@@ -1,5 +1,6 @@
 package com.coco.beetup.core.data
 
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
@@ -150,5 +151,12 @@ class BeetRepository(
       }
       return@map map
     }
+  }
+
+  suspend fun updateLogAndResistances(
+      log: BeetExerciseLog,
+      selectedResistances: SnapshotStateMap<Int, String>
+  ) {
+    exerciseLogDao.updateLogAndResistances(log, selectedResistances)
   }
 }

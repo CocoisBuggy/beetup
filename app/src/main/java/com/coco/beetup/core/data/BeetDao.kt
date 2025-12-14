@@ -1,11 +1,13 @@
 package com.coco.beetup.core.data
 
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import java.util.Date
 import kotlinx.coroutines.flow.Flow
 
@@ -69,6 +71,8 @@ interface ExerciseLogDao {
 
   @Delete suspend fun delete(activities: List<BeetExerciseLog>)
 
+  @Update suspend fun update(activity: BeetExerciseLog)
+
   @Query("SELECT * FROM BeetExerciseLog WHERE id = :id") fun getLog(id: Int): Flow<BeetExerciseLog>
 
   @Query("SELECT * FROM BeetExerciseLog") fun getAllLogs(): Flow<List<BeetExerciseLog>>
@@ -99,6 +103,9 @@ interface ExerciseLogDao {
   @Insert(onConflict = OnConflictStrategy.IGNORE)
   suspend fun insertResistances(resistances: List<BeetActivityResistance>)
 
+  @Query("DELETE FROM BeetActivityResistance where activity_id = :logId")
+  suspend fun deleteLogsFor(logId: Int)
+
   @Transaction
   suspend fun insertActivityAndResistances(
       log: BeetExerciseLog,
@@ -108,6 +115,20 @@ interface ExerciseLogDao {
     if (resistances.isNotEmpty()) {
       insertResistances(resistances.map { it.copy(activityId = logId.toInt()) })
     }
+  }
+
+  @Transaction
+  suspend fun updateLogAndResistances(
+      log: BeetExerciseLog,
+      selectedResistances: SnapshotStateMap<Int, String>
+  ) {
+    update(log)
+    deleteLogsFor(log.id)
+    insertResistances(
+        selectedResistances.map { (id, value) ->
+          BeetActivityResistance(
+              activityId = log.id, resistanceKind = id, resistanceValue = value.toInt())
+        })
   }
 
   @Query(

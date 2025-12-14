@@ -1,4 +1,4 @@
-package com.coco.beetup.ui.components
+package com.coco.beetup.ui.components.activity
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -20,6 +20,45 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.coco.beetup.core.data.BeetResistance
+import kotlin.collections.set
+
+@Composable
+fun Resistances(
+    resistances: List<BeetResistance>,
+    selectedResistances: Map<Int, String>,
+    onSelectionChange: (Int, String?) -> Unit
+) {
+  LazyColumn {
+    items(resistances) { resistance ->
+      val isChecked = resistance.id in selectedResistances
+      Column {
+        ListItem(
+            headlineContent = { Text(resistance.name) },
+            leadingContent = { Checkbox(checked = isChecked, onCheckedChange = null) },
+            modifier =
+                Modifier.clickable {
+                  if (isChecked) {
+                    onSelectionChange(resistance.id, null)
+                  } else {
+                    onSelectionChange(resistance.id, "")
+                  }
+                })
+        if (isChecked) {
+          TextField(
+              value = selectedResistances[resistance.id] ?: "",
+              onValueChange = { value ->
+                if (value.all { it.isDigit() }) {
+                  onSelectionChange(resistance.id, value)
+                }
+              },
+              label = { Text("${resistance.name} Value (${resistance.unit}") },
+              keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+              modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 4.dp))
+        }
+      }
+    }
+  }
+}
 
 @Composable
 fun ResistanceSelectionDialog(
@@ -36,37 +75,16 @@ fun ResistanceSelectionDialog(
         if (resistances.isEmpty()) {
           Text("No recommended resistances for this exercise.")
         } else {
-          LazyColumn {
-            items(resistances) { resistance ->
-              val isChecked = resistance.id in selectedResistances
-              Column {
-                ListItem(
-                    headlineContent = { Text(resistance.name) },
-                    leadingContent = { Checkbox(checked = isChecked, onCheckedChange = null) },
-                    modifier =
-                        Modifier.clickable {
-                          if (isChecked) {
-                            selectedResistances.remove(resistance.id)
-                          } else {
-                            selectedResistances[resistance.id] = ""
-                          }
-                        })
-                if (isChecked) {
-                  TextField(
-                      value = selectedResistances[resistance.id] ?: "",
-                      onValueChange = { value ->
-                        if (value.all { it.isDigit() }) {
-                          selectedResistances[resistance.id] = value
-                        }
-                      },
-                      label = { Text("${resistance.name} Value (${resistance.unit}") },
-                      keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                      modifier =
-                          Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 4.dp))
+          Resistances(
+              resistances = resistances,
+              selectedResistances = selectedResistances,
+              onSelectionChange = { id, value ->
+                if (value == null) {
+                  selectedResistances.remove(id)
+                } else {
+                  selectedResistances[id] = value
                 }
-              }
-            }
-          }
+              })
         }
       },
       confirmButton = {

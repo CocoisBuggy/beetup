@@ -18,6 +18,14 @@ fun Date.toLocalDate(): LocalDate {
   return this.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
 }
 
+fun Date.unixDay(): Int {
+  return (this.time / 86_400_000L).toInt()
+}
+
+fun LocalDate.unixDay(): Int {
+  return this.toEpochDay().toInt()
+}
+
 class BeetRepository(
     private val beetProfileDao: BeetProfileDao,
     private val beetExerciseDao: BeetExerciseDao,
@@ -119,7 +127,7 @@ class BeetRepository(
     exerciseLogDao.insertResistances(resistances)
   }
 
-  fun logsForDay(day: Int = (Date().time / 86_400_000L).toInt()) = exerciseLogDao.getLogsForDay(day)
+  fun logsForDay(day: Int = Date().unixDay()) = exerciseLogDao.getLogsForDay(day)
 
   suspend fun deleteLogEntries(exercises: List<BeetExerciseLog>) {
     exerciseLogDao.delete(exercises.toList())
@@ -134,18 +142,21 @@ class BeetRepository(
     exerciseLogDao.insertActivityAndResistances(newExercise, selectedResistances)
   }
 
-  fun activityOverview(): Flow<List<ActivityOverview>> {
-    val thirtyDaysAgo = (Date().time / 86_400_000L).toInt() - 30
-    return exerciseLogDao.activityOverview(thirtyDaysAgo).map {
+  fun activityOverview(untilDate: Date = Date(), daysAgo: Int = 30): Flow<List<ActivityOverview>> {
+    val minDate = untilDate.unixDay() - daysAgo
+    return exerciseLogDao.activityOverview(minDate).map {
       it.map { item -> ActivityOverview(item.date.toLocalDate(), item.count) }
     }
   }
 
-  fun exerciseDateOverview(): Flow<Map<Int, List<LocalDate>>> {
-    val thirtyDaysAgo = (Date().time / 86_400_000L).toInt() - 30
+  fun exerciseDateOverview(
+      untilDate: Date = Date(),
+      daysAgo: Int = 30
+  ): Flow<Map<Int, List<LocalDate>>> {
+    val minDate = untilDate.unixDay() - daysAgo
     val map = mutableMapOf<Int, List<LocalDate>>()
 
-    return exerciseLogDao.exerciseDateOverview(thirtyDaysAgo).map {
+    return exerciseLogDao.exerciseDateOverview(minDate).map {
       it.forEach { item ->
         map[item.exercise] = map.getOrDefault(item.exercise, emptyList()) + item.date.toLocalDate()
       }

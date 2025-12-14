@@ -1,6 +1,5 @@
 package com.coco.beetup.ui.destinations
 
-import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -14,15 +13,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.coco.beetup.core.data.ActivityKey
 import com.coco.beetup.core.data.BeetExercise
+import com.coco.beetup.core.data.unixDay
 import com.coco.beetup.ui.components.MorphFab
 import com.coco.beetup.ui.components.SelectionAppBar
 import com.coco.beetup.ui.components.activity.ActivityList
 import com.coco.beetup.ui.components.nav.BeetTopBar
 import com.coco.beetup.ui.viewmodel.BeetViewModel
-import java.util.Date
+import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,9 +34,11 @@ fun BeetHome(
     drawerState: DrawerState,
     scope: CoroutineScope = rememberCoroutineScope(),
 ) {
-  val day = (Date().time / 86_400_000L).toInt()
   val exerciseCategories by viewModel.allExercises.collectAsState(initial = emptyList())
-  val activityGroups by viewModel.activityGroupsForDay(day).collectAsState(initial = emptyList())
+  var date by remember { mutableStateOf(LocalDate.now()) }
+
+  val activityGroups by
+      viewModel.activityGroupsForDay(date.unixDay()).collectAsState(initial = emptyList())
   val activityOverview by viewModel.activityOverview().collectAsState(initial = null)
   val exerciseDateOverview by viewModel.exerciseDateOverview().collectAsState(initial = null)
 
@@ -52,9 +55,6 @@ fun BeetHome(
 
   val onDeleteSelected = {
     val itemsToDelete = activityGroups.filter { it.key in selectedItems }
-    Log.i("BeetHome", "Deleting ${"$"}{itemsToDelete.size} items")
-    Log.d("BeetHome", "Deleting ${"$"}itemsToDelete")
-
     viewModel.deleteActivity(itemsToDelete.flatMap { outer -> outer.logs.map { it.log } })
     selectedItems = emptySet()
     multiSelectionEnabled = false
@@ -116,7 +116,8 @@ fun BeetHome(
       },
   ) { innerPadding ->
     ActivityList(
-        modifier = Modifier.padding(innerPadding),
+        date = date,
+        modifier = Modifier.padding(innerPadding).padding(6.dp),
         todaysActivity = activityGroups,
         activityDates = activityOverview,
         exerciseDates = exerciseDateOverview,
@@ -134,6 +135,7 @@ fun BeetHome(
               }
         },
         onToggleMultiSelection = { multiSelectionEnabled = !multiSelectionEnabled },
-        viewModel = viewModel)
+        viewModel = viewModel,
+        onDateChange = { date = it })
   }
 }

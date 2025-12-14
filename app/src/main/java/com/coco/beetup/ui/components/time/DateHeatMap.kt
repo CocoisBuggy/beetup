@@ -38,6 +38,7 @@ import java.util.Locale
  */
 @Composable
 fun DateHeatMap(
+    selectedDates: Set<LocalDate>,
     activeDates: List<ActivityOverview>,
     modifier: Modifier = Modifier,
     activeColor: Color = MaterialTheme.colorScheme.primaryContainer,
@@ -71,6 +72,7 @@ fun DateHeatMap(
           activeColor = activeColor,
           maxActivity = maxActivity,
           onDatePositioned = onDatePositioned,
+          selectedDates = selectedDates,
       )
     }
   }
@@ -79,6 +81,7 @@ fun DateHeatMap(
 /** A section of the heatmap representing a single month. */
 @Composable
 private fun MonthSection(
+    selectedDates: Set<LocalDate>,
     yearMonth: YearMonth,
     days: List<ActivityOverview>,
     activeColor: Color,
@@ -91,8 +94,8 @@ private fun MonthSection(
   }
   val dayOfWeekHeaders = remember {
     // Generates ["S", "M", "T", "W", "T", "F", "S"]
-    (1..7).map {
-      LocalDate.of(2024, 1, it).dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.getDefault())
+    (1..7).map { day ->
+      LocalDate.of(2024, 1, day).dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.getDefault())
     }
   }
 
@@ -118,7 +121,7 @@ private fun MonthSection(
           activeColor = activeColor,
           maxActivity = maxActivity,
           onDatePositioned = onDatePositioned,
-      )
+          selected = selectedDates.contains(day.date))
     }
   }
 }
@@ -129,7 +132,8 @@ private fun HeatmapCell(
     day: ActivityOverview,
     activeColor: Color,
     maxActivity: Int,
-    onDatePositioned: (id: Any, coordinates: LayoutCoordinates) -> Unit
+    onDatePositioned: (id: Any, coordinates: LayoutCoordinates) -> Unit,
+    selected: Boolean = false,
 ) {
   val color =
       when (day.count) {

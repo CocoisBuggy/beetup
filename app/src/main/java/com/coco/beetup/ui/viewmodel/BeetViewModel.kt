@@ -8,6 +8,7 @@ import com.coco.beetup.core.data.BeetActivityResistance
 import com.coco.beetup.core.data.BeetExercise
 import com.coco.beetup.core.data.BeetExerciseLog
 import com.coco.beetup.core.data.BeetRepository
+import java.util.Date
 import kotlinx.coroutines.launch
 
 class BeetViewModel(
@@ -49,9 +50,11 @@ class BeetViewModel(
   }
 
   /** Count log items grouped into day buckets */
-  fun activityOverview() = repository.activityOverview()
+  fun activityOverview(untilDate: Date = Date(), daysAgo: Int = 30) =
+      repository.activityOverview(untilDate, daysAgo)
 
-  fun exerciseDateOverview() = repository.exerciseDateOverview()
+  fun exerciseDateOverview(untilDate: Date = Date(), daysAgo: Int = 30) =
+      repository.exerciseDateOverview(untilDate, daysAgo)
 
   suspend fun updateLogAndResistances(
       log: BeetExerciseLog,

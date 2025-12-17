@@ -13,9 +13,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.coco.beetup.ui.components.AppDrawer
 import com.coco.beetup.ui.components.BeetRaw
+import com.coco.beetup.ui.components.ExerciseManager
 import com.coco.beetup.ui.components.History
 import com.coco.beetup.ui.components.Home
 import com.coco.beetup.ui.components.Settings
+import com.coco.beetup.ui.destinations.BeetExerciseManager
 import com.coco.beetup.ui.destinations.BeetHistory
 import com.coco.beetup.ui.destinations.BeetHome
 import com.coco.beetup.ui.destinations.BeetRawView
@@ -41,6 +43,9 @@ class MainActivity : ComponentActivity() {
         AppDrawer(drawerState = drawerState, scope = scope, navController = navController) {
           NavHost(navController = navController, startDestination = Home) {
             composable<Home> { BeetHome(navController, viewModel, drawerState) }
+            composable<ExerciseManager> {
+              BeetExerciseManager(navController, viewModel, drawerState)
+            }
             composable<BeetRaw> { BeetRawView(navController, viewModel, drawerState) }
             composable<History> { BeetHistory() }
             composable<Settings> { BeetSettings(navController, viewModel, drawerState) }

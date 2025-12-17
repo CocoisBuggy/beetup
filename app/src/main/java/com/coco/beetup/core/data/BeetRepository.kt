@@ -170,4 +170,6 @@ class BeetRepository(
   ) {
     exerciseLogDao.updateLogAndResistances(log, selectedResistances)
   }
+
+  fun allMagnitudes(): Flow<List<BeetMagnitude>> = beetExerciseDao.getAllMagnitudes()
 }

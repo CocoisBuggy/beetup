@@ -1,6 +1,7 @@
 package com.coco.beetup.ui.components.time
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,7 +43,8 @@ fun DateHeatMap(
     activeDates: List<ActivityOverview>,
     modifier: Modifier = Modifier,
     activeColor: Color = MaterialTheme.colorScheme.primaryContainer,
-    onDatePositioned: (id: Any, coordinates: LayoutCoordinates) -> Unit
+    onDatePositioned: (id: Any, coordinates: LayoutCoordinates) -> Unit,
+    onDateSelected: (LocalDate) -> Unit,
 ) {
   val today = LocalDate.now()
   val fourWeeksAgo = today.minusWeeks(4)
@@ -73,6 +75,7 @@ fun DateHeatMap(
           maxActivity = maxActivity,
           onDatePositioned = onDatePositioned,
           selectedDates = selectedDates,
+          onDateSelected=onDateSelected,
       )
     }
   }
@@ -86,16 +89,21 @@ private fun MonthSection(
     days: List<ActivityOverview>,
     activeColor: Color,
     maxActivity: Int,
-    onDatePositioned: (id: Any, coordinates: LayoutCoordinates) -> Unit
+    onDatePositioned: (id: Any, coordinates: LayoutCoordinates) -> Unit,
+    onDateSelected: (LocalDate) -> Unit
 ) {
   val monthName = remember {
     val formatter = DateTimeFormatter.ofPattern("MMMM yyyy")
     yearMonth.format(formatter)
   }
+
   val dayOfWeekHeaders = remember {
-    // Generates ["S", "M", "T", "W", "T", "F", "S"]
     (1..7).map { day ->
-      LocalDate.of(2024, 1, day).dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.getDefault())
+      LocalDate
+          .of(2024, 1, day)
+          .dayOfWeek
+          .getDisplayName(TextStyle.NARROW, Locale.getDefault()
+          )
     }
   }
 
@@ -121,7 +129,9 @@ private fun MonthSection(
           activeColor = activeColor,
           maxActivity = maxActivity,
           onDatePositioned = onDatePositioned,
-          selected = selectedDates.contains(day.date))
+          selected = selectedDates.contains(day.date),
+          onClick = { onDateSelected(day.date) }
+      )
     }
   }
 }
@@ -134,6 +144,7 @@ private fun HeatmapCell(
     maxActivity: Int,
     onDatePositioned: (id: Any, coordinates: LayoutCoordinates) -> Unit,
     selected: Boolean = false,
+    onClick: () -> Unit
 ) {
   val color =
       when (day.count) {
@@ -156,7 +167,11 @@ private fun HeatmapCell(
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(12.dp))
                 .background(color)
-                .onGloballyPositioned { coordinates -> onDatePositioned(day.date, coordinates) })
+                .onGloballyPositioned { coordinates -> onDatePositioned(day.date, coordinates) }
+                .combinedClickable {
+                    onClick()
+                }
+    )
   }
 }
 

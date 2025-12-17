@@ -17,10 +17,7 @@ INSERT INTO BeetExercise VALUES(9, 'Plank', 'Core stability exercise', 3);
 INSERT INTO BeetExercise VALUES(13, 'Fingerboard Hang', 'Hanging from a fingerboard', 3);
 
 -- Strength Training
-INSERT INTO BeetExercise VALUES(5, 'Squat', 'Bodyweight or weighted squat', 1);
-INSERT INTO BeetExercise VALUES(6, 'Deadlift', 'Deadlift with barbell or dumbbells', 1);
-INSERT INTO BeetExercise VALUES(7, 'Bench Press', 'Bench press with barbell or dumbbells', 1);
-INSERT INTO BeetExercise VALUES(8, 'Overhead Press', 'Standing or seated overhead press', 1);
+INSERT INTO BeetExercise VALUES(5, 'Rows', 'Bodyweight or weighted squat', 1);
 
 -- Cardio
 INSERT INTO BeetExercise VALUES(10, 'Running', 'Running on a treadmill or outdoors', 2);
@@ -35,8 +32,6 @@ INSERT INTO ValidBeetResistances VALUES(4, 2), (4, 4);
 
 INSERT INTO ValidBeetResistances VALUES(5, 2);
 INSERT INTO ValidBeetResistances VALUES(6, 2);
-INSERT INTO ValidBeetResistances VALUES(7, 2);
-INSERT INTO ValidBeetResistances VALUES(8, 2);
 INSERT INTO ValidBeetResistances VALUES(9, 2);
 INSERT INTO ValidBeetResistances VALUES(12, 4);
 INSERT INTO ValidBeetResistances VALUES(13, 2), (13, 4);

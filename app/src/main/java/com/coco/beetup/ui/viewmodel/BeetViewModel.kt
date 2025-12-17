@@ -62,6 +62,8 @@ class BeetViewModel(
   ) {
     repository.updateLogAndResistances(log, selectedResistances)
   }
+
+  fun allMagnitudes() = repository.allMagnitudes()
 }
 
 class BeetViewModelFactory(

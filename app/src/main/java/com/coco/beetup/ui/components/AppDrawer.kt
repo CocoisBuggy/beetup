@@ -4,10 +4,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DataObject
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.QueryStats
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
@@ -37,6 +36,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable object Settings : Screen
 
+@Serializable object ExerciseManager : Screen
+
 @Serializable object BeetRaw : Screen
 
 @Composable
@@ -51,8 +52,8 @@ fun AppDrawer(
   val navItems: List<Triple<Screen, String, ImageVector>> =
       listOf(
           Triple(Home, "Home", Icons.Default.Home),
-          Triple(History, "History", Icons.Default.History),
-          Triple(Stats, "Stats", Icons.Default.QueryStats),
+          Triple(ExerciseManager, "Exercise Manager", Icons.Default.SportsTennis),
+          //          Triple(Stats, "Stats", Icons.Default.QueryStats),
           Triple(Settings, "Settings", Icons.Default.Settings),
           Triple(BeetRaw, "Raw", Icons.Default.DataObject),
       )

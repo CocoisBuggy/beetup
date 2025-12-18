@@ -63,7 +63,7 @@ fun PulsingSunnyShape(
 
   Surface(
       modifier = modifier.size(150.dp),
-      color = MaterialTheme.colorScheme.primaryContainer,
+      color = MaterialTheme.colorScheme.secondaryContainer,
       shape = animatedShape,
       shadowElevation = 8.dp) {
         Box(contentAlignment = Alignment.Center) { content() }

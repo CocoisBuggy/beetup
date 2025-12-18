@@ -133,7 +133,7 @@ fun BeetExerciseManager(
             ExerciseListItem(
                 isSelected,
                 exercise,
-                animatedPadding,
+                animatedPadding.coerceAtLeast(0.dp),
                 viewModel,
                 onClick = { selectedExercise = it })
           }

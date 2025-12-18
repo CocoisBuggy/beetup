@@ -1,6 +1,6 @@
 package com.coco.beetup.ui.components.exercise
 
-import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring.DampingRatioLowBouncy
 import androidx.compose.animation.core.Spring.StiffnessMedium
 import androidx.compose.animation.core.animateFloatAsState
@@ -9,7 +9,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -75,39 +74,38 @@ fun CreateExerciseDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
         text = {
           Box(modifier = Modifier.widthIn(min = 280.dp, max = 360.dp).padding(24.dp)) {
-            AnimatedContent(
-                targetState = isNamed,
-                label = "Progressive Content",
-                transitionSpec = {
-                  slideInVertically { h -> h } + fadeIn() togetherWith
-                      slideOutVertically { h -> -h } + fadeOut()
-                }) { targetIsNamed ->
-                  Column(
-                      horizontalAlignment = Alignment.CenterHorizontally,
-                      verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                        TextField(
-                            value = name,
-                            onValueChange = { name = it },
-                            label = { Text("Exercise Name") },
-                            singleLine = true)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                  TextField(
+                      value = name,
+                      onValueChange = { name = it },
+                      label = { Text("Exercise Name") },
+                      singleLine = true)
 
-                        if (targetIsNamed) {
-                          TextField(
-                              value = desc,
-                              onValueChange = { desc = it },
-                              label = { Text("Description") })
-                        }
+                  AnimatedVisibility(
+                      visible = isNamed,
+                      enter = slideInVertically { h -> h } + fadeIn(),
+                      exit = slideOutVertically { h -> -h } + fadeOut()) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                              TextField(
+                                  value = desc,
+                                  onValueChange = { desc = it },
+                                  label = { Text("Description") })
 
-                        if (targetIsNamed && desc.isNotBlank()) {
-                          if (magnitudes != null) {
-                            MagnitudeSelector(
-                                magnitudes = magnitudes!!,
-                                selectedMagnitude = magnitude,
-                                onMagnitudeSelected = { magnitude = it })
-                          } else {
-                            CircularProgressIndicator()
-                          }
-                        }
+                              if (desc.isNotBlank()) {
+                                if (magnitudes != null) {
+                                  MagnitudeSelector(
+                                      magnitudes = magnitudes!!,
+                                      selectedMagnitude = magnitude,
+                                      onMagnitudeSelected = { magnitude = it })
+                                } else {
+                                  CircularProgressIndicator()
+                                }
+                              }
+                            }
                       }
                 }
           }

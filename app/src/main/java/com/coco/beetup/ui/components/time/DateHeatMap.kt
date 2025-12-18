@@ -153,7 +153,7 @@ private fun HeatmapCell(
         else -> activeColor.copy(alpha = day.count.toFloat() / maxActivity)
       }
 
-  if (day.date.isEqual(LocalDate.now())) {
+  if (selected) {
     PulsingSunnyShape(
         day.count,
         Modifier.padding(2.dp).aspectRatio(1f),

@@ -172,4 +172,10 @@ class BeetRepository(
   }
 
   fun allMagnitudes(): Flow<List<BeetMagnitude>> = beetExerciseDao.getAllMagnitudes()
+
+  suspend fun removeResistanceReference(exerciseId: Int, resistanceId: Int) =
+      beetExerciseDao.removeResistanceReference(exerciseId, resistanceId)
+
+  suspend fun insertResistanceReference(exerciseId: Int, resistanceId: Int) =
+      beetExerciseDao.insertResistanceReference(exerciseId, resistanceId)
 }

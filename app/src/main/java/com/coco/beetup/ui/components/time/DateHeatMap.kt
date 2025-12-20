@@ -75,7 +75,7 @@ fun DateHeatMap(
           maxActivity = maxActivity,
           onDatePositioned = onDatePositioned,
           selectedDates = selectedDates,
-          onDateSelected=onDateSelected,
+          onDateSelected = onDateSelected,
       )
     }
   }
@@ -99,11 +99,7 @@ private fun MonthSection(
 
   val dayOfWeekHeaders = remember {
     (1..7).map { day ->
-      LocalDate
-          .of(2024, 1, day)
-          .dayOfWeek
-          .getDisplayName(TextStyle.NARROW, Locale.getDefault()
-          )
+      LocalDate.of(2024, 1, day).dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.getDefault())
     }
   }
 
@@ -130,8 +126,7 @@ private fun MonthSection(
           maxActivity = maxActivity,
           onDatePositioned = onDatePositioned,
           selected = selectedDates.contains(day.date),
-          onClick = { onDateSelected(day.date) }
-      )
+          onClick = { onDateSelected(day.date) })
     }
   }
 }
@@ -168,10 +163,7 @@ private fun HeatmapCell(
                 .clip(RoundedCornerShape(12.dp))
                 .background(color)
                 .onGloballyPositioned { coordinates -> onDatePositioned(day.date, coordinates) }
-                .combinedClickable {
-                    onClick()
-                }
-    )
+                .combinedClickable { onClick() })
   }
 }
 

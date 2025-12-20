@@ -64,6 +64,12 @@ class BeetViewModel(
   }
 
   fun allMagnitudes() = repository.allMagnitudes()
+
+  fun removeResistanceReference(exerciseId: Int, resistanceId: Int) =
+      viewModelScope.launch { repository.removeResistanceReference(exerciseId, resistanceId) }
+
+  fun insertResistanceReference(exerciseId: Int, resistanceId: Int) =
+      viewModelScope.launch { repository.insertResistanceReference(exerciseId, resistanceId) }
 }
 
 class BeetViewModelFactory(

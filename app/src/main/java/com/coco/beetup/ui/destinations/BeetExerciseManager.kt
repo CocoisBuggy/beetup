@@ -44,6 +44,7 @@ import androidx.navigation.NavHostController
 import com.coco.beetup.ui.components.exercise.CreateExerciseDialog
 import com.coco.beetup.ui.components.exercise.ExerciseListItem
 import com.coco.beetup.ui.components.exercise.ExerciseManagerHero
+import com.coco.beetup.ui.components.exercise.ResistanceManagementDialog
 import com.coco.beetup.ui.components.nav.BeetTopBar
 import com.coco.beetup.ui.viewmodel.BeetViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -56,6 +57,7 @@ fun BeetExerciseManager(
     drawerState: DrawerState,
     scope: CoroutineScope = rememberCoroutineScope(),
 ) {
+  val resistances by viewModel.allResistances.collectAsState(emptyList())
   var showExerciseDialog by remember { mutableStateOf(false) }
 
   val exerciseCategories by viewModel.allExercises.collectAsState(initial = null)
@@ -117,6 +119,13 @@ fun BeetExerciseManager(
         LoadingIndicator()
       } else {
         var selectedExercise by remember { mutableStateOf<Int?>(null) }
+        var showResistanceDialog by remember { mutableStateOf(false) }
+        ResistanceManagementDialog(
+            selectedExercise,
+            showResistanceDialog,
+            viewModel,
+            resistances,
+            onDismiss = { showResistanceDialog = false })
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
           for (exercise in exerciseCategories) {
@@ -135,7 +144,11 @@ fun BeetExerciseManager(
                 exercise,
                 animatedPadding.coerceAtLeast(0.dp),
                 viewModel,
-                onClick = { selectedExercise = it })
+                onClick = { selectedExercise = it },
+                onRemoveResistanceReference = {
+                  viewModel.removeResistanceReference(exercise.id, it)
+                },
+                onAddResistance = { showResistanceDialog = true })
           }
         }
       }

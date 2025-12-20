@@ -63,6 +63,19 @@ interface BeetExerciseDao {
           " JOIN BeetResistance ON ValidBeetResistances.resistance_kind = BeetResistance.id" +
           " WHERE exercise_id = :exercise")
   fun validResistancesFor(exercise: Int): Flow<List<BeetResistance>>
+
+  @Query(
+      """
+        delete from ValidBeetResistances where exercise_id = :exerciseId and resistance_kind = :resistanceId
+      """)
+  suspend fun removeResistanceReference(exerciseId: Int, resistanceId: Int)
+
+  @Query(
+      """
+          insert into ValidBeetResistances (exercise_id, resistance_kind)
+          values (:exerciseId, :resistanceId)
+      """)
+  suspend fun insertResistanceReference(exerciseId: Int, resistanceId: Int)
 }
 
 @Dao

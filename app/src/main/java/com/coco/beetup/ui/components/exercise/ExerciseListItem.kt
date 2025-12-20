@@ -33,7 +33,9 @@ fun ExerciseListItem(
     exercise: BeetExercise,
     animatedPadding: Dp,
     viewModel: BeetViewModel,
-    onClick: (Int?) -> Unit
+    onClick: (Int?) -> Unit,
+    onRemoveResistanceReference: (Int) -> Unit,
+    onAddResistance: () -> Unit
 ) {
 
   ListItem(
@@ -66,7 +68,7 @@ fun ExerciseListItem(
                           Text(res.description, style = MaterialTheme.typography.labelSmall)
                         },
                         trailingContent = {
-                          IconButton({}) {
+                          IconButton({ onRemoveResistanceReference(res.id) }) {
                             Icon(
                                 Icons.Default.RemoveCircleOutline,
                                 "",
@@ -76,7 +78,7 @@ fun ExerciseListItem(
                   }
 
                   Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                    Button({}) {
+                    Button({ onAddResistance() }) {
                       Icon(Icons.Default.Add, "")
                       Text("Add Resistance Type")
                     }

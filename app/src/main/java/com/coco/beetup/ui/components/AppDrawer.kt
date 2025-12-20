@@ -54,7 +54,7 @@ fun AppDrawer(
           Triple(Home, "Home", Icons.Default.Home),
           Triple(ExerciseManager, "Exercise Manager", Icons.Default.SportsTennis),
           //          Triple(Stats, "Stats", Icons.Default.QueryStats),
-          Triple(Settings, "Settings", Icons.Default.Settings),
+//          Triple(Settings, "Settings", Icons.Default.Settings),
           Triple(BeetRaw, "Raw", Icons.Default.DataObject),
       )
 

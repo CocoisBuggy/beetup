@@ -88,7 +88,7 @@ interface ExerciseLogDao {
 
   @Query("SELECT * FROM BeetExerciseLog WHERE id = :id") fun getLog(id: Int): Flow<BeetExerciseLog>
 
-  @Query("SELECT * FROM BeetExerciseLog") fun getAllLogs(): Flow<List<BeetExerciseLog>>
+  @Query("SELECT * FROM BeetExerciseLog order by log_date desc") fun getAllLogs(): Flow<List<BeetExerciseLog>>
 
   @Query("SELECT * FROM BeetExerciseLog where log_day = :day")
   fun getLogsForDay(day: Int): Flow<List<BeetExerciseLog>>

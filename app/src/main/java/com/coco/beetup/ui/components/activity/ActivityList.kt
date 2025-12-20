@@ -98,11 +98,13 @@ fun ActivityList(
                         label = "",
                         icon = { Icon(Icons.Default.SkipPrevious, "Previous Day") },
                         weight = 1f,
+                        enabled = selectedItems.isEmpty(),
                     )
 
                     customItem(
                         buttonGroupContent = {
                           Button(
+                              enabled = selectedItems.isEmpty() && date != LocalDate.now(),
                               modifier =
                                   Modifier.weight(if (date != LocalDate.now()) 1.5f else 0.5f),
                               onClick = { onDateChange(LocalDate.now()) },
@@ -124,7 +126,8 @@ fun ActivityList(
                         label = "",
                         icon = { Icon(Icons.Default.SkipNext, "Next Day") },
                         weight = if (date < LocalDate.now()) 1f else 0.5f,
-                        enabled = date < LocalDate.now())
+                        enabled = date < LocalDate.now() && selectedItems.isEmpty(),
+                    )
                   }
 
                   Text("$date", style = MaterialTheme.typography.displayLarge)

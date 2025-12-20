@@ -162,7 +162,11 @@ private fun HeatmapCell(
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(12.dp))
                 .background(color)
-                .onGloballyPositioned { coordinates -> onDatePositioned(day.date, coordinates) }
+                .onGloballyPositioned { coordinates ->
+                  if (coordinates.isAttached) {
+                    onDatePositioned(day.date, coordinates)
+                  }
+                }
                 .combinedClickable { onClick() })
   }
 }

@@ -61,6 +61,7 @@ fun BeetHome(
   }
 
   BeetHomeDialogs(
+      date = date,
       activityGroups = activityGroups,
       viewModel = viewModel,
       showCategoryDialog = showCategoryDialog,

@@ -151,7 +151,9 @@ fun ActivityList(
                 onToggleMultiSelection = onToggleMultiSelection,
                 modifier =
                     Modifier.onGloballyPositioned { coordinates ->
-                      nodePositionState.onNodePositioned(item.key, coordinates)
+                      if (coordinates.isAttached) {
+                        nodePositionState.onNodePositioned(item.key, coordinates)
+                      }
                     })
           }
         }

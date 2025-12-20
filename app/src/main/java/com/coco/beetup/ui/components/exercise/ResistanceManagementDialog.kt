@@ -27,14 +27,14 @@ fun ResistanceManagementDialog(
 
       AlertDialog(
           title = { Text("Manage Resistance Types") },
-          onDismissRequest =  onDismiss,
+          onDismissRequest = onDismiss,
           text = {
             Column() {
               for (res in resistances) {
                 ListItem(
-                    colors = androidx.compose.material3.ListItemDefaults.colors(
-                        containerColor = androidx.compose.ui.graphics.Color.Transparent
-                    ),
+                    colors =
+                        androidx.compose.material3.ListItemDefaults.colors(
+                            containerColor = androidx.compose.ui.graphics.Color.Transparent),
                     headlineContent = { Text(res.name) },
                     leadingContent = {
                       Checkbox(

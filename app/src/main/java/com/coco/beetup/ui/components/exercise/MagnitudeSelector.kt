@@ -2,7 +2,7 @@ package com.coco.beetup.ui.components.exercise
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.FilterChip
@@ -23,7 +23,7 @@ fun MagnitudeSelector(
   Column {
     Text("Select Magnitude Kind:", style = MaterialTheme.typography.labelLarge)
     Spacer(Modifier.height(8.dp))
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
       magnitudes.forEach { mag ->
         FilterChip(
             selected = selectedMagnitude == mag,

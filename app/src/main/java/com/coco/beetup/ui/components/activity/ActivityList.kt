@@ -83,7 +83,11 @@ fun ActivityList(
                     selectedDates = setOf(date),
                     activeDates = activityDates,
                     onDatePositioned = { id, pos -> nodePositionState.onNodePositioned(id, pos) },
-                    onDateSelected = onDateChange,
+                    onDateSelected = {
+                      if (selectedItems.isEmpty()) {
+                        onDateChange(it)
+                      }
+                    },
                 )
 
                 Column {

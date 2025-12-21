@@ -4,6 +4,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -24,6 +25,11 @@ fun Date.unixDay(): Int {
 
 fun LocalDate.unixDay(): Int {
   return this.toEpochDay().toInt()
+}
+
+fun Date.daysSince(): Long {
+  val diff = Date().time - this.time
+  return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS)
 }
 
 class BeetRepository(
@@ -163,6 +169,9 @@ class BeetRepository(
       return@map map
     }
   }
+
+  fun getExerciseUsageCounts(): Flow<List<ExerciseUsagePrimitive>> =
+      exerciseLogDao.getExerciseUsageCounts()
 
   suspend fun updateLogAndResistances(
       log: BeetExerciseLog,

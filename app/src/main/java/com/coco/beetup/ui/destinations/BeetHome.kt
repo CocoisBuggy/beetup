@@ -100,7 +100,11 @@ fun BeetHome(
               selectedItems = selectedActivityGroups,
               editMode = editMode,
               multiSelectionEnabled = multiSelectionEnabled,
-              onAddActivityClick = { showCategoryDialog = true },
+              onAddActivityClick = {
+                selectedExerciseForEntry = null
+                magnitudeForEntry = null
+                showCategoryDialog = true
+              },
               onEditModeToggle = { editMode = !editMode },
               onDeleteSelected = onDeleteSelected,
               onBifurcate = {

@@ -19,6 +19,7 @@ class BeetViewModel(
   val allLogs = repository.getAllLogs()
   val todaysLogs = repository.logsForDay()
   val allResistances = repository.allResistances()
+  val exerciseUsageCounts = repository.getExerciseUsageCounts()
 
   fun validResistancesFor(exercise: Int) = repository.validResistancesFor(exercise)
 

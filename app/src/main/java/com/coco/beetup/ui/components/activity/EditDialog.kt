@@ -61,6 +61,8 @@ fun EditDialog(
                 for (log in forItem.logs) {
                   viewModel.updateLogAndResistances(log.log, selectedResistances)
                 }
+
+                onDismiss()
               }
             }) {
               Icon(Icons.Default.Save, "Save Icon")

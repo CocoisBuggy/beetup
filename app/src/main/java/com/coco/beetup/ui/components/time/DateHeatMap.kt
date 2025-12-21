@@ -1,7 +1,5 @@
 package com.coco.beetup.ui.components.time
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.Icon
@@ -19,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -148,26 +144,21 @@ private fun HeatmapCell(
         else -> activeColor.copy(alpha = day.count.toFloat() / maxActivity)
       }
 
-  if (selected) {
-    PulsingSunnyShape(
-        day.count,
-        Modifier.padding(2.dp).aspectRatio(1f),
-    ) {
+  PulsingSunnyShape(
+      selected,
+      day.count,
+      color = if (selected) MaterialTheme.colorScheme.secondary else color,
+      modifier =
+          Modifier.padding(2.dp).aspectRatio(1f).onGloballyPositioned { coordinates ->
+            if (coordinates.isAttached) {
+              onDatePositioned(day.date, coordinates)
+            }
+          },
+      onClick = onClick,
+  ) {
+    if (day.date == LocalDate.now()) {
       Icon(Icons.Default.Today, contentDescription = "TodayIcon")
     }
-  } else {
-    Box(
-        modifier =
-            Modifier.padding(2.dp)
-                .aspectRatio(1f)
-                .clip(RoundedCornerShape(12.dp))
-                .background(color)
-                .onGloballyPositioned { coordinates ->
-                  if (coordinates.isAttached) {
-                    onDatePositioned(day.date, coordinates)
-                  }
-                }
-                .combinedClickable { onClick() })
   }
 }
 

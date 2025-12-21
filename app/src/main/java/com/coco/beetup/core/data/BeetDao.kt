@@ -15,6 +15,8 @@ data class ActivityOverviewPrimitive(val date: Date, val count: Int)
 
 data class ExerciseOccurredOnDatePrimitive(val date: Date, val exercise: Int)
 
+data class ExerciseUsagePrimitive(val exerciseId: Int, val count: Int, val lastDate: Date?)
+
 @Dao
 interface BeetProfileDao {
   @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun insert(profile: BeetProfile)
@@ -162,4 +164,8 @@ interface ExerciseLogDao {
           GROUP BY log_day, exerciseId
           """)
   fun exerciseDateOverview(since: Int): Flow<List<ExerciseOccurredOnDatePrimitive>>
+
+  @Query(
+      "SELECT exerciseId, COUNT(*) as count, MAX(log_date) as lastDate FROM BeetExerciseLog GROUP BY exerciseId")
+  fun getExerciseUsageCounts(): Flow<List<ExerciseUsagePrimitive>>
 }

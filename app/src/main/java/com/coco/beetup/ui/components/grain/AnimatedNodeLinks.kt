@@ -63,7 +63,7 @@ fun AnimatedNodeLinks(
       )
 
   Canvas(modifier = Modifier.fillMaxSize()) {
-    val parentCoords = columnCoords ?: return@Canvas
+    if (columnCoords.isAttached.not()) return@Canvas
 
     selectedItems.forEach { activityKey ->
       val curveOffsetDistance = 100f
@@ -76,80 +76,84 @@ fun AnimatedNodeLinks(
           Offset(
               x = finalStartOffset.x + (startLayoutCoords.size.width / 2f), y = finalStartOffset.y)
 
-      drawCircle(
-          radius = 8.dp.toPx() * circleBump,
-          center = startPoint,
-          color = color,
-      )
+      exerciseDates[activityKey.exerciseId]?.let { dates ->
+        val datePositions = dates.mapNotNull { nodes.nodePositions[it] }.filter { it.isAttached }
+        if (datePositions.isEmpty()) return@let
 
-      exerciseDates[activityKey.exerciseId]?.forEachIndexed { idx, date ->
-        val endLayoutCoords = nodes.nodePositions[date] ?: return@forEach
-        val endOffset = parentCoords.localPositionOf(endLayoutCoords, Offset.Zero)
-
-        val finalEndOffset = endOffset + scrollOffset
-
-        val endPoint =
-            Offset(
-                x = finalEndOffset.x + (endLayoutCoords.size.width / 2f),
-                y = finalEndOffset.y + endLayoutCoords.size.height)
-
-        val angle = atan2(endPoint.y - startPoint.y, endPoint.x - startPoint.x)
-        val perpendicularAngle = angle - (Math.PI / 2).toFloat()
-
-        val point1OnLine = startPoint + (endPoint - startPoint) / 3f
-        val point2OnLine = startPoint + (endPoint - startPoint) * (2f / 3f)
-
-        val cosPerpendicular = cos(perpendicularAngle) * curveOffsetDistance
-        val sinPerpendicular = sin(perpendicularAngle) * curveOffsetDistance
-
-        val xOffset = if (endPoint.x <= startPoint.x) cosPerpendicular else -cosPerpendicular
-
-        val controlPoint1 =
-            Offset(
-                x = point1OnLine.x + xOffset + randomPairs[idx].first,
-                y = point1OnLine.y + sinPerpendicular)
-
-        val controlPoint2 =
-            Offset(
-                x = point2OnLine.x + xOffset + randomPairs[idx].second,
-                y = point2OnLine.y + sinPerpendicular)
-
-        val path =
-            Path().apply {
-              moveTo(startPoint.x, startPoint.y)
-              cubicTo(
-                  controlPoint1.x,
-                  controlPoint1.y,
-                  controlPoint2.x,
-                  controlPoint2.y,
-                  endPoint.x,
-                  endPoint.y)
-            }
-
-        val pathMeasure = PathMeasure()
-        pathMeasure.setPath(path, forceClosed = false)
-
-        val totalLength = pathMeasure.length
-        val animatedLength = totalLength * lineProgress
-        val partialPath = Path()
-
-        pathMeasure.getSegment(
-            0f,
-            animatedLength,
-            partialPath,
-            startWithMoveTo = true,
-        )
-
-        drawPath(
-            path = partialPath,
+        drawCircle(
+            radius = 8.dp.toPx() * circleBump,
+            center = startPoint,
             color = color,
-            style =
-                Stroke(
-                    width = 3.dp.toPx(),
-                    pathEffect =
-                        PathEffect.dashPathEffect(
-                            intervals = floatArrayOf(8.dp.toPx(), 4.dp.toPx()), phase = 0f)),
         )
+
+        datePositions.forEachIndexed { idx, endLayoutCoords ->
+          val endOffset = columnCoords.localPositionOf(endLayoutCoords, Offset.Zero)
+
+          val finalEndOffset = endOffset + scrollOffset
+
+          val endPoint =
+              Offset(
+                  x = finalEndOffset.x + (endLayoutCoords.size.width / 2f),
+                  y = finalEndOffset.y + endLayoutCoords.size.height)
+
+          val angle = atan2(endPoint.y - startPoint.y, endPoint.x - startPoint.x)
+          val perpendicularAngle = angle - (Math.PI / 2).toFloat()
+
+          val point1OnLine = startPoint + (endPoint - startPoint) / 3f
+          val point2OnLine = startPoint + (endPoint - startPoint) * (2f / 3f)
+
+          val cosPerpendicular = cos(perpendicularAngle) * curveOffsetDistance
+          val sinPerpendicular = sin(perpendicularAngle) * curveOffsetDistance
+
+          val xOffset = if (endPoint.x <= startPoint.x) cosPerpendicular else -cosPerpendicular
+
+          val controlPoint1 =
+              Offset(
+                  x = point1OnLine.x + xOffset + randomPairs[idx].first,
+                  y = point1OnLine.y + sinPerpendicular)
+
+          val controlPoint2 =
+              Offset(
+                  x = point2OnLine.x + xOffset + randomPairs[idx].second,
+                  y = point2OnLine.y + sinPerpendicular)
+
+          val path =
+              Path().apply {
+                moveTo(startPoint.x, startPoint.y)
+                cubicTo(
+                    controlPoint1.x,
+                    controlPoint1.y,
+                    controlPoint2.x,
+                    controlPoint2.y,
+                    endPoint.x,
+                    endPoint.y)
+              }
+
+          val pathMeasure = PathMeasure()
+          pathMeasure.setPath(path, forceClosed = false)
+
+          val totalLength = pathMeasure.length
+          val animatedLength = totalLength * lineProgress
+          val partialPath = Path()
+
+          pathMeasure.getSegment(
+              0f,
+              animatedLength,
+              partialPath,
+              startWithMoveTo = true,
+          )
+
+          drawPath(
+              path = partialPath,
+              color = color,
+              style =
+                  Stroke(
+                      width = 3.dp.toPx(),
+                      pathEffect =
+                          PathEffect.dashPathEffect(
+                              intervals = floatArrayOf(8.dp.toPx(), 4.dp.toPx()), phase = 0f)),
+          )
+        }
       }
     }
   }

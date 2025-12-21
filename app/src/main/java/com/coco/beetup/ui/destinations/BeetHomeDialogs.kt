@@ -9,6 +9,7 @@ import com.coco.beetup.core.data.ActivityKey
 import com.coco.beetup.core.data.BeetActivityResistance
 import com.coco.beetup.core.data.BeetExercise
 import com.coco.beetup.core.data.BeetExerciseLog
+import com.coco.beetup.core.data.daysSince
 import com.coco.beetup.ui.components.activity.CategorySelectionDialog
 import com.coco.beetup.ui.components.activity.EditDialog
 import com.coco.beetup.ui.components.activity.ExerciseLogDetailsDialog
@@ -61,8 +62,24 @@ fun BeetHomeDialogs(
   }
 
   if (showCategoryDialog) {
+    val exerciseUsageCounts by viewModel.exerciseUsageCounts.collectAsState(initial = emptyList())
+
+    val countsMap =
+        remember(exerciseUsageCounts) {
+          exerciseUsageCounts.associate { it.exerciseId to it.count }
+        }
+
+    val lastUsedMap =
+        remember(exerciseUsageCounts) {
+          exerciseUsageCounts.associate {
+            it.exerciseId to (it.lastDate?.daysSince()?.toInt() ?: -1)
+          }
+        }
+
     CategorySelectionDialog(
         categories = exerciseCategories,
+        usageCounts = countsMap,
+        lastUsedDays = lastUsedMap,
         onCategorySelected = onExerciseSelected,
         onDismiss = onDismissCategoryDialog,
     )

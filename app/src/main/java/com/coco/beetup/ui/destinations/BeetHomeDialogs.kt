@@ -5,7 +5,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.coco.beetup.core.data.ActivityGroup
-import com.coco.beetup.core.data.ActivityKey
 import com.coco.beetup.core.data.BeetActivityResistance
 import com.coco.beetup.core.data.BeetExercise
 import com.coco.beetup.core.data.BeetExerciseLog
@@ -27,24 +26,14 @@ fun LocalDate.toDate(): Date {
 
 @Composable
 fun BeetHomeDialogs(
-    date: LocalDate,
+    state: BeetHomeState,
     activityGroups: List<ActivityGroup>,
-    selectedItems: Set<ActivityKey>,
     viewModel: BeetViewModel,
-    showCategoryDialog: Boolean,
-    onDismissCategoryDialog: () -> Unit,
-    selectedExerciseForEntry: BeetExercise?,
-    onExerciseSelected: (BeetExercise) -> Unit,
-    magnitudeForEntry: Int?,
-    onMagnitudeSet: (Int) -> Unit,
-    onDismissExerciseDetails: () -> Unit,
     exerciseCategories: List<BeetExercise>,
-    editMode: Boolean,
-    onEditCommit: () -> Unit
 ) {
 
-  selectedItems.firstOrNull()?.let { key ->
-    if (editMode) {
+  state.selectedItems.firstOrNull()?.let { key ->
+    if (state.editMode) {
       val activity = remember { activityGroups.find { it.key == key }!! }
       val allowedResistances by
           viewModel
@@ -53,15 +42,15 @@ fun BeetHomeDialogs(
 
       EditDialog(
           viewModel = viewModel,
-          onDismiss = onEditCommit,
-          onCommit = onEditCommit,
+          onDismiss = { state.editMode = false },
+          onCommit = { state.editMode = false },
           forItem = activity,
           allowedResistances = allowedResistances,
       )
     }
   }
 
-  if (showCategoryDialog) {
+  if (state.showCategoryDialog) {
     val exerciseUsageCounts by viewModel.exerciseUsageCounts.collectAsState(initial = emptyList())
 
     val countsMap =
@@ -80,50 +69,53 @@ fun BeetHomeDialogs(
         categories = exerciseCategories,
         usageCounts = countsMap,
         lastUsedDays = lastUsedMap,
-        onCategorySelected = onExerciseSelected,
-        onDismiss = onDismissCategoryDialog,
+        onCategorySelected = state::selectExercise,
+        onDismiss = { state.showCategoryDialog = false },
     )
   }
 
-  selectedExerciseForEntry?.let { exercise ->
+  state.selectedExerciseForEntry?.let { exercise ->
     val magnitude by viewModel.magnitudeFor(exercise.magnitudeKind).collectAsState(initial = null)
     val validResistances by
         viewModel.validResistancesFor(exercise.id).collectAsState(initial = emptyList())
 
-    if (magnitudeForEntry == null) {
+    if (state.magnitudeForEntry == null) {
       magnitude?.let {
         ExerciseLogDetailsDialog(
             exercise = exercise,
             magnitudeName = it.name,
             magnitudeUnit = it.unit,
-            onConfirm = onMagnitudeSet,
-            onDismiss = onDismissExerciseDetails,
+            onConfirm = { state.magnitudeForEntry = it },
+            onDismiss = state::dismissExerciseDetails,
         )
       }
     } else {
-      ResistanceSelectionDialog(
-          resistances = validResistances,
-          onConfirm = { selectedResistances ->
-            val logDate = if (date.isToday()) Date() else date.toDate()
-            val newExerciseLog =
-                BeetExerciseLog(
-                    logDate = logDate,
-                    logDay = date.toEpochDay().toInt(),
-                    exerciseId = exercise.id,
-                    magnitude = magnitudeForEntry,
-                )
-            val newResistances =
-                selectedResistances.map {
-                  BeetActivityResistance(
-                      activityId = 0, // This will be overridden by the repository
-                      resistanceKind = it.key,
-                      resistanceValue = it.value)
-                }
-            viewModel.insertActivityAndResistances(newExerciseLog, newResistances)
-            onDismissExerciseDetails()
-          },
-          onDismiss = onDismissExerciseDetails,
-      )
+        state.magnitudeForEntry?.let { magnitudeForEntry ->
+            ResistanceSelectionDialog(
+                resistances = validResistances,
+                onConfirm = { selectedResistances ->
+                    val logDate = if (state.date.isToday()) Date() else state.date.toDate()
+                    val newExerciseLog =
+                        BeetExerciseLog(
+                            logDate = logDate,
+                            logDay = state.date.toEpochDay().toInt(),
+                            exerciseId = exercise.id,
+                            magnitude = magnitudeForEntry,
+                        )
+                    val newResistances =
+                        selectedResistances.map {
+                            BeetActivityResistance(
+                                activityId = 0, // This will be overridden by the repository
+                                resistanceKind = it.key,
+                                resistanceValue = it.value
+                            )
+                        }
+                    viewModel.insertActivityAndResistances(newExerciseLog, newResistances)
+                    state.dismissExerciseDetails()
+                },
+                onDismiss = state::dismissExerciseDetails,
+            )
+        }
     }
   }
 }

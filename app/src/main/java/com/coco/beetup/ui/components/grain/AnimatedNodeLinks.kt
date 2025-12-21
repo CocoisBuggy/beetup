@@ -39,7 +39,8 @@ fun AnimatedNodeLinks(
   val randomPairs = remember {
     (0..20).map { Pair(Random.nextInt(-200, 200), Random.nextInt(-300, 300)) }
   }
-  val color = MaterialTheme.colorScheme.tertiary
+  val color = MaterialTheme.colorScheme.primary
+
   val lineProgress: Float by
       animateFloatAsState(
           targetValue = if (selectedItems.isEmpty()) 0f else 1f,

@@ -8,22 +8,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.coco.beetup.core.data.ActivityKey
-import com.coco.beetup.core.data.BeetExercise
 import com.coco.beetup.core.data.unixDay
 import com.coco.beetup.ui.components.MorphFab
 import com.coco.beetup.ui.components.SelectionAppBar
 import com.coco.beetup.ui.components.activity.ActivityList
 import com.coco.beetup.ui.components.nav.BeetTopBar
 import com.coco.beetup.ui.viewmodel.BeetViewModel
-import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,59 +30,37 @@ fun BeetHome(
     scope: CoroutineScope = rememberCoroutineScope(),
 ) {
   val exerciseCategories by viewModel.allExercises.collectAsState(initial = emptyList())
-  var date by remember { mutableStateOf(LocalDate.now()) }
+  val state = rememberBeetHomeState()
 
   val activityGroups by
-      viewModel.activityGroupsForDay(date.unixDay()).collectAsState(initial = emptyList())
+      viewModel.activityGroupsForDay(state.date.unixDay()).collectAsState(initial = emptyList())
   val activityOverview by viewModel.activityOverview().collectAsState(initial = null)
   val exerciseDateOverview by viewModel.exerciseDateOverview().collectAsState(initial = null)
 
-  var editMode by remember { mutableStateOf(false) }
-  var selectedItems by remember { mutableStateOf<Set<ActivityKey>>(emptySet()) }
-  var multiSelectionEnabled by remember { mutableStateOf(false) }
-  var showCategoryDialog by remember { mutableStateOf(false) }
-  var selectedExerciseForEntry by remember { mutableStateOf<BeetExercise?>(null) }
-  var magnitudeForEntry by remember { mutableStateOf<Int?>(null) }
   val selectedActivityGroups by
-      remember(activityGroups, selectedItems) {
-        derivedStateOf { activityGroups.filter { it.key in selectedItems }.toSet() }
+      remember(activityGroups, state.selectedItems) {
+        derivedStateOf { activityGroups.filter { it.key in state.selectedItems }.toSet() }
       }
 
   val onDeleteSelected = {
-    val itemsToDelete = activityGroups.filter { it.key in selectedItems }
+    val itemsToDelete = activityGroups.filter { it.key in state.selectedItems }
     viewModel.deleteActivity(itemsToDelete.flatMap { outer -> outer.logs.map { it.log } })
-    selectedItems = emptySet()
-    multiSelectionEnabled = false
+    state.clearSelection()
   }
 
   BeetHomeDialogs(
-      date = date,
+      state = state,
       activityGroups = activityGroups,
       viewModel = viewModel,
-      showCategoryDialog = showCategoryDialog,
-      onDismissCategoryDialog = { showCategoryDialog = false },
-      selectedExerciseForEntry = selectedExerciseForEntry,
-      onExerciseSelected = { exercise ->
-        selectedExerciseForEntry = exercise
-        showCategoryDialog = false
-      },
-      magnitudeForEntry = magnitudeForEntry,
-      onMagnitudeSet = { magnitude -> magnitudeForEntry = magnitude },
-      onDismissExerciseDetails = { selectedExerciseForEntry = null },
       exerciseCategories = exerciseCategories,
-      editMode = editMode,
-      onEditCommit = { editMode = false },
-      selectedItems = selectedItems)
+  )
 
   Scaffold(
       topBar = {
-        if (multiSelectionEnabled) {
+        if (state.multiSelectionEnabled) {
           SelectionAppBar(
-              selectedItemCount = selectedItems.size,
-              onClearSelection = {
-                selectedItems = emptySet()
-                multiSelectionEnabled = false
-              },
+              selectedItemCount = state.selectedItems.size,
+              onClearSelection = state::clearSelection,
               onDeleteSelected = onDeleteSelected,
           )
         } else {
@@ -95,21 +68,17 @@ fun BeetHome(
         }
       },
       floatingActionButton = {
-        if (!multiSelectionEnabled) {
+        if (!state.multiSelectionEnabled) {
           MorphFab(
               selectedItems = selectedActivityGroups,
-              editMode = editMode,
-              multiSelectionEnabled = multiSelectionEnabled,
-              onAddActivityClick = {
-                selectedExerciseForEntry = null
-                magnitudeForEntry = null
-                showCategoryDialog = true
-              },
-              onEditModeToggle = { editMode = !editMode },
+              editMode = state.editMode,
+              multiSelectionEnabled = state.multiSelectionEnabled,
+              onAddActivityClick = state::startAddActivity,
+              onEditModeToggle = { state.editMode = !state.editMode },
               onDeleteSelected = onDeleteSelected,
               onBifurcate = {
-                selectedExerciseForEntry =
-                    exerciseCategories.find { it.id == selectedItems.first().exerciseId }
+                state.selectedExerciseForEntry =
+                    exerciseCategories.find { it.id == state.selectedItems.first().exerciseId }
               },
               onMinus = {
                 selectedActivityGroups.forEach {
@@ -121,26 +90,15 @@ fun BeetHome(
       },
   ) { innerPadding ->
     ActivityList(
-        date = date,
+        date = state.date,
         modifier = Modifier.padding(innerPadding).padding(6.dp),
         todaysActivity = activityGroups,
         activityDates = activityOverview,
         exerciseDates = exerciseDateOverview,
-        selectedItems = selectedItems,
-        onToggleSelection = {
-          selectedItems =
-              if (multiSelectionEnabled) {
-                if (it in selectedItems) {
-                  selectedItems - it
-                } else {
-                  selectedItems + it
-                }
-              } else {
-                if (it in selectedItems) emptySet() else setOf(it)
-              }
-        },
-        onToggleMultiSelection = { multiSelectionEnabled = !multiSelectionEnabled },
+        selectedItems = state.selectedItems,
+        onToggleSelection = state::toggleSelection,
+        onToggleMultiSelection = state::toggleMultiSelection,
         viewModel = viewModel,
-        onDateChange = { date = it })
+        onDateChange = { state.date = it })
   }
 }

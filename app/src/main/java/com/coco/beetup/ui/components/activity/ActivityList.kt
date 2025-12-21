@@ -1,6 +1,8 @@
 package com.coco.beetup.ui.components.activity
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -134,12 +136,26 @@ fun ActivityList(
                     )
                   }
 
-                  Text("$date", style = MaterialTheme.typography.displayLarge)
+                  val animatedTextColor by
+                      animateColorAsState(
+                          targetValue =
+                              if (selectedItems.isEmpty()) MaterialTheme.colorScheme.onSurfaceVariant
+                              else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha=0.4f),
+                          animationSpec = spring(),
+                          label = "animatedHeroTextColor",
+                      )
+
+                  Text(
+                      "$date",
+                      style = MaterialTheme.typography.displayLarge,
+                      color = animatedTextColor)
 
                   Text(
                       if (todaysActivity.isEmpty()) "No activity for this day"
                       else "Activity for this day",
-                      style = MaterialTheme.typography.titleMedium)
+                      style = MaterialTheme.typography.titleMedium,
+                      color = animatedTextColor,
+                  )
                 }
               }
             }

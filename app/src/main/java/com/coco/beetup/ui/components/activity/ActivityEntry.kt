@@ -34,7 +34,7 @@ import com.coco.beetup.core.data.PlusOne
 import com.coco.beetup.core.data.ResistanceConversion
 import com.coco.beetup.ui.components.grain.ResistanceIcon
 import com.coco.beetup.ui.viewmodel.BeetViewModel
-import java.util.Date
+import java.time.LocalDateTime
 import java.util.UUID
 
 private data class PlusOneAnimation(val id: String = UUID.randomUUID().toString())
@@ -120,7 +120,7 @@ fun ActivityEntry(
               onClick = {
                 plusOneAnimations = plusOneAnimations + PlusOneAnimation()
                 viewModel.insertActivityAndResistances(
-                    activity.logs.last().log.copy(id = 0, logDate = Date()),
+                    activity.logs.last().log.copy(id = 0, logDate = LocalDateTime.now()),
                     activity.logs.last().resistances.map { it.entry })
               }) {
                 Text("+1")

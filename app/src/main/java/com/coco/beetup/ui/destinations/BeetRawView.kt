@@ -29,8 +29,7 @@ import com.coco.beetup.core.data.BeetExerciseLog
 import com.coco.beetup.core.data.BeetMagnitude
 import com.coco.beetup.ui.components.nav.BeetTopBar
 import com.coco.beetup.ui.viewmodel.BeetViewModel
-import java.text.SimpleDateFormat
-import java.util.Locale
+import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.CoroutineScope
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -74,7 +73,7 @@ fun BeetRawView(
 
 @Composable
 fun LogCard(log: BeetExerciseLog, exercise: BeetExercise?, magnitude: BeetMagnitude?) {
-  val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()) }
+  val dateFormatter = remember { DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss") }
 
   Card(
       modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth(),
@@ -106,7 +105,7 @@ fun LogCard(log: BeetExerciseLog, exercise: BeetExercise?, magnitude: BeetMagnit
 
           Row(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.weight(1f)) {
-              LabelValue("Date", dateFormat.format(log.logDate))
+              LabelValue("Date", log.logDate.format(dateFormatter))
               LabelValue("Unix Day", log.logDay.toString())
             }
             Column(modifier = Modifier.weight(1f)) {

@@ -15,13 +15,14 @@ import com.coco.beetup.ui.components.activity.ExerciseLogDetailsDialog
 import com.coco.beetup.ui.components.activity.ResistanceSelectionDialog
 import com.coco.beetup.ui.viewmodel.BeetViewModel
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
 
 private fun LocalDate.isToday() = (this == LocalDate.now())
 
-fun LocalDate.toDate(): Date {
-  return Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant())
+fun LocalDate.toLocalDateTime(): LocalDateTime {
+  return this.atStartOfDay()
 }
 
 @Composable
@@ -94,7 +95,7 @@ fun BeetHomeDialogs(
             ResistanceSelectionDialog(
                 resistances = validResistances,
                 onConfirm = { selectedResistances ->
-                    val logDate = if (state.date.isToday()) Date() else state.date.toDate()
+                    val logDate = if (state.date.isToday()) LocalDateTime.now() else state.date.toLocalDateTime()
                     val newExerciseLog =
                         BeetExerciseLog(
                             logDate = logDate,

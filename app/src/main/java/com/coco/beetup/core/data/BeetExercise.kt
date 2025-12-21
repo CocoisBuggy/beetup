@@ -5,6 +5,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.Date
 
 @Entity
@@ -86,7 +88,7 @@ data class ValidBeetResistances(
 data class BeetExerciseLog(
     @ColumnInfo val exerciseId: Int,
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    @ColumnInfo(name = "log_date") val logDate: Date = Date(),
+    @ColumnInfo(name = "log_date") val logDate: LocalDateTime = LocalDateTime.now(),
     /** Day of all time (unix day) */
     @ColumnInfo(name = "log_day") val logDay: Int = (Date().time / 86_400_000L).toInt(),
     @ColumnInfo(name = "magnitude", defaultValue = "1") val magnitude: Int = 0,

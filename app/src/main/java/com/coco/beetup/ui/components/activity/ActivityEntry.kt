@@ -1,11 +1,14 @@
 package com.coco.beetup.ui.components.activity
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -27,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.coco.beetup.core.data.ActivityGroup
@@ -34,7 +38,10 @@ import com.coco.beetup.core.data.PlusOne
 import com.coco.beetup.core.data.ResistanceConversion
 import com.coco.beetup.ui.components.grain.ResistanceIcon
 import com.coco.beetup.ui.viewmodel.BeetViewModel
+import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.util.UUID
 
 private data class PlusOneAnimation(val id: String = UUID.randomUUID().toString())
@@ -108,6 +115,75 @@ fun ActivityEntry(
 
               if (activity.logs.first().resistances.isEmpty()) {
                 AssistChip({}, label = { Text("No Resistance") }, enabled = false)
+              }
+            }
+
+            if (isSelected) {
+              val sortedLogs = remember(activity.logs) { activity.logs.sortedBy { it.log.logDate } }
+              val hasTimeData = remember(sortedLogs) {
+                sortedLogs.isNotEmpty() &&
+                    sortedLogs.any { it.log.logDate.toLocalTime() != LocalTime.MIN }
+              }
+
+              if (hasTimeData) {
+                val intervals = remember(sortedLogs) {
+                  sortedLogs.zipWithNext { a, b ->
+                    Duration.between(a.log.logDate, b.log.logDate)
+                  }
+                }
+
+                if (intervals.isNotEmpty()) {
+                  Spacer(Modifier.height(8.dp))
+                  Text(
+                      text =
+                          "Rest: " +
+                              intervals.joinToString(", ") {
+                                val mm = it.toMinutes()
+                                val ss = it.minusMinutes(mm).seconds
+                                if (mm > 0) "${mm}m${ss}s" else "${ss}s"
+                              },
+                      style = MaterialTheme.typography.bodySmall)
+
+                  if (intervals.size > 1) {
+                    val maxDuration = intervals.maxOf { it.seconds }
+                    val minDuration = intervals.minOf { it.seconds }
+                    val range = (maxDuration - minDuration).coerceAtLeast(1)
+                    val color = MaterialTheme.colorScheme.primary
+
+                    Canvas(
+                        modifier = Modifier.height(30.dp).fillMaxWidth().padding(top = 4.dp)) {
+                          val points =
+                              intervals.mapIndexed { index, duration ->
+                                val x =
+                                    size.width * index / (intervals.size - 1).coerceAtLeast(1)
+                                val normalized =
+                                    (duration.seconds - minDuration).toFloat() / range
+                                val y = size.height - (normalized * size.height)
+                                Offset(x, y)
+                              }
+
+                          points.zipWithNext { a, b ->
+                            drawLine(
+                                color = color, start = a, end = b, strokeWidth = 2.dp.toPx())
+                          }
+
+                          points.forEach {
+                            drawCircle(color, radius = 2.dp.toPx(), center = it)
+                          }
+                        }
+                  }
+                }
+
+                val lastLog = sortedLogs.last()
+                if (lastLog.log.logDate.toLocalDate().isEqual(LocalDate.now())) {
+                  if (intervals.isEmpty()) Spacer(Modifier.height(4.dp))
+                  val since = Duration.between(lastLog.log.logDate, LocalDateTime.now())
+                  val mm = since.toMinutes()
+                  val ss = since.minusMinutes(mm).seconds
+                  Text(
+                      "Since last: ${if (mm > 0) "${mm}m${ss}s" else "${ss}s"} ago",
+                      style = MaterialTheme.typography.bodySmall)
+                }
               }
             }
           }

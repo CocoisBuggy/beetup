@@ -31,7 +31,6 @@ INSERT INTO ValidBeetResistances VALUES(3, 2), (3, 4);
 INSERT INTO ValidBeetResistances VALUES(4, 2), (4, 4);
 
 INSERT INTO ValidBeetResistances VALUES(5, 2);
-INSERT INTO ValidBeetResistances VALUES(6, 2);
 INSERT INTO ValidBeetResistances VALUES(9, 2);
 INSERT INTO ValidBeetResistances VALUES(12, 4);
 INSERT INTO ValidBeetResistances VALUES(13, 2), (13, 4);

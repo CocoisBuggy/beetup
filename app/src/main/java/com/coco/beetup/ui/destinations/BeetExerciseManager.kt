@@ -63,6 +63,8 @@ fun BeetExerciseManager(
   var exerciseToEdit by remember { mutableStateOf<BeetExercise?>(null) }
 
   val exerciseCategories by viewModel.allExercises.collectAsState(initial = null)
+  val usageCounts by viewModel.exerciseUsageCounts.collectAsState(initial = emptyList())
+
   val scrollState = rememberScrollState()
 
   val isVisible = scrollState.value > 0
@@ -136,6 +138,7 @@ fun BeetExerciseManager(
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
           for (exercise in exerciseCategories!!) {
             val isSelected = selectedExercise == exercise.id
+            val count = usageCounts.find { it.exerciseId == exercise.id }?.count ?: 0
 
             val animatedPadding by
                 animateDpAsState(
@@ -148,6 +151,7 @@ fun BeetExerciseManager(
             ExerciseListItem(
                 isSelected,
                 exercise,
+                count,
                 animatedPadding.coerceAtLeast(0.dp),
                 viewModel,
                 onClick = { selectedExercise = it },

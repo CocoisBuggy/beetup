@@ -1,13 +1,23 @@
 package com.coco.beetup.core.data
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.snapshots.SnapshotStateMap
+import androidx.sqlite.db.SimpleSQLiteQuery
+import com.coco.beetup.R
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import kotlin.sequences.forEach
 
 private fun List<BeetResistance>.toMap(): Map<Int, BeetResistance> = this.associateBy { it.id }
 
@@ -189,8 +199,20 @@ class BeetRepository(
   suspend fun insertResistanceReference(exerciseId: Int, resistanceId: Int) =
       beetExerciseDao.insertResistanceReference(exerciseId, resistanceId)
 
-  suspend fun clearAllData() {
-    database.clearAllTables()
+  suspend fun clearAllData(context: Context) {
+    withContext(Dispatchers.IO) {
+      database.clearAllTables()
+      val inputStream = context.resources.openRawResource(R.raw.defaults)
+      val reader = BufferedReader(InputStreamReader(inputStream))
+      reader.useLines { lines ->
+        lines.forEach { line ->
+          if (line.isNotBlank() && !line.trim().startsWith("--")) {
+              Log.d("Database", line)
+            database.openHelper.writableDatabase.execSQL(line)
+          }
+        }
+      }
+    }
   }
 
   fun checkpoint() {

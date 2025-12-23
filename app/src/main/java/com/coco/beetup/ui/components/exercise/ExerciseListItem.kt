@@ -35,6 +35,7 @@ import com.coco.beetup.ui.viewmodel.BeetViewModel
 fun ExerciseListItem(
     isSelected: Boolean,
     exercise: BeetExercise,
+    usageCount: Int,
     animatedPadding: Dp,
     viewModel: BeetViewModel,
     onClick: (Int?) -> Unit,
@@ -52,6 +53,7 @@ fun ExerciseListItem(
                   width = 1.dp,
                   color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
                   shape = MaterialTheme.shapes.medium),
+      overlineContent = { Text("$usageCount entries") },
       headlineContent = {
         Text(exercise.exerciseName, style = MaterialTheme.typography.titleMedium)
       },

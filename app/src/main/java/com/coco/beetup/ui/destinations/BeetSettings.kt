@@ -103,7 +103,7 @@ fun BeetSettings(
           TextButton(
               onClick = {
                 scope.launch {
-                  viewModel.clearAllData()
+                  viewModel.clearAllData(context)
                   showClearDialog = false
                   Toast.makeText(context, "Data cleared", Toast.LENGTH_SHORT).show()
                 }

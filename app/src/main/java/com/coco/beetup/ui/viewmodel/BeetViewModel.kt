@@ -1,5 +1,6 @@
 package com.coco.beetup.ui.viewmodel
 
+import android.content.Context
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -74,7 +75,7 @@ class BeetViewModel(
   fun insertResistanceReference(exerciseId: Int, resistanceId: Int) =
       viewModelScope.launch { repository.insertResistanceReference(exerciseId, resistanceId) }
 
-  suspend fun clearAllData() = withContext(Dispatchers.IO) { repository.clearAllData() }
+  suspend fun clearAllData(ctx: Context) = withContext(Dispatchers.IO) { repository.clearAllData(ctx) }
 
   suspend fun checkpoint() = withContext(Dispatchers.IO) { repository.checkpoint() }
 

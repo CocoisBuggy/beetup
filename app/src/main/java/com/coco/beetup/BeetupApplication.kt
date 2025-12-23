@@ -38,6 +38,7 @@ class BeetupApplication : Application() {
 
   val repository: BeetRepository by lazy {
     BeetRepository(
+        database,
         database.beetProfileDao(),
         database.beetExerciseDao(),
         database.exerciseLogDao(),

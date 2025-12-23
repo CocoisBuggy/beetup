@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DataObject
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
@@ -53,7 +54,7 @@ fun AppDrawer(
           Triple(Home, "Home", Icons.Default.Home),
           Triple(ExerciseManager, "Exercise Manager", Icons.Default.SportsTennis),
           //          Triple(Stats, "Stats", Icons.Default.QueryStats),
-          //          Triple(Settings, "Settings", Icons.Default.Settings),
+          Triple(Settings, "Settings", Icons.Default.Settings),
           Triple(BeetRaw, "Raw", Icons.Default.DataObject),
       )
 

@@ -33,6 +33,7 @@ fun Date.daysSince(): Long {
 }
 
 class BeetRepository(
+    private val database: BeetData,
     private val beetProfileDao: BeetProfileDao,
     private val beetExerciseDao: BeetExerciseDao,
     private val exerciseLogDao: ExerciseLogDao,
@@ -187,4 +188,18 @@ class BeetRepository(
 
   suspend fun insertResistanceReference(exerciseId: Int, resistanceId: Int) =
       beetExerciseDao.insertResistanceReference(exerciseId, resistanceId)
+
+  suspend fun clearAllData() {
+    database.clearAllTables()
+  }
+
+  fun checkpoint() {
+    database.openHelper.writableDatabase.query("PRAGMA wal_checkpoint(FULL)").close()
+  }
+
+  fun close() {
+    if (database.isOpen) {
+      database.close()
+    }
+  }
 }

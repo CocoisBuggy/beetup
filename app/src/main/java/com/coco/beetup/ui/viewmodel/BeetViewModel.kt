@@ -9,7 +9,9 @@ import com.coco.beetup.core.data.BeetExercise
 import com.coco.beetup.core.data.BeetExerciseLog
 import com.coco.beetup.core.data.BeetRepository
 import java.util.Date
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class BeetViewModel(
     private val repository: BeetRepository,
@@ -71,6 +73,12 @@ class BeetViewModel(
 
   fun insertResistanceReference(exerciseId: Int, resistanceId: Int) =
       viewModelScope.launch { repository.insertResistanceReference(exerciseId, resistanceId) }
+
+  suspend fun clearAllData() = withContext(Dispatchers.IO) { repository.clearAllData() }
+
+  suspend fun checkpoint() = withContext(Dispatchers.IO) { repository.checkpoint() }
+
+  fun closeDatabase() = repository.close()
 }
 
 class BeetViewModelFactory(

@@ -66,11 +66,11 @@ fun AnimatedNodeLinks(
           label = "circleBumpAnimation",
       )
 
-  LaunchedEffect(selectedItems) {
-    if (selectedItems.isEmpty()) {
-      randomPairs = (0..5).map { Pair(Random.nextInt(-200, 200), Random.nextInt(-500, 500)) }
-    }
-  }
+//  LaunchedEffect(selectedItems) {
+//    if (selectedItems.isEmpty()) {
+//      randomPairs = (0..5).map { Pair(Random.nextInt(-200, 200), Random.nextInt(-500, 500)) }
+//    }
+//  }
 
   Canvas(modifier = Modifier.fillMaxSize()) {
     if (columnCoords.isAttached.not()) return@Canvas

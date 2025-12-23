@@ -8,7 +8,6 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,9 +38,13 @@ fun AnimatedNodeLinks(
     selectedItems: Set<ActivityKey>,
     scrollState: ScrollState
 ) {
-  var randomPairs by remember {
-    mutableStateOf((0..20).map { Pair(Random.nextInt(-200, 200), Random.nextInt(-300, 300)) })
-  }
+  var randomPairs by
+      remember(selectedItems) {
+        mutableStateOf(
+            (0..selectedItems.size).map {
+              Pair(Random.nextInt(-200, 200), Random.nextInt(-300, 300))
+            })
+      }
   val color = MaterialTheme.colorScheme.primary
 
   val lineProgress: Float by
@@ -65,12 +68,6 @@ fun AnimatedNodeLinks(
               ),
           label = "circleBumpAnimation",
       )
-
-//  LaunchedEffect(selectedItems) {
-//    if (selectedItems.isEmpty()) {
-//      randomPairs = (0..5).map { Pair(Random.nextInt(-200, 200), Random.nextInt(-500, 500)) }
-//    }
-//  }
 
   Canvas(modifier = Modifier.fillMaxSize()) {
     if (columnCoords.isAttached.not()) return@Canvas
@@ -96,7 +93,7 @@ fun AnimatedNodeLinks(
             color = color,
         )
 
-        datePositions.forEachIndexed { idx, endLayoutCoords ->
+        datePositions.distinct().forEachIndexed { idx, endLayoutCoords ->
           val endOffset = columnCoords.localPositionOf(endLayoutCoords, Offset.Zero)
 
           val finalEndOffset = endOffset + scrollOffset

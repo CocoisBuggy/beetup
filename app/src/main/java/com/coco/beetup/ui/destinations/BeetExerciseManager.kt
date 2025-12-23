@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.coco.beetup.core.data.BeetExercise
 import com.coco.beetup.ui.components.exercise.CreateExerciseDialog
 import com.coco.beetup.ui.components.exercise.ExerciseListItem
 import com.coco.beetup.ui.components.exercise.ExerciseManagerHero
@@ -59,6 +60,7 @@ fun BeetExerciseManager(
 ) {
   val resistances by viewModel.allResistances.collectAsState(emptyList())
   var showExerciseDialog by remember { mutableStateOf(false) }
+  var exerciseToEdit by remember { mutableStateOf<BeetExercise?>(null) }
 
   val exerciseCategories by viewModel.allExercises.collectAsState(initial = null)
   val scrollState = rememberScrollState()
@@ -89,7 +91,11 @@ fun BeetExerciseManager(
   CreateExerciseDialog(
       viewModel,
       showExerciseDialog,
-      onDismiss = { showExerciseDialog = false },
+      onDismiss = {
+        showExerciseDialog = false
+        exerciseToEdit = null
+      },
+      exerciseToEdit = exerciseToEdit
   )
 
   Scaffold(
@@ -128,7 +134,7 @@ fun BeetExerciseManager(
             onDismiss = { showResistanceDialog = false })
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-          for (exercise in exerciseCategories) {
+          for (exercise in exerciseCategories!!) {
             val isSelected = selectedExercise == exercise.id
 
             val animatedPadding by
@@ -148,7 +154,12 @@ fun BeetExerciseManager(
                 onRemoveResistanceReference = {
                   viewModel.removeResistanceReference(exercise.id, it)
                 },
-                onAddResistance = { showResistanceDialog = true })
+                onAddResistance = { showResistanceDialog = true },
+                onEdit = {
+                  exerciseToEdit = exercise
+                  showExerciseDialog = true
+                },
+                onDelete = { viewModel.deleteExercise(exercise) })
           }
         }
       }

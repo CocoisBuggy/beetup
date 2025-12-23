@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -41,7 +42,8 @@ import com.coco.beetup.ui.viewmodel.BeetViewModel
 fun CreateExerciseDialog(
     viewModel: BeetViewModel,
     showExerciseDialog: Boolean,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    exerciseToEdit: BeetExercise? = null
 ) {
   var name by remember { mutableStateOf("") }
   var desc by remember { mutableStateOf("") }
@@ -49,20 +51,32 @@ fun CreateExerciseDialog(
 
   val magnitudes by viewModel.allMagnitudes().collectAsState(initial = null)
 
-  LaunchedEffect(showExerciseDialog) {
+  LaunchedEffect(showExerciseDialog, exerciseToEdit) {
     if (showExerciseDialog) {
-      name = ""
-      desc = ""
-      magnitude = null
+      if (exerciseToEdit != null) {
+        name = exerciseToEdit.exerciseName
+        desc = exerciseToEdit.exerciseDescription
+      } else {
+        name = ""
+        desc = ""
+        magnitude = null
+      }
+    }
+  }
+
+  LaunchedEffect(magnitudes, exerciseToEdit, showExerciseDialog) {
+    if (showExerciseDialog && exerciseToEdit != null && magnitudes != null) {
+      magnitude = magnitudes!!.find { it.id == exerciseToEdit.magnitudeKind }
     }
   }
 
   if (showExerciseDialog) {
     val isNamed = name.isNotEmpty()
+    val isEdit = exerciseToEdit != null
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Create New Exercise") },
+        title = { Text(if (isEdit) "Edit Exercise" else "Create New Exercise") },
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         properties = DialogProperties(usePlatformDefaultWidth = false),
         text = {
@@ -109,14 +123,15 @@ fun CreateExerciseDialog(
               onClick = {
                 viewModel.insertExercise(
                     BeetExercise(
+                        id = exerciseToEdit?.id ?: 0,
                         exerciseName = name,
                         exerciseDescription = desc,
                         magnitudeKind = magnitude?.id ?: 0))
                 onDismiss()
               },
               enabled = name.isNotBlank() && desc.isNotBlank() && magnitude != null) {
-                Text("Add")
-                Icon(Icons.Default.Add, "")
+                Text(if (isEdit) "Save" else "Add")
+                Icon(if (isEdit) Icons.Default.Edit else Icons.Default.Add, "")
               }
         })
   }

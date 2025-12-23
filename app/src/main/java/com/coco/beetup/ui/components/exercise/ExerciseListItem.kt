@@ -10,8 +10,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.RemoveCircleOutline
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -20,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
@@ -35,7 +39,9 @@ fun ExerciseListItem(
     viewModel: BeetViewModel,
     onClick: (Int?) -> Unit,
     onRemoveResistanceReference: (Int) -> Unit,
-    onAddResistance: () -> Unit
+    onAddResistance: () -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
 ) {
 
   ListItem(
@@ -83,6 +89,24 @@ fun ExerciseListItem(
                       Text("Add Resistance Type")
                     }
                   }
+
+                  Row(
+                      Modifier.fillMaxWidth(),
+                      horizontalArrangement =
+                          Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)) {
+                        Button(onClick = onEdit) {
+                          Icon(Icons.Default.Edit, contentDescription = null)
+                          Text("Edit")
+                        }
+                        Button(
+                            onClick = onDelete,
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.error)) {
+                              Icon(Icons.Default.Delete, contentDescription = null)
+                              Text("Delete")
+                            }
+                      }
                 }
               }
             }

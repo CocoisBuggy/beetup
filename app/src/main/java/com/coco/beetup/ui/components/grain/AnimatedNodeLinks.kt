@@ -8,8 +8,11 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
@@ -36,8 +39,8 @@ fun AnimatedNodeLinks(
     selectedItems: Set<ActivityKey>,
     scrollState: ScrollState
 ) {
-  val randomPairs = remember {
-    (0..20).map { Pair(Random.nextInt(-200, 200), Random.nextInt(-300, 300)) }
+  var randomPairs by remember {
+    mutableStateOf((0..20).map { Pair(Random.nextInt(-200, 200), Random.nextInt(-300, 300)) })
   }
   val color = MaterialTheme.colorScheme.primary
 
@@ -62,6 +65,12 @@ fun AnimatedNodeLinks(
               ),
           label = "circleBumpAnimation",
       )
+
+  LaunchedEffect(selectedItems) {
+    if (selectedItems.isEmpty()) {
+      randomPairs = (0..5).map { Pair(Random.nextInt(-200, 200), Random.nextInt(-500, 500)) }
+    }
+  }
 
   Canvas(modifier = Modifier.fillMaxSize()) {
     if (columnCoords.isAttached.not()) return@Canvas
@@ -110,12 +119,12 @@ fun AnimatedNodeLinks(
 
           val controlPoint1 =
               Offset(
-                  x = point1OnLine.x + xOffset + randomPairs[idx].first,
+                  x = point1OnLine.x + xOffset + randomPairs[idx % randomPairs.size].first,
                   y = point1OnLine.y + sinPerpendicular)
 
           val controlPoint2 =
               Offset(
-                  x = point2OnLine.x + xOffset + randomPairs[idx].second,
+                  x = point2OnLine.x + xOffset + randomPairs[idx % randomPairs.size].second,
                   y = point2OnLine.y + sinPerpendicular)
 
           val path =

@@ -6,7 +6,6 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.util.Date
 
 @Entity

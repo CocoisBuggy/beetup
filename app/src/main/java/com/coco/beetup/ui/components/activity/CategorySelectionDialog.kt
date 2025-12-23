@@ -62,7 +62,7 @@ fun CategorySelectionDialog(
 
               val lastUsed = lastUsedDays[category.id]
               val supportingText =
-                  if (lastUsed != null && lastUsed == 0) "Used Today"
+                  if (lastUsed == 0) "Used Today"
                   else if (lastUsed != null && lastUsed > 0) {
                     "$lastUsed days since last"
                   } else {

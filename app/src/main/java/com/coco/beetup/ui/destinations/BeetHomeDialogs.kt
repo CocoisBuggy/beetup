@@ -1,6 +1,7 @@
 package com.coco.beetup.ui.destinations
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -8,7 +9,7 @@ import com.coco.beetup.core.data.ActivityGroup
 import com.coco.beetup.core.data.BeetActivityResistance
 import com.coco.beetup.core.data.BeetExercise
 import com.coco.beetup.core.data.BeetExerciseLog
-import com.coco.beetup.core.data.daysSince
+import com.coco.beetup.core.data.unixDay
 import com.coco.beetup.ui.components.activity.CategorySelectionDialog
 import com.coco.beetup.ui.components.activity.EditDialog
 import com.coco.beetup.ui.components.activity.ExerciseLogDetailsDialog
@@ -16,7 +17,6 @@ import com.coco.beetup.ui.components.activity.ResistanceSelectionDialog
 import com.coco.beetup.ui.viewmodel.BeetViewModel
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.util.Date
 
 private fun LocalDate.isToday() = (this == LocalDate.now())
@@ -62,7 +62,7 @@ fun BeetHomeDialogs(
     val lastUsedMap =
         remember(exerciseUsageCounts) {
           exerciseUsageCounts.associate {
-            it.exerciseId to (it.lastDate?.daysSince()?.toInt() ?: -1)
+            it.exerciseId to (it.lastDate?.unixDay()?.let { date -> Date().unixDay() - date } ?: -1)
           }
         }
 
@@ -91,32 +91,38 @@ fun BeetHomeDialogs(
         )
       }
     } else {
-        state.magnitudeForEntry?.let { magnitudeForEntry ->
-            ResistanceSelectionDialog(
-                resistances = validResistances,
-                onConfirm = { selectedResistances ->
-                    val logDate = if (state.date.isToday()) LocalDateTime.now() else state.date.toLocalDateTime()
-                    val newExerciseLog =
-                        BeetExerciseLog(
-                            logDate = logDate,
-                            logDay = state.date.toEpochDay().toInt(),
-                            exerciseId = exercise.id,
-                            magnitude = magnitudeForEntry,
-                        )
-                    val newResistances =
-                        selectedResistances.map {
-                            BeetActivityResistance(
-                                activityId = 0, // This will be overridden by the repository
-                                resistanceKind = it.key,
-                                resistanceValue = it.value
-                            )
-                        }
-                    viewModel.insertActivityAndResistances(newExerciseLog, newResistances)
-                    state.dismissExerciseDetails()
-                },
-                onDismiss = state::dismissExerciseDetails,
-            )
+      state.magnitudeForEntry?.let { magnitudeForEntry ->
+        val onSave = { selectedResistances: Map<Int, Int> ->
+          val logDate =
+              if (state.date.isToday()) LocalDateTime.now() else state.date.toLocalDateTime()
+          val newExerciseLog =
+              BeetExerciseLog(
+                  logDate = logDate,
+                  logDay = state.date.toEpochDay().toInt(),
+                  exerciseId = exercise.id,
+                  magnitude = magnitudeForEntry,
+              )
+          val newResistances =
+              selectedResistances.map {
+                BeetActivityResistance(
+                    activityId = 0, // This will be overridden by the repository
+                    resistanceKind = it.key,
+                    resistanceValue = it.value)
+              }
+          viewModel.insertActivityAndResistances(newExerciseLog, newResistances)
+          state.dismissExerciseDetails()
         }
+
+        if (validResistances.isNotEmpty()) {
+          ResistanceSelectionDialog(
+              resistances = validResistances,
+              onConfirm = onSave,
+              onDismiss = state::dismissExerciseDetails,
+          )
+        } else {
+          LaunchedEffect(Unit) { onSave(emptyMap()) }
+        }
+      }
     }
   }
 }

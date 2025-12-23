@@ -1,5 +1,8 @@
 package com.coco.beetup.ui.components.activity
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +26,7 @@ import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +47,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.UUID
+import kotlinx.coroutines.delay
 
 private data class PlusOneAnimation(val id: String = UUID.randomUUID().toString())
 
@@ -59,12 +64,12 @@ fun ActivityEntry(
   if (activity.logs.isEmpty()) {
     ListItem(
         leadingContent = { LoadingIndicator() },
-        headlineContent = { Text("${activity.exercise.exerciseName}") },
+        headlineContent = { Text(activity.exercise.exerciseName) },
     )
   } else {
 
     ListItem(
-        headlineContent = { Text("${activity.exercise.exerciseName}") },
+        headlineContent = { Text(activity.exercise.exerciseName) },
         supportingContent = {
           Column {
             val text = mutableListOf<String>()
@@ -119,18 +124,28 @@ fun ActivityEntry(
             }
 
             if (isSelected) {
-              val sortedLogs = remember(activity.logs) { activity.logs.sortedBy { it.log.logDate } }
-              val hasTimeData = remember(sortedLogs) {
-                sortedLogs.isNotEmpty() &&
-                    sortedLogs.any { it.log.logDate.toLocalTime() != LocalTime.MIN }
+              var currentNow by remember { mutableStateOf(LocalDateTime.now()) }
+              LaunchedEffect(Unit) {
+                while (true) {
+                  delay(1000)
+                  currentNow = LocalDateTime.now()
+                }
               }
 
-              if (hasTimeData) {
-                val intervals = remember(sortedLogs) {
-                  sortedLogs.zipWithNext { a, b ->
-                    Duration.between(a.log.logDate, b.log.logDate)
+              val sortedLogs = remember(activity.logs) { activity.logs.sortedBy { it.log.logDate } }
+              val hasTimeData =
+                  remember(sortedLogs) {
+                    sortedLogs.isNotEmpty() &&
+                        sortedLogs.any { it.log.logDate.toLocalTime() != LocalTime.MIN }
                   }
-                }
+
+              if (hasTimeData) {
+                val intervals =
+                    remember(sortedLogs) {
+                      sortedLogs.zipWithNext { a, b ->
+                        Duration.between(a.log.logDate, b.log.logDate)
+                      }
+                    }
 
                 if (intervals.isNotEmpty()) {
                   Spacer(Modifier.height(8.dp))
@@ -150,34 +165,28 @@ fun ActivityEntry(
                     val range = (maxDuration - minDuration).coerceAtLeast(1)
                     val color = MaterialTheme.colorScheme.primary
 
-                    Canvas(
-                        modifier = Modifier.height(30.dp).fillMaxWidth().padding(top = 4.dp)) {
-                          val points =
-                              intervals.mapIndexed { index, duration ->
-                                val x =
-                                    size.width * index / (intervals.size - 1).coerceAtLeast(1)
-                                val normalized =
-                                    (duration.seconds - minDuration).toFloat() / range
-                                val y = size.height - (normalized * size.height)
-                                Offset(x, y)
-                              }
-
-                          points.zipWithNext { a, b ->
-                            drawLine(
-                                color = color, start = a, end = b, strokeWidth = 2.dp.toPx())
+                    Canvas(modifier = Modifier.height(30.dp).fillMaxWidth().padding(top = 4.dp)) {
+                      val points =
+                          intervals.mapIndexed { index, duration ->
+                            val x = size.width * index / (intervals.size - 1).coerceAtLeast(1)
+                            val normalized = (duration.seconds - minDuration).toFloat() / range
+                            val y = size.height - (normalized * size.height)
+                            Offset(x, y)
                           }
 
-                          points.forEach {
-                            drawCircle(color, radius = 2.dp.toPx(), center = it)
-                          }
-                        }
+                      points.zipWithNext { a, b ->
+                        drawLine(color = color, start = a, end = b, strokeWidth = 2.dp.toPx())
+                      }
+
+                      points.forEach { drawCircle(color, radius = 2.dp.toPx(), center = it) }
+                    }
                   }
                 }
 
                 val lastLog = sortedLogs.last()
-                if (lastLog.log.logDate.toLocalDate().isEqual(LocalDate.now())) {
+                if (lastLog.log.logDate.toLocalDate().isEqual(currentNow.toLocalDate())) {
                   if (intervals.isEmpty()) Spacer(Modifier.height(4.dp))
-                  val since = Duration.between(lastLog.log.logDate, LocalDateTime.now())
+                  val since = Duration.between(lastLog.log.logDate, currentNow)
                   val mm = since.toMinutes()
                   val ss = since.minusMinutes(mm).seconds
                   Text(
@@ -194,10 +203,18 @@ fun ActivityEntry(
         trailingContent = {
           FilledTonalButton(
               onClick = {
-                plusOneAnimations = plusOneAnimations + PlusOneAnimation()
-                viewModel.insertActivityAndResistances(
-                    activity.logs.last().log.copy(id = 0, logDate = LocalDateTime.now()),
-                    activity.logs.last().resistances.map { it.entry })
+                activity.logs.lastOrNull()?.let { lastLog ->
+                  val nextDate =
+                      if (lastLog.log.logDate.toLocalDate() == LocalDate.now()) LocalDateTime.now()
+                      else lastLog.log.logDate.toLocalDate().atStartOfDay()
+
+                  if (nextDate == null) return@let
+
+                  plusOneAnimations += PlusOneAnimation()
+                  viewModel.insertActivityAndResistances(
+                      activity.logs.last().log.copy(id = 0, logDate = nextDate),
+                      activity.logs.last().resistances.map { it.entry })
+                }
               }) {
                 Text("+1")
               }
@@ -213,6 +230,11 @@ fun ActivityEntry(
                     width = 1.dp,
                     color =
                         if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
-                    shape = MaterialTheme.shapes.medium))
+                    shape = MaterialTheme.shapes.medium)
+                .animateContentSize(
+                    animationSpec =
+                        spring(
+                            dampingRatio = Spring.DampingRatioLowBouncy,
+                            stiffness = Spring.StiffnessLow)))
   }
 }

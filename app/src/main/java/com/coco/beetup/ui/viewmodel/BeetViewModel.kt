@@ -75,7 +75,8 @@ class BeetViewModel(
   fun insertResistanceReference(exerciseId: Int, resistanceId: Int) =
       viewModelScope.launch { repository.insertResistanceReference(exerciseId, resistanceId) }
 
-  suspend fun clearAllData(ctx: Context) = withContext(Dispatchers.IO) { repository.clearAllData(ctx) }
+  suspend fun clearAllData(ctx: Context) =
+      withContext(Dispatchers.IO) { repository.clearAllData(ctx) }
 
   suspend fun checkpoint() = withContext(Dispatchers.IO) { repository.checkpoint() }
 

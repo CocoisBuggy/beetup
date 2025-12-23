@@ -95,10 +95,11 @@ fun BeetHomeDialogs(
         val onSave = { selectedResistances: Map<Int, Int> ->
           val logDate =
               if (state.date.isToday()) LocalDateTime.now() else state.date.toLocalDateTime()
+
           val newExerciseLog =
               BeetExerciseLog(
                   logDate = logDate,
-                  logDay = state.date.toEpochDay().toInt(),
+                  logDay = logDate.toLocalDate().toEpochDay().toInt(),
                   exerciseId = exercise.id,
                   magnitude = magnitudeForEntry,
               )

@@ -97,8 +97,7 @@ fun BeetExerciseManager(
         showExerciseDialog = false
         exerciseToEdit = null
       },
-      exerciseToEdit = exerciseToEdit
-  )
+      exerciseToEdit = exerciseToEdit)
 
   Scaffold(
       topBar = { BeetTopBar(scope, drawerState) },

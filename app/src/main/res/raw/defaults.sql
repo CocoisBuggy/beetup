@@ -6,6 +6,7 @@ INSERT INTO BeetResistance VALUES(1, 'Overhang', 'Some overhang expressed in deg
 INSERT INTO BeetResistance VALUES(2, 'Grams', 'Additional weight in the form of some number of grams', 'g');
 INSERT INTO BeetResistance VALUES(3, 'Elastic', 'Elastic of some resistance factor', 'none');
 INSERT INTO BeetResistance VALUES(4, 'Edge', 'Performing an exercise of some kind, but using an edge of some number of mm', 'mm');
+INSERT INTO BeetResistance VALUES(5, 'Duration', 'How long must each repetition/iteration be in seconds', 's');
 
 -- Bodyweight and Climbing
 INSERT INTO BeetExercise VALUES(1, 'Pull Up', 'Pull up exercise', 1);

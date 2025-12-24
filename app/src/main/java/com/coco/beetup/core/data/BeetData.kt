@@ -15,7 +15,7 @@ import androidx.room.TypeConverters
             BeetActivityResistance::class,
             ValidBeetResistances::class,
         ],
-    version = 1,
+    version = 2,
 )
 @TypeConverters(Converters::class)
 abstract class BeetData : RoomDatabase() {

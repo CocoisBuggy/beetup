@@ -5,6 +5,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.coco.beetup.core.data.ActivityGroupFlatRow
 import com.coco.beetup.core.data.BeetActivityResistance
 import com.coco.beetup.core.data.BeetExercise
 import com.coco.beetup.core.data.BeetExerciseLog
@@ -78,9 +79,20 @@ class BeetViewModel(
   suspend fun clearAllData(ctx: Context) =
       withContext(Dispatchers.IO) { repository.clearAllData(ctx) }
 
+  fun installDefaults(ctx: Context) =
+      viewModelScope.launch { repository.installDefaults(ctx, allowOverwrite = true) }
+
   suspend fun checkpoint() = withContext(Dispatchers.IO) { repository.checkpoint() }
 
   fun closeDatabase() = repository.close()
+
+  suspend fun getExerciseHistory(
+      exerciseId: Int,
+      since: Int,
+      before: Int
+  ): List<ActivityGroupFlatRow> {
+    return repository.getExerciseHistory(exerciseId, since, before)
+  }
 }
 
 class BeetViewModelFactory(

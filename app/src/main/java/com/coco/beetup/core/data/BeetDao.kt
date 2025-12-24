@@ -116,6 +116,21 @@ interface ExerciseLogDao {
     """)
   fun getAllFlatActivityDataForDay(day: Int): Flow<List<ActivityGroupFlatRow>>
 
+  @Query(
+      """
+        SELECT *
+        FROM BeetExerciseLog L
+        INNER JOIN BeetExercise E ON E.id = L.exerciseId
+        LEFT JOIN BeetActivityResistance R ON R.activity_id = L.id
+        WHERE L.exerciseId = :exerciseId AND L.log_day >= :since AND L.log_day < :before
+        ORDER BY E.id, L.magnitude, R.resistance_kind
+    """)
+  suspend fun getFlatActivityDataForExerciseSince(
+      exerciseId: Int,
+      since: Int,
+      before: Int
+  ): List<ActivityGroupFlatRow>
+
   @Insert(onConflict = OnConflictStrategy.IGNORE)
   suspend fun insertResistances(resistances: List<BeetActivityResistance>)
 

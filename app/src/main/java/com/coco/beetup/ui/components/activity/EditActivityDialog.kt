@@ -1,6 +1,8 @@
 package com.coco.beetup.ui.components.activity
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.AlertDialog
@@ -8,12 +10,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.coco.beetup.core.data.ActivityGroup
 import com.coco.beetup.core.data.BeetExpandedResistance
 import com.coco.beetup.core.data.BeetResistance
+import com.coco.beetup.ui.components.time.DurationPicker
 import com.coco.beetup.ui.viewmodel.BeetViewModel
 import kotlinx.coroutines.launch
 
@@ -35,12 +43,19 @@ fun EditDialog(
   val selectedResistances = remember {
     mutableStateMapOf(*mapRes(forItem.logs.first().resistances).toTypedArray())
   }
+  var restValue by remember { mutableStateOf(forItem.logs.first().log.rest ?: 0) }
 
   AlertDialog(
       onDismissRequest = onDismiss,
       title = { Text("Edit Activity") },
       text = {
         Column {
+          Text("Rest Duration", modifier = Modifier.padding(bottom = 8.dp))
+          DurationPicker(
+              seconds = restValue,
+              onSecondsChanged = { restValue = it },
+              modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp))
+
           Resistances(
               resistances = allowedResistances,
               selectedResistances = selectedResistances,
@@ -58,10 +73,12 @@ fun EditDialog(
         TextButton(
             onClick = {
               scope.launch {
+                val newRest = if (restValue > 0) restValue else null
                 for (log in forItem.logs) {
-                  viewModel.updateLogAndResistances(log.log, selectedResistances)
+                  viewModel.updateLogAndResistances(
+                      log.log.copy(rest = newRest), selectedResistances)
                 }
-
+                onCommit()
                 onDismiss()
               }
             }) {

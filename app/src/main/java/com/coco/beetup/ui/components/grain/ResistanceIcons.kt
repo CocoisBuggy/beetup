@@ -16,5 +16,4 @@ val ResistanceIcon =
         // Edge
         Pair(4, Icons.AutoMirrored.Default.CompareArrows),
         // Duration
-        Pair(5, Icons.Default.Timer)
-    )
+        Pair(5, Icons.Default.Timer))

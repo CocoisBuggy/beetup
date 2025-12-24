@@ -1,6 +1,7 @@
 package com.coco.beetup.core.data
 
 import android.content.Context
+import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.coco.beetup.R
@@ -200,13 +201,28 @@ class BeetRepository(
   suspend fun clearAllData(context: Context) {
     withContext(Dispatchers.IO) {
       database.clearAllTables()
+      installDefaults(context)
+    }
+  }
+
+  suspend fun installDefaults(context: Context, allowOverwrite: Boolean = false) {
+    withContext(Dispatchers.IO) {
       val inputStream = context.resources.openRawResource(R.raw.defaults)
       val reader = BufferedReader(InputStreamReader(inputStream))
+
       reader.useLines { lines ->
         lines.forEach { line ->
           if (line.isNotBlank() && !line.trim().startsWith("--")) {
             Log.d("Database", line)
-            database.openHelper.writableDatabase.execSQL(line)
+            try {
+              database.openHelper.writableDatabase.execSQL(line)
+            } catch (exc: SQLiteConstraintException) {
+              if (exc.message?.contains("UNIQUE constraint failed") ?: false && allowOverwrite) {
+                return@forEach
+              }
+
+              throw exc
+            }
           }
         }
       }
@@ -221,5 +237,13 @@ class BeetRepository(
     if (database.isOpen) {
       database.close()
     }
+  }
+
+  suspend fun getExerciseHistory(
+      exerciseId: Int,
+      since: Int,
+      before: Int
+  ): List<ActivityGroupFlatRow> {
+    return exerciseLogDao.getFlatActivityDataForExerciseSince(exerciseId, since, before)
   }
 }

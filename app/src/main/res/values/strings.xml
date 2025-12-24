@@ -2,4 +2,8 @@
     <string name="app_name">Beetup</string>
     <string name="todays_activity">Today\'s Activity</string>
     <string name="add_exercise_entry">Add Exercise</string>
+    <string name="time_since_last">Since last: %1$s ago</string>
+    <string name="duration_hms">%1$dh%2$dm%3$ds</string>
+    <string name="duration_ms">%1$dm%2$ds</string>
+    <string name="duration_s">%1$ds</string>
 </resources>

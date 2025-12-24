@@ -12,11 +12,12 @@ import java.io.InputStreamReader
 
 class BeetupApplication : Application() {
 
-  val MIGRATION_1_2 = object : Migration(1, 2) {
-      override fun migrate(db: SupportSQLiteDatabase) {
+  val MIGRATION_1_2 =
+      object : Migration(1, 2) {
+        override fun migrate(db: SupportSQLiteDatabase) {
           db.execSQL("ALTER TABLE BeetExerciseLog ADD COLUMN rest_seconds INTEGER")
+        }
       }
-  }
 
   val database: BeetData by lazy {
     Room.databaseBuilder(

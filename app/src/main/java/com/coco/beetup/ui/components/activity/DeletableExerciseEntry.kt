@@ -17,7 +17,7 @@ fun DeletableExerciseEntry(
     onToggleMultiSelection: () -> Unit,
     modifier: Modifier
 ) {
-  ActivityEntry(
+  ActivityListItem(
       viewModel = viewModel,
       activity = item,
       isSelected = isSelected,

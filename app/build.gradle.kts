@@ -68,6 +68,4 @@ dependencies {
   debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
-ksp {
-    arg("room.schemaLocation", "$projectDir/schemas")
-}
+ksp { arg("room.schemaLocation", "$projectDir/schemas") }

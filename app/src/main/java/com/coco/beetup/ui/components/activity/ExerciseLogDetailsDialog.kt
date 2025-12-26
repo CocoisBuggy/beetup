@@ -23,6 +23,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.coco.beetup.core.data.BeetExercise
+import com.coco.beetup.ui.components.exercise.magnitude.DistanceEntry
+import com.coco.beetup.ui.components.exercise.magnitude.DurationEntry
+import com.coco.beetup.ui.components.exercise.magnitude.RepsEntry
 
 @Composable
 fun ExerciseLogDetailsDialog(
@@ -43,21 +46,44 @@ fun ExerciseLogDetailsDialog(
               text = "$magnitudeName ($magnitudeUnit)",
               style = MaterialTheme.typography.titleMedium,
               modifier = Modifier.padding(bottom = 8.dp))
-          Row(
-              verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.Center,
-              modifier = Modifier.fillMaxWidth()) {
-                IconButton(onClick = { if (magnitude > 0) magnitude-- }) {
-                  Icon(Icons.Default.Remove, contentDescription = "Decrement")
-                }
-                Text(
-                    text = magnitude.toString(),
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(horizontal = 16.dp))
-                IconButton(onClick = { magnitude++ }) {
-                  Icon(Icons.Default.Add, contentDescription = "Increment")
-                }
-              }
+
+          when {
+            exercise.magnitudeKind == 2 -> {
+              DistanceEntry(
+                  value = magnitude,
+                  onValueChange = { magnitude = it },
+                  modifier = Modifier.fillMaxWidth())
+            }
+            exercise.magnitudeKind == 3 -> {
+              DurationEntry(
+                  value = magnitude,
+                  onValueChange = { magnitude = it },
+                  modifier = Modifier.fillMaxWidth())
+            }
+            magnitudeName.equals("Weight", ignoreCase = true) -> {
+              RepsEntry(
+                  value = magnitude,
+                  onValueChange = { magnitude = it },
+                  modifier = Modifier.fillMaxWidth())
+            }
+            else -> {
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.Center,
+                  modifier = Modifier.fillMaxWidth()) {
+                    IconButton(onClick = { if (magnitude > 0) magnitude-- }) {
+                      Icon(Icons.Default.Remove, contentDescription = "Decrement")
+                    }
+                    Text(
+                        text = magnitude.toString(),
+                        style = MaterialTheme.typography.headlineMedium,
+                        modifier = Modifier.padding(horizontal = 16.dp))
+                    IconButton(onClick = { magnitude++ }) {
+                      Icon(Icons.Default.Add, contentDescription = "Increment")
+                    }
+                  }
+            }
+          }
         }
       },
       confirmButton = { TextButton(onClick = { onConfirm(magnitude) }) { Text("Confirm") } },

@@ -20,7 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.coco.beetup.core.data.BeetResistance
+import com.coco.beetup.ui.components.exercise.resistance.EdgeEntry
+import com.coco.beetup.ui.components.exercise.resistance.HoldDurationEntry
+import com.coco.beetup.ui.components.exercise.resistance.WeightEntry
 import kotlin.collections.set
+
+val ResistanceEntryMap =
+    mapOf<Int, @Composable (value: String, onValueChange: (String) -> Unit) -> Unit>(
+        (2 to ::WeightEntry), (4 to ::EdgeEntry), (5 to ::HoldDurationEntry))
 
 @Composable
 fun Resistances(
@@ -44,16 +51,23 @@ fun Resistances(
                   }
                 })
         if (isChecked) {
-          TextField(
-              value = selectedResistances[resistance.id] ?: "",
-              onValueChange = { value ->
-                if (value.all { it.isDigit() }) {
-                  onSelectionChange(resistance.id, value)
-                }
-              },
-              label = { Text("${resistance.name} Value (${resistance.unit}") },
-              keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-              modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 4.dp))
+          fun onSelectionChangeHoc(value: String) {
+            if (value.all { it.isDigit() }) {
+              onSelectionChange(resistance.id, value)
+            }
+          }
+
+          val resEntry = ResistanceEntryMap[resistance.id]
+          if (resEntry != null) {
+            resEntry(selectedResistances[resistance.id] ?: "", { onSelectionChangeHoc(it) })
+          } else {
+            TextField(
+                value = selectedResistances[resistance.id] ?: "",
+                onValueChange = { onSelectionChangeHoc(it) },
+                label = { Text("${resistance.name} Value (${resistance.unit})") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 4.dp))
+          }
         }
       }
     }

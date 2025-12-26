@@ -168,6 +168,8 @@ fun ActivityList(
                       }
                     })
           }
+
+          Spacer(Modifier.size(68.dp))
         }
 
     columnCoords?.let { columnCoords ->

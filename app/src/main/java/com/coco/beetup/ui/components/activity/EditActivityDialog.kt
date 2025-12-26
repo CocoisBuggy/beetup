@@ -1,16 +1,20 @@
 package com.coco.beetup.ui.components.activity
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,18 +47,26 @@ fun EditDialog(
   val selectedResistances = remember {
     mutableStateMapOf(*mapRes(forItem.logs.first().resistances).toTypedArray())
   }
-  var restValue by remember { mutableStateOf(forItem.logs.first().log.rest ?: 0) }
+  var restValue by remember { mutableIntStateOf(forItem.logs.first().log.rest ?: 0) }
+  var restEntry by remember { mutableStateOf(forItem.logs.first().log.rest != null) }
 
   AlertDialog(
       onDismissRequest = onDismiss,
       title = { Text("Edit Activity") },
       text = {
         Column {
-          Text("Rest Duration", modifier = Modifier.padding(bottom = 8.dp))
-          DurationPicker(
-              seconds = restValue,
-              onSecondsChanged = { restValue = it },
-              modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp))
+          Row(horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("Include Rest Time")
+            Checkbox(checked = restEntry, onCheckedChange = { restEntry = it })
+          }
+
+          if (restEntry) {
+            Text("Rest Duration", modifier = Modifier.padding(bottom = 8.dp))
+            DurationPicker(
+                seconds = restValue,
+                onSecondsChanged = { restValue = it },
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp))
+          }
 
           Resistances(
               resistances = allowedResistances,

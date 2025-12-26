@@ -17,32 +17,23 @@ import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EdgeEntry(value: String, onValueChange: (String) -> Unit) {
-  var sliderValue by remember {
-    mutableFloatStateOf(if (value.isEmpty()) 0f else value.toFloat().coerceIn(1f, 50f))
-  }
+fun EdgeEntry(value: Int, onValueChange: (Int) -> Unit) {
+  var sliderValue by remember { mutableFloatStateOf(value.toFloat().coerceIn(1f, 50f)) }
 
-  LaunchedEffect(value) {
-    sliderValue =
-        if (value.isEmpty()) {
-          0f
-        } else {
-          value.toFloat().coerceIn(1f, 50f)
-        }
-  }
+  LaunchedEffect(value) { sliderValue = value.toFloat().coerceIn(1f, 50f) }
 
   Column(
       modifier = Modifier.fillMaxWidth().padding(16.dp),
       horizontalAlignment = Alignment.CenterHorizontally) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
           OutlinedTextField(
-              value = value,
+              value = value.toString(),
               onValueChange = { newValue ->
                 val parsedValue = newValue.toFloatOrNull()
                 if (parsedValue != null) {
                   val clampedValue = parsedValue.coerceIn(1f, 50f)
                   sliderValue = clampedValue
-                  onValueChange(clampedValue.toInt().toString())
+                  onValueChange(clampedValue.toInt())
                 }
               },
               label = { Text("Edge (MM)") },
@@ -59,7 +50,7 @@ fun EdgeEntry(value: String, onValueChange: (String) -> Unit) {
             value = sliderValue,
             onValueChange = { newValue ->
               sliderValue = newValue
-              onValueChange(newValue.toInt().toString())
+              onValueChange(newValue.toInt())
             },
             range = 1f..50f)
       }
@@ -73,6 +64,7 @@ fun RulerSlider(
     range: ClosedFloatingPointRange<Float>
 ) {
   val textMeasurer = rememberTextMeasurer()
+  val scheme = MaterialTheme.colorScheme
 
   Column(modifier = Modifier.fillMaxWidth()) {
     Slider(
@@ -96,9 +88,9 @@ fun RulerSlider(
       // Draw marks
       for (i in startValue.toInt()..endValue.toInt()) {
         val x = ((i - startValue) / valueRange) * canvasWidth
-        val isMajorMark = (i % 5 == 0) // Every 5 units is a major mark
+        val isMajorMark = (i % 5 == 0)
 
-        val lineColor = if (isMajorMark) Color.DarkGray else Color.Gray
+        val lineColor = if (isMajorMark) scheme.onSurfaceVariant else Color.Gray
         val lineHeight = if (isMajorMark) 15.dp.toPx() else 8.dp.toPx()
         val lineWidth = if (isMajorMark) 2.dp.toPx() else 1.dp.toPx()
 
@@ -114,7 +106,8 @@ fun RulerSlider(
           val textLayoutResult =
               textMeasurer.measure(
                   text = AnnotatedString(i.toString()),
-                  style = TextStyle(fontSize = 10.sp, color = Color.Black))
+                  style = TextStyle(fontSize = 10.sp, color = scheme.onSurface))
+
           drawText(
               textLayoutResult = textLayoutResult,
               topLeft = Offset(x - textLayoutResult.size.width / 2, lineY + textYOffset))
@@ -127,5 +120,5 @@ fun RulerSlider(
 @Preview(showBackground = true)
 @Composable
 fun EdgeEntryPreview() {
-  MaterialTheme { EdgeEntry(value = "25", onValueChange = {}) }
+  MaterialTheme { EdgeEntry(value = 25, onValueChange = {}) }
 }

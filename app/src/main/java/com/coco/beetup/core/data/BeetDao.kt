@@ -151,14 +151,13 @@ interface ExerciseLogDao {
   @Transaction
   suspend fun updateLogAndResistances(
       log: BeetExerciseLog,
-      selectedResistances: SnapshotStateMap<Int, String>
+      selectedResistances: SnapshotStateMap<Int, Int>
   ) {
     update(log)
     deleteLogsFor(log.id)
     insertResistances(
         selectedResistances.map { (id, value) ->
-          BeetActivityResistance(
-              activityId = log.id, resistanceKind = id, resistanceValue = value.toInt())
+          BeetActivityResistance(activityId = log.id, resistanceKind = id, resistanceValue = value)
         })
   }
 

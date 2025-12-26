@@ -63,7 +63,7 @@ class BeetViewModel(
 
   suspend fun updateLogAndResistances(
       log: BeetExerciseLog,
-      selectedResistances: SnapshotStateMap<Int, String>
+      selectedResistances: SnapshotStateMap<Int, Int>
   ) {
     repository.updateLogAndResistances(log, selectedResistances)
   }

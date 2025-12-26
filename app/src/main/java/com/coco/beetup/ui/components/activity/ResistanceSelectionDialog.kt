@@ -26,44 +26,39 @@ import com.coco.beetup.ui.components.exercise.resistance.WeightEntry
 import kotlin.collections.set
 
 val ResistanceEntryMap =
-    mapOf<Int, @Composable (value: String, onValueChange: (String) -> Unit) -> Unit>(
+    mapOf<Int, @Composable (value: Int, onValueChange: (Int) -> Unit) -> Unit>(
         (2 to ::WeightEntry), (4 to ::EdgeEntry), (5 to ::HoldDurationEntry))
 
 @Composable
-fun Resistances(
+fun ResistanceSelectionDialog(
     resistances: List<BeetResistance>,
-    selectedResistances: Map<Int, String>,
-    onSelectionChange: (Int, String?) -> Unit
+    selectedResistances: Map<Int, Int>,
+    onSelectionChange: (Int, Int?) -> Unit
 ) {
-  LazyColumn {
+  LazyColumn(Modifier.fillMaxWidth()) {
     items(resistances) { resistance ->
       val isChecked = resistance.id in selectedResistances
-      Column {
+      Column(Modifier.fillMaxWidth()) {
         ListItem(
             headlineContent = { Text(resistance.name) },
             leadingContent = { Checkbox(checked = isChecked, onCheckedChange = null) },
             modifier =
-                Modifier.clickable {
+                Modifier.fillMaxWidth().clickable {
                   if (isChecked) {
                     onSelectionChange(resistance.id, null)
                   } else {
-                    onSelectionChange(resistance.id, "")
+                    onSelectionChange(resistance.id, 0)
                   }
                 })
         if (isChecked) {
-          fun onSelectionChangeHoc(value: String) {
-            if (value.all { it.isDigit() }) {
-              onSelectionChange(resistance.id, value)
-            }
-          }
-
           val resEntry = ResistanceEntryMap[resistance.id]
           if (resEntry != null) {
-            resEntry(selectedResistances[resistance.id] ?: "", { onSelectionChangeHoc(it) })
+            resEntry(
+                selectedResistances[resistance.id] ?: 0, { onSelectionChange(resistance.id, it) })
           } else {
             TextField(
-                value = selectedResistances[resistance.id] ?: "",
-                onValueChange = { onSelectionChangeHoc(it) },
+                value = selectedResistances[resistance.id]?.toString() ?: "",
+                onValueChange = { onSelectionChange(resistance.id, it.toIntOrNull()) },
                 label = { Text("${resistance.name} Value (${resistance.unit})") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 4.dp))
@@ -80,7 +75,7 @@ fun ResistanceSelectionDialog(
     onConfirm: (selectedResistances: Map<Int, Int>) -> Unit,
     onDismiss: () -> Unit,
 ) {
-  val selectedResistances = remember { mutableStateMapOf<Int, String>() }
+  val selectedResistances = remember { mutableStateMapOf<Int, Int>() }
 
   AlertDialog(
       onDismissRequest = onDismiss,
@@ -89,7 +84,7 @@ fun ResistanceSelectionDialog(
         if (resistances.isEmpty()) {
           Text("No recommended resistances for this exercise.")
         } else {
-          Resistances(
+          ResistanceSelectionDialog(
               resistances = resistances,
               selectedResistances = selectedResistances,
               onSelectionChange = { id, value ->
@@ -104,16 +99,12 @@ fun ResistanceSelectionDialog(
       confirmButton = {
         TextButton(
             onClick = {
-              val confirmedResistances =
-                  selectedResistances
-                      .filter { it.value.isNotBlank() }
-                      .mapValues { it.value.toInt() }
+              val confirmedResistances = selectedResistances.mapValues { it.value }
               onConfirm(confirmedResistances)
             },
-            enabled =
-                selectedResistances.values.all { it.isNotBlank() && it.toIntOrNull() != null }) {
-              Text("Confirm")
-            }
+        ) {
+          Text("Confirm")
+        }
       },
       dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } })
 }

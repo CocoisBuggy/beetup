@@ -185,7 +185,7 @@ class BeetRepository(
 
   suspend fun updateLogAndResistances(
       log: BeetExerciseLog,
-      selectedResistances: SnapshotStateMap<Int, String>
+      selectedResistances: SnapshotStateMap<Int, Int>
   ) {
     exerciseLogDao.updateLogAndResistances(log, selectedResistances)
   }

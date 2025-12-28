@@ -1,6 +1,5 @@
 package com.coco.beetup.ui.components.activity
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -77,75 +76,78 @@ fun ActivityList(
                   LoadingIndicator()
                 }
           } else {
-            AnimatedVisibility(true) {
-              Column() {
-                DateHeatMap(
-                    selectedDates = setOf(date),
-                    activeDates = activityDates,
-                    onDatePositioned = { id, pos -> nodePositionState.onNodePositioned(id, pos) },
-                    onDateSelected = {
-                      if (selectedItems.isEmpty()) {
-                        onDateChange(it)
+            Column {
+              DateHeatMap(
+                  selectedDates = setOf(date),
+                  activeDates = activityDates,
+                  onDatePositioned = { id, pos -> nodePositionState.onNodePositioned(id, pos) },
+                  onDateSelected = {
+                    if (selectedItems.isEmpty()) {
+                      onDateChange(it)
+                    } else {
+                      for (item in selectedItems) {
+                        onToggleSelection(item)
                       }
+
+                      onDateChange(it)
+                    }
+                  },
+              )
+
+              Column {
+                ButtonGroup(
+                    overflowIndicator = { menuState ->
+                      ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
                     },
-                )
+                    verticalAlignment = Alignment.Top,
+                ) {
+                  clickableItem(
+                      onClick = { onDateChange(date.minusDays(1)) },
+                      label = "",
+                      icon = { Icon(Icons.Default.SkipPrevious, "Previous Day") },
+                      weight = 1f,
+                      enabled = selectedItems.isEmpty(),
+                  )
 
-                Column {
-                  ButtonGroup(
-                      overflowIndicator = { menuState ->
-                        ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
-                      },
-                      verticalAlignment = Alignment.Top,
-                  ) {
-                    clickableItem(
-                        onClick = { onDateChange(date.minusDays(1)) },
-                        label = "",
-                        icon = { Icon(Icons.Default.SkipPrevious, "Previous Day") },
-                        weight = 1f,
-                        enabled = selectedItems.isEmpty(),
-                    )
-
-                    customItem(
-                        buttonGroupContent = {
-                          Button(
-                              enabled = selectedItems.isEmpty() && date != LocalDate.now(),
-                              modifier =
-                                  Modifier.weight(if (date != LocalDate.now()) 1.5f else 0.5f),
-                              onClick = { onDateChange(LocalDate.now()) },
-                              shapes =
-                                  ButtonShapes(
-                                      shape = ButtonDefaults.squareShape,
-                                      pressedShape = ButtonDefaults.pressedShape)) {
-                                Icon(Icons.Default.Today, "Today")
-                                if (date != LocalDate.now()) {
-                                  Text("Today", style = MaterialTheme.typography.labelSmall)
-                                }
+                  customItem(
+                      buttonGroupContent = {
+                        Button(
+                            enabled = selectedItems.isEmpty() && date != LocalDate.now(),
+                            modifier = Modifier.weight(if (date != LocalDate.now()) 1.5f else 0.5f),
+                            onClick = { onDateChange(LocalDate.now()) },
+                            shapes =
+                                ButtonShapes(
+                                    shape = ButtonDefaults.squareShape,
+                                    pressedShape = ButtonDefaults.pressedShape)) {
+                              Icon(Icons.Default.Today, "Today")
+                              if (date != LocalDate.now()) {
+                                Text("Today", style = MaterialTheme.typography.labelSmall)
                               }
-                        },
-                        menuContent = {},
-                    )
+                            }
+                      },
+                      menuContent = {},
+                  )
 
-                    clickableItem(
-                        onClick = { onDateChange(date.plusDays(1)) },
-                        label = "",
-                        icon = { Icon(Icons.Default.SkipNext, "Next Day") },
-                        weight = if (date < LocalDate.now()) 1f else 0.5f,
-                        enabled = date < LocalDate.now() && selectedItems.isEmpty(),
-                    )
-                  }
-
-                  Text(
-                      "$date",
-                      style = MaterialTheme.typography.displayLarge,
-                      color = MaterialTheme.colorScheme.onSurfaceVariant)
-
-                  Text(
-                      if (todaysActivity.isEmpty()) "No activity for this day"
-                      else "Activity for this day",
-                      style = MaterialTheme.typography.titleMedium,
-                      color = MaterialTheme.colorScheme.onSurfaceVariant,
+                  clickableItem(
+                      onClick = { onDateChange(date.plusDays(1)) },
+                      label = "",
+                      icon = { Icon(Icons.Default.SkipNext, "Next Day") },
+                      weight = if (date < LocalDate.now()) 1f else 0.5f,
+                      enabled = date < LocalDate.now() && selectedItems.isEmpty(),
                   )
                 }
+
+                Text(
+                    "$date",
+                    style = MaterialTheme.typography.displayLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+                Text(
+                    if (todaysActivity.isEmpty()) "No activity for this day"
+                    else "Activity for this day",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
               }
             }
           }

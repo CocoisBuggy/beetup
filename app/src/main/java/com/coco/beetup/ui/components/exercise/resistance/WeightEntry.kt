@@ -28,7 +28,8 @@ fun WeightEntry(value: Int, onValueChange: (Int) -> Unit) {
 
   Column(Modifier.fillMaxWidth()) {
     OutlinedTextField(
-        value = if (value > 0) (if (selectedUnit == "g") value else value / 1000f).toString() else "",
+        value =
+            if (value > 0) (if (selectedUnit == "g") value else value / 1000f).toString() else "",
         onValueChange = {
           onValueChange(
               when (selectedUnit) {
@@ -55,13 +56,14 @@ fun WeightEntry(value: Int, onValueChange: (Int) -> Unit) {
             checked = selectedUnit == "kg",
             onCheckedChange = { selectedUnit = "kg" },
             label = "kg",
-            icon = { Icon(Icons.Default.MonitorWeight, null) })
+            icon = { Icon(Icons.Default.MonitorWeight, null) },
+            weight = 1f)
 
         toggleableItem(
             checked = selectedUnit == "g",
             onCheckedChange = { selectedUnit = "g" },
             label = "grams",
-        )
+            weight = 1f)
       }
     }
   }

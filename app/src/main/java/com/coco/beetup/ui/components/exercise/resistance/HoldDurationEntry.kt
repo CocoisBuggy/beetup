@@ -21,13 +21,12 @@ enum class TimeInterval {
   Hr
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun HoldDurationEntry(value: Int, onValueChange: (Int) -> Unit) {
   var holdDurationSeconds by remember(value) { mutableIntStateOf(value) }
   var unit by remember { mutableStateOf(TimeInterval.Sec) }
-  val displaySeconds by remember {
+  val displaySeconds by remember(unit, holdDurationSeconds) {
     derivedStateOf {
       when (unit) {
         TimeInterval.Sec -> holdDurationSeconds.toFloat()
@@ -41,22 +40,17 @@ fun HoldDurationEntry(value: Int, onValueChange: (Int) -> Unit) {
     Spacer(Modifier.size(16.dp))
 
     OutlinedTextField(
-        value = if (holdDurationSeconds == 0) "" else displaySeconds.toString(),
+        value = if (displaySeconds == 0f) "" else displaySeconds.toString(),
         onValueChange = { newValue ->
-          if (newValue.isNotBlank()) {
-            newValue.toFloatOrNull()?.let { displayUpdate ->
-              holdDurationSeconds =
-                  when (unit) {
-                    TimeInterval.Sec -> displayUpdate
-                    TimeInterval.Min -> displayUpdate * 60
-                    TimeInterval.Hr -> displayUpdate * (60 * 60)
-                  }.toInt()
-            }
-          } else {
-            holdDurationSeconds = 0
+          newValue.toFloatOrNull()?.let { displayUpdate ->
+            holdDurationSeconds =
+                when (unit) {
+                  TimeInterval.Sec -> displayUpdate
+                  TimeInterval.Min -> displayUpdate * 60
+                  TimeInterval.Hr -> displayUpdate * (60 * 60)
+                }.toInt()
+            onValueChange(holdDurationSeconds)
           }
-
-          onValueChange(holdDurationSeconds)
         },
         label = { Text("Hold Duration") },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -72,10 +66,10 @@ fun HoldDurationEntry(value: Int, onValueChange: (Int) -> Unit) {
       TimeInterval.entries.forEach { interval ->
         toggleableItem(
             checked = interval == unit,
-            label =  if (interval == unit) interval.name else interval.name,
+            label = if (interval == unit) interval.name else interval.name,
             onCheckedChange = { unit = interval },
             weight = 1f,
-            )
+        )
       }
     }
   }

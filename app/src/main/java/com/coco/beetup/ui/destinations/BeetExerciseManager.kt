@@ -13,14 +13,14 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -28,7 +28,9 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialShapes.Companion.Sunny
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -58,6 +60,8 @@ fun BeetExerciseManager(
     drawerState: DrawerState,
     scope: CoroutineScope = rememberCoroutineScope(),
 ) {
+  var searchQuery by remember { mutableStateOf("") }
+
   val resistances by viewModel.allResistances.collectAsState(emptyList())
   var showExerciseDialog by remember { mutableStateOf(false) }
   var exerciseToEdit by remember { mutableStateOf<BeetExercise?>(null) }
@@ -120,13 +124,22 @@ fun BeetExerciseManager(
         Modifier.fillMaxSize().padding(innerPadding).padding(12.dp).verticalScroll(scrollState),
     ) {
       ExerciseManagerHero(onAddClick = { showExerciseDialog = true })
-      Spacer(Modifier.size(24.dp))
+
+      OutlinedTextField(
+          value = searchQuery,
+          onValueChange = { searchQuery = it },
+          modifier = Modifier.padding(top = 24.dp, bottom = 24.dp).fillMaxWidth(),
+          leadingIcon = { Icon(Icons.Default.Search, null) },
+          placeholder = { Text("Search Exercises") },
+          singleLine = true,
+      )
 
       if (exerciseCategories == null) {
         LoadingIndicator()
       } else {
         var selectedExercise by remember { mutableStateOf<Int?>(null) }
         var showResistanceDialog by remember { mutableStateOf(false) }
+
         ResistanceManagementDialog(
             selectedExercise,
             showResistanceDialog,
@@ -136,6 +149,8 @@ fun BeetExerciseManager(
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
           for (exercise in exerciseCategories!!) {
+            if (exercise.exerciseName.contains(searchQuery, ignoreCase = true).not()) continue
+
             val isSelected = selectedExercise == exercise.id
             val count = usageCounts.find { it.exerciseId == exercise.id }?.count ?: 0
 

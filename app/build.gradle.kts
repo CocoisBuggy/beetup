@@ -14,8 +14,9 @@ android {
     applicationId = "com.coco.beetup"
     minSdk = 30
     targetSdk = 36
-    versionCode = 12
-    versionName = "1.3.0"
+
+    versionCode = 13
+    versionName = "1.3.1"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }

@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.coco.beetup.R
 import com.coco.beetup.core.data.ActivityGroup
 import com.coco.beetup.core.data.ActivityGroupFlatRow
+import com.coco.beetup.core.data.MagnitudeConversion
 import com.coco.beetup.core.data.PlusOne
 import com.coco.beetup.core.data.ResistanceConversion
 import com.coco.beetup.ui.components.grain.ResistanceIcon
@@ -90,7 +91,9 @@ fun ActivityListItem(
           Column {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
               activity.logs.firstOrNull()?.let { entry ->
-                Text("${entry.log.magnitude} ${activity.magnitude.unit}")
+                Text(
+                    MagnitudeConversion[activity.magnitude.id]?.invoke(entry.log.magnitude)
+                        ?: "${entry.log.magnitude} ${activity.magnitude.unit}")
 
                 maxMagnitude?.let { maxMag ->
                   val max = maxMag.log.magnitude.toFloat()

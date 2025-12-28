@@ -84,7 +84,6 @@ fun ActivityListItem(
         headlineContent = { Text(activity.exercise.exerciseName) },
     )
   } else {
-
     ListItem(
         headlineContent = { Text(activity.exercise.exerciseName) },
         supportingContent = {

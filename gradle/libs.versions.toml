@@ -38,6 +38,8 @@ androidx-room-compiler = { group = "androidx.room", name = "room-compiler", vers
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomVersion" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationVersion" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+datetime-names = { group = "io.github.adrcotfas", name = "kotlinx-datetime-names", version = "0.1.1" }
+desugar = { group = "com.android.tools", name = "desugar_jdk_libs",  version = "2.1.5" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

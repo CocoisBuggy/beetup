@@ -23,11 +23,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.coco.beetup.core.data.ActivityOverview
 import com.coco.beetup.ui.components.grain.PulsingSunnyShape
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
-import java.time.format.TextStyle
-import java.util.Locale
+import kotlin.math.absoluteValue
 
 /**
  * A composable that displays a heatmap for a given set of dates. The heatmap is organized by month
@@ -57,6 +57,7 @@ fun DateHeatMap(
         // Otherwise, stick to the default 4-week view.
         fourWeeksAgo
       }
+
   // Remember the calculated data to avoid re-computing on every recomposition
   val heatmapData =
       remember(startDate, today, activeDates) { generateHeatmapData(startDate, today, activeDates) }
@@ -93,11 +94,12 @@ private fun MonthSection(
     yearMonth.format(formatter)
   }
 
-  val dayOfWeekHeaders = remember {
-    (1..7).map { day ->
-      LocalDate.of(2024, 1, day).dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.getDefault())
-    }
-  }
+  // Ignore the actual dates used here, all this does is lay out
+  val dayOfWeekHeaders =
+      List(7) {
+        DayOfWeek.of(it + 1)
+            .getDisplayName(java.time.format.TextStyle.NARROW, java.util.Locale.getDefault())
+      }
 
   Column(modifier = Modifier.padding(bottom = 16.dp)) {
     Text(
@@ -181,9 +183,14 @@ private fun generateHeatmapData(
 
   data.forEach { (yearMonth, days) ->
     val firstDayOfMonth = days.first().date
-    val emptyDaysCount = (firstDayOfMonth.dayOfWeek.value % 7)
+    val emptyDaysCount = (firstDayOfMonth.dayOfWeek.value - 1)
+
     val placeholders: List<ActivityOverview> =
-        List(emptyDaysCount) { ActivityOverview(firstDayOfMonth, -1) }
+        List(emptyDaysCount) { back ->
+          ActivityOverview(
+              firstDayOfMonth.minusDays((emptyDaysCount - back.toLong()).absoluteValue), -1)
+        }
+
     alignedData[yearMonth] = placeholders + days
   }
 

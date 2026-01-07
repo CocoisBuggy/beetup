@@ -26,15 +26,16 @@ enum class TimeInterval {
 fun HoldDurationEntry(value: Int, onValueChange: (Int) -> Unit) {
   var holdDurationSeconds by remember(value) { mutableIntStateOf(value) }
   var unit by remember { mutableStateOf(TimeInterval.Sec) }
-  val displaySeconds by remember(unit, holdDurationSeconds) {
-    derivedStateOf {
-      when (unit) {
-        TimeInterval.Sec -> holdDurationSeconds.toFloat()
-        TimeInterval.Min -> holdDurationSeconds.toFloat() / 60f
-        TimeInterval.Hr -> holdDurationSeconds.toFloat() / 60f / 60f
+  val displaySeconds by
+      remember(unit, holdDurationSeconds) {
+        derivedStateOf {
+          when (unit) {
+            TimeInterval.Sec -> holdDurationSeconds.toFloat()
+            TimeInterval.Min -> holdDurationSeconds.toFloat() / 60f
+            TimeInterval.Hr -> holdDurationSeconds.toFloat() / 60f / 60f
+          }
+        }
       }
-    }
-  }
 
   Column(modifier = Modifier.fillMaxWidth()) {
     Spacer(Modifier.size(16.dp))

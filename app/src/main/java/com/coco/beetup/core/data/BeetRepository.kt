@@ -46,6 +46,7 @@ class BeetRepository(
     private val beetProfileDao: BeetProfileDao,
     private val beetExerciseDao: BeetExerciseDao,
     private val exerciseLogDao: ExerciseLogDao,
+    private val exerciseNoteDao: ExerciseNoteDao,
 ) {
   fun getProfile(): Flow<BeetProfile> = beetProfileDao.getProfile()
 
@@ -246,4 +247,14 @@ class BeetRepository(
   ): List<ActivityGroupFlatRow> {
     return exerciseLogDao.getFlatActivityDataForExerciseSince(exerciseId, since, before)
   }
+
+  fun getNoteForDay(day: Int): Flow<ExerciseNote?> = exerciseNoteDao.getNoteForDay(day)
+
+  suspend fun insertNote(note: ExerciseNote): Long = exerciseNoteDao.insertNote(note)
+
+  suspend fun updateNote(note: ExerciseNote) = exerciseNoteDao.updateNote(note)
+
+  suspend fun deleteNote(note: ExerciseNote) = exerciseNoteDao.deleteNote(note)
+
+  suspend fun deleteNoteForDay(day: Int) = exerciseNoteDao.deleteNoteForDay(day)
 }

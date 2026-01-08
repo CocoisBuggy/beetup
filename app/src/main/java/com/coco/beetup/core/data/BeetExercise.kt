@@ -96,6 +96,15 @@ data class BeetExerciseLog(
     @ColumnInfo(name = "rest_seconds") val rest: Int? = null,
 )
 
+@Entity
+data class ExerciseNote(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @ColumnInfo(name = "note_date") val noteDate: LocalDateTime = LocalDateTime.now(),
+    /** Day of all time (unix day) */
+    @ColumnInfo(name = "note_day") val noteDay: Int = (Date().time / 86_400_000L).toInt(),
+    @ColumnInfo(name = "note_text") val noteText: String,
+)
+
 @Entity(
     primaryKeys = ["activity_id", "resistance_kind"],
     foreignKeys =

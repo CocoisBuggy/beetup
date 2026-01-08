@@ -38,7 +38,9 @@ import androidx.compose.ui.unit.dp
 import com.coco.beetup.core.data.ActivityGroup
 import com.coco.beetup.core.data.ActivityKey
 import com.coco.beetup.core.data.ActivityOverview
+import com.coco.beetup.core.data.unixDay
 import com.coco.beetup.core.ui.NodePositionState
+import com.coco.beetup.ui.components.exercise.ExerciseNoteCard
 import com.coco.beetup.ui.components.grain.AnimatedNodeLinks
 import com.coco.beetup.ui.components.time.DateHeatMap
 import com.coco.beetup.ui.viewmodel.BeetViewModel
@@ -170,6 +172,9 @@ fun ActivityList(
                       }
                     })
           }
+
+          // Add ExerciseNoteCard at the bottom of the scrollable view
+          ExerciseNoteCard(viewModel = viewModel, day = date.unixDay())
 
           Spacer(Modifier.size(68.dp))
         }

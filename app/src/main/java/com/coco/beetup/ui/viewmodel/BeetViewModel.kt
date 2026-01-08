@@ -10,6 +10,7 @@ import com.coco.beetup.core.data.BeetActivityResistance
 import com.coco.beetup.core.data.BeetExercise
 import com.coco.beetup.core.data.BeetExerciseLog
 import com.coco.beetup.core.data.BeetRepository
+import com.coco.beetup.core.data.ExerciseNote
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -93,6 +94,16 @@ class BeetViewModel(
   ): List<ActivityGroupFlatRow> {
     return repository.getExerciseHistory(exerciseId, since, before)
   }
+
+  fun getNoteForDay(day: Int) = repository.getNoteForDay(day)
+
+  fun insertNote(note: ExerciseNote) = viewModelScope.launch { repository.insertNote(note) }
+
+  fun updateNote(note: ExerciseNote) = viewModelScope.launch { repository.updateNote(note) }
+
+  fun deleteNote(note: ExerciseNote) = viewModelScope.launch { repository.deleteNote(note) }
+
+  fun deleteNoteForDay(day: Int) = viewModelScope.launch { repository.deleteNoteForDay(day) }
 }
 
 class BeetViewModelFactory(

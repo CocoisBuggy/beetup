@@ -183,3 +183,22 @@ interface ExerciseLogDao {
       "SELECT exerciseId, COUNT(*) as count, MAX(log_date) as lastDate FROM BeetExerciseLog GROUP BY exerciseId")
   fun getExerciseUsageCounts(): Flow<List<ExerciseUsagePrimitive>>
 }
+
+@Dao
+interface ExerciseNoteDao {
+  @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun insertNote(note: ExerciseNote): Long
+
+  @Update suspend fun updateNote(note: ExerciseNote)
+
+  @Delete suspend fun deleteNote(note: ExerciseNote)
+
+  @Query("SELECT * FROM ExerciseNote WHERE id = :id") fun getNote(id: Int): Flow<ExerciseNote>
+
+  @Query("SELECT * FROM ExerciseNote WHERE note_day = :day LIMIT 1")
+  fun getNoteForDay(day: Int): Flow<ExerciseNote?>
+
+  @Query("SELECT * FROM ExerciseNote ORDER BY note_date DESC")
+  fun getAllNotes(): Flow<List<ExerciseNote>>
+
+  @Query("DELETE FROM ExerciseNote WHERE note_day = :day") suspend fun deleteNoteForDay(day: Int)
+}

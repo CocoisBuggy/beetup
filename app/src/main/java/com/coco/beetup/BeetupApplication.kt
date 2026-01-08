@@ -3,21 +3,14 @@ package com.coco.beetup
 import android.app.Application
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.coco.beetup.core.data.BeetData
 import com.coco.beetup.core.data.BeetRepository
+import com.coco.beetup.core.data.DatabaseMigrations
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
 class BeetupApplication : Application() {
-
-  val MIGRATION_1_2 =
-      object : Migration(1, 2) {
-        override fun migrate(db: SupportSQLiteDatabase) {
-          db.execSQL("ALTER TABLE BeetExerciseLog ADD COLUMN rest_seconds INTEGER")
-        }
-      }
 
   val database: BeetData by lazy {
     Room.databaseBuilder(
@@ -25,7 +18,7 @@ class BeetupApplication : Application() {
             BeetData::class.java,
             "beet_database",
         )
-        .addMigrations(MIGRATION_1_2)
+        .addMigrations(*DatabaseMigrations.ALL_MIGRATIONS)
         .addCallback(
             object : RoomDatabase.Callback() {
               override fun onCreate(db: SupportSQLiteDatabase) {
@@ -51,6 +44,7 @@ class BeetupApplication : Application() {
         database.beetProfileDao(),
         database.beetExerciseDao(),
         database.exerciseLogDao(),
+        database.exerciseNoteDao(),
     )
   }
 }

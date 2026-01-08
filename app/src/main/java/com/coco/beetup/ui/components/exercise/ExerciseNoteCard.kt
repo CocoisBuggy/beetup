@@ -49,7 +49,7 @@ fun ExerciseNoteCard(viewModel: BeetViewModel, day: Int, modifier: Modifier = Mo
   val note by viewModel.getNoteForDay(day).collectAsState(initial = null)
   var showEditDialog by remember { mutableStateOf(false) }
 
-  Card(modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+  Card(modifier = modifier.fillMaxWidth()) {
     Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
       Row(
           modifier = Modifier.fillMaxWidth(),

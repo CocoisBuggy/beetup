@@ -146,21 +146,22 @@ fun ActivityListItem(
                       }
                 }
 
-                entry.resistances.forEach { res ->
-                  Badge(
-                      contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                      containerColor = MaterialTheme.colorScheme.secondaryContainer) {
-                        ResistanceIcon[res.extra.id]?.let { icon ->
-                          Icon(
-                              icon,
-                              contentDescription = "Icon for ${res.extra.name}",
-                          )
-                        }
-                        Text(
-                            ResistanceConversion[res.extra.id]?.invoke(res)
-                                ?: "${res.entry.resistanceValue}${res.extra.unit}")
-                      }
-                }
+                entry.resistances
+                    .forEach { res ->
+                      Badge(
+                          contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                          containerColor = MaterialTheme.colorScheme.secondaryContainer) {
+                            ResistanceIcon[res.extra.id]?.let { icon ->
+                              Icon(
+                                  icon,
+                                  contentDescription = "Icon for ${res.extra.name}",
+                              )
+                            }
+                            Text(
+                                ResistanceConversion[res.extra.id]?.invoke(res)
+                                    ?: "${res.entry.resistanceValue}${res.extra.unit}")
+                          }
+                    }
               }
             }
           }

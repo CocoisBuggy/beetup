@@ -70,12 +70,14 @@ class BeetRepository(
         val extraResistancesMap = allResistances.toMap()
         val extraMagnitudes = allMagnitudes.toMagMap()
         val groupedByExercise =
-            flatRows.groupBy {
+            flatRows.groupBy { flat ->
               Triple(
-                  it.exercise.id,
-                  it.log.magnitude,
-                  it.resistanceEntry,
-              )
+                  flat.exercise.id,
+                  flat.log.magnitude,
+                  flat.resistanceEntry
+                      .map { Pair(it.resistanceKind, it.resistanceValue) }
+                      .sortedBy { it.first }
+                      .distinct())
             }
 
         val exerciseByKey: MutableMap<ActivityKey, BeetExercise> = mutableMapOf()
@@ -112,7 +114,7 @@ class BeetRepository(
                                       extra = extraResistancesMap[flatRow.resistanceKind]!!,
                                   )
                                 }
-                                .distinct())
+                                .distinctBy { Pair(it.extra.id, it.entry.resistanceValue) })
                   }
           exerciseByKey[key] = exercise
         }

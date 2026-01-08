@@ -174,8 +174,11 @@ fun ActivityList(
           }
 
           // Add ExerciseNoteCard at the bottom of the scrollable view
-          ExerciseNoteCard(viewModel = viewModel, day = date.unixDay())
-
+          ExerciseNoteCard(
+              viewModel = viewModel,
+              day = date.unixDay(),
+              modifier = Modifier.padding(top = 8.dp),
+          )
           Spacer(Modifier.size(68.dp))
         }
 

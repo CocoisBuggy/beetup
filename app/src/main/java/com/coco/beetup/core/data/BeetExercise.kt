@@ -130,5 +130,3 @@ data class BeetActivityResistance(
     @ColumnInfo(name = "resistance_kind") val resistanceKind: Int,
     @ColumnInfo(name = "resistance_value") val resistanceValue: Int,
 )
-
-

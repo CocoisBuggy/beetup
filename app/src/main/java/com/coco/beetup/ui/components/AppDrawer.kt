@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DataObject
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material3.DrawerState
@@ -38,6 +39,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable object ExerciseManager : Screen
 
+@Serializable object ScheduleManager : Screen
+
 @Serializable object BeetRaw : Screen
 
 @Composable
@@ -53,6 +56,7 @@ fun AppDrawer(
       listOf(
           Triple(Home, "Home", Icons.Default.Home),
           Triple(ExerciseManager, "Exercise Manager", Icons.Default.SportsTennis),
+          Triple(ScheduleManager, "Schedule Manager", Icons.Default.Schedule),
           //          Triple(Stats, "Stats", Icons.Default.QueryStats),
           Triple(Settings, "Settings", Icons.Default.Settings),
           Triple(BeetRaw, "Raw", Icons.Default.DataObject),

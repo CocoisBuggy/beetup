@@ -7,17 +7,21 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 enum class ScheduleKind {
-    MONOTONIC,
-    DAY_OF_WEEK,
-    FOLLOWS_EXERCISE,
+  MONOTONIC,
+  DAY_OF_WEEK,
+  FOLLOWS_EXERCISE,
 }
 
 enum class ReminderStrength {
-    IN_APP,
-    NOTIFICATION,
-    ANNOYING_NOTIFICATION,
+  IN_APP,
+  NOTIFICATION,
+  ANNOYING_NOTIFICATION,
 }
 
+/**
+ * You can imagine this as rules that the notification engine should be following when it schedules
+ * a notification.
+ */
 @Entity(
     foreignKeys =
         [
@@ -44,12 +48,18 @@ data class BeetExerciseSchedule(
     @ColumnInfo(name = "follows_exercise") val followsExercise: Int? = null,
     @ColumnInfo(name = "day_of_week") val dayOfWeek: Int? = null,
     @ColumnInfo(name = "monotonic_days") val monotonicDays: Int? = null,
+    @ColumnInfo(name = "message") val message: String? = null,
 ) {
-    init {
-        when (kind) {
-            ScheduleKind.MONOTONIC -> monotonicDays ?: throw IllegalArgumentException()
-            ScheduleKind.DAY_OF_WEEK -> dayOfWeek ?: throw IllegalArgumentException()
-            ScheduleKind.FOLLOWS_EXERCISE -> followsExercise ?: throw IllegalArgumentException()
-        }
+  init {
+    when (kind) {
+      ScheduleKind.MONOTONIC -> monotonicDays ?: throw IllegalArgumentException()
+      ScheduleKind.DAY_OF_WEEK -> dayOfWeek ?: throw IllegalArgumentException()
+      ScheduleKind.FOLLOWS_EXERCISE -> followsExercise ?: throw IllegalArgumentException()
     }
+
+    if (monotonicDays != null && dayOfWeek != null) {
+      throw IllegalArgumentException(
+          "The dayOfWeek and monotonicDays values are mutually exclusive")
+    }
+  }
 }

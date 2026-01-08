@@ -45,6 +45,7 @@ class BeetupApplication : Application() {
         database.beetExerciseDao(),
         database.exerciseLogDao(),
         database.exerciseNoteDao(),
+        database.beetExerciseScheduleDao(),
     )
   }
 }

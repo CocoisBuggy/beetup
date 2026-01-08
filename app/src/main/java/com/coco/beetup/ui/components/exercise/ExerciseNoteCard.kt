@@ -16,15 +16,17 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Note
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Note
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -49,50 +51,52 @@ fun ExerciseNoteCard(viewModel: BeetViewModel, day: Int, modifier: Modifier = Mo
   val note by viewModel.getNoteForDay(day).collectAsState(initial = null)
   var showEditDialog by remember { mutableStateOf(false) }
 
-  Card(modifier = modifier.fillMaxWidth()) {
-    Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-      Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+  OutlinedCard(
+      modifier = modifier.fillMaxWidth(),
+      colors = CardDefaults.cardColors(MaterialTheme.colorScheme.tertiaryContainer)) {
+        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+          Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                      Icon(
+                          imageVector = Icons.AutoMirrored.Filled.Note,
+                          contentDescription = "Note",
+                          tint = MaterialTheme.colorScheme.onTertiaryContainer)
+                      Text(
+                          text = "Daily Note",
+                          style = MaterialTheme.typography.titleMedium,
+                          fontWeight = FontWeight.Medium)
+                    }
+
+                IconButton(onClick = { showEditDialog = true }) {
                   Icon(
-                      imageVector = Icons.Default.Note,
-                      contentDescription = "Note",
-                      tint = MaterialTheme.colorScheme.primary)
-                  Text(
-                      text = "Daily Note",
-                      style = MaterialTheme.typography.titleMedium,
-                      fontWeight = FontWeight.Medium)
+                      imageVector = Icons.Default.Edit,
+                      contentDescription = "Edit Note",
+                      tint = MaterialTheme.colorScheme.onTertiaryContainer)
                 }
+              }
 
-            IconButton(onClick = { showEditDialog = true }) {
-              Icon(
-                  imageVector = Icons.Default.Edit,
-                  contentDescription = "Edit Note",
-                  tint = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
+          Spacer(modifier = Modifier.height(8.dp))
+
+          if (note != null) {
+            Text(
+                text = note!!.noteText,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                modifier = Modifier.fillMaxWidth())
+          } else {
+            Text(
+                text = "No note for today. Tap the edit button to add one.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                modifier = Modifier.fillMaxWidth())
           }
-
-      Spacer(modifier = Modifier.height(8.dp))
-
-      if (note != null) {
-        Text(
-            text = note!!.noteText,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.fillMaxWidth())
-      } else {
-        Text(
-            text = "No note for today. Tap the edit button to add one.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.fillMaxWidth())
+        }
       }
-    }
-  }
 
   if (showEditDialog) {
     ExerciseNoteEditDialog(
@@ -114,10 +118,11 @@ private fun ExerciseNoteEditDialog(
   var noteText by remember { mutableStateOf(existingNote?.noteText ?: "") }
   val scrollState = rememberScrollState()
 
-  AlertDialog(
+  BasicAlertDialog(
       onDismissRequest = onDismiss,
       modifier = Modifier.widthIn(max = 400.dp),
-      properties = DialogProperties(usePlatformDefaultWidth = false)) {
+      properties = DialogProperties(usePlatformDefaultWidth = false),
+      content = {
         Card(
             modifier = Modifier.fillMaxWidth().verticalScroll(scrollState),
             shape = MaterialTheme.shapes.large) {
@@ -194,5 +199,5 @@ private fun ExerciseNoteEditDialog(
                     }
                   }
             }
-      }
+      })
 }

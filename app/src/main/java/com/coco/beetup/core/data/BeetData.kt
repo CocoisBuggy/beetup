@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 @Database(
-    version = 4,
+    version = 5,
     entities =
         [
             BeetProfile::class,
@@ -16,7 +16,7 @@ import androidx.room.TypeConverters
             BeetActivityResistance::class,
             ValidBeetResistances::class,
             ExerciseNote::class,
-        ],
+            BeetExerciseSchedule::class],
 )
 @TypeConverters(Converters::class)
 abstract class BeetData : RoomDatabase() {
@@ -27,4 +27,6 @@ abstract class BeetData : RoomDatabase() {
   abstract fun exerciseLogDao(): ExerciseLogDao
 
   abstract fun exerciseNoteDao(): ExerciseNoteDao
+
+  abstract fun beetExerciseScheduleDao(): BeetExerciseScheduleDao
 }

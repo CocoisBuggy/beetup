@@ -47,6 +47,7 @@ class BeetRepository(
     private val beetExerciseDao: BeetExerciseDao,
     private val exerciseLogDao: ExerciseLogDao,
     private val exerciseNoteDao: ExerciseNoteDao,
+    private val beetExerciseScheduleDao: BeetExerciseScheduleDao,
 ) {
   fun getProfile(): Flow<BeetProfile> = beetProfileDao.getProfile()
 
@@ -265,4 +266,28 @@ class BeetRepository(
   }
 
   fun getBannerDates(): Flow<List<Int>> = exerciseLogDao.getBannerDates()
+
+  // Schedule operations
+  fun getAllSchedules(): Flow<List<BeetExerciseSchedule>> =
+      beetExerciseScheduleDao.getAllSchedules()
+
+  fun getSchedule(id: Int): Flow<BeetExerciseSchedule> = beetExerciseScheduleDao.getSchedule(id)
+
+  fun getSchedulesForExercise(exerciseId: Int): Flow<List<BeetExerciseSchedule>> =
+      beetExerciseScheduleDao.getSchedulesForExercise(exerciseId)
+
+  fun getScheduleForExercise(exerciseId: Int): Flow<BeetExerciseSchedule?> =
+      beetExerciseScheduleDao.getScheduleForExercise(exerciseId)
+
+  suspend fun insertSchedule(schedule: BeetExerciseSchedule): Long =
+      beetExerciseScheduleDao.insertSchedule(schedule)
+
+  suspend fun updateSchedule(schedule: BeetExerciseSchedule) =
+      beetExerciseScheduleDao.updateSchedule(schedule)
+
+  suspend fun deleteSchedule(schedule: BeetExerciseSchedule) =
+      beetExerciseScheduleDao.deleteSchedule(schedule)
+
+  suspend fun deleteSchedulesForExercise(exerciseId: Int) =
+      beetExerciseScheduleDao.deleteSchedulesForExercise(exerciseId)
 }

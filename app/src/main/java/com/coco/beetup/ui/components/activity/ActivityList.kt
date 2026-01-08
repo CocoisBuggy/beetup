@@ -21,6 +21,7 @@ import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ButtonShapes
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
@@ -175,11 +176,12 @@ fun ActivityList(
                     })
           }
 
+          HorizontalDivider(Modifier.padding(vertical = 16.dp))
+
           // Add ExerciseNoteCard at the bottom of the scrollable view
           ExerciseNoteCard(
               viewModel = viewModel,
               day = date.unixDay(),
-              modifier = Modifier.padding(top = 8.dp),
           )
           Spacer(Modifier.size(68.dp))
         }

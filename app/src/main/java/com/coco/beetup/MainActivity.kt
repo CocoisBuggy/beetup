@@ -16,11 +16,13 @@ import com.coco.beetup.ui.components.BeetRaw
 import com.coco.beetup.ui.components.ExerciseManager
 import com.coco.beetup.ui.components.History
 import com.coco.beetup.ui.components.Home
+import com.coco.beetup.ui.components.ScheduleManager
 import com.coco.beetup.ui.components.Settings
 import com.coco.beetup.ui.destinations.BeetExerciseManager
 import com.coco.beetup.ui.destinations.BeetHistory
 import com.coco.beetup.ui.destinations.BeetHome
 import com.coco.beetup.ui.destinations.BeetRawView
+import com.coco.beetup.ui.destinations.BeetScheduleManager
 import com.coco.beetup.ui.destinations.BeetSettings
 import com.coco.beetup.ui.theme.AppTheme
 import com.coco.beetup.ui.viewmodel.BeetViewModel
@@ -28,7 +30,7 @@ import com.coco.beetup.ui.viewmodel.BeetViewModelFactory
 
 class MainActivity : ComponentActivity() {
   private val viewModel: BeetViewModel by viewModels {
-    BeetViewModelFactory((application as BeetupApplication).repository)
+    BeetViewModelFactory((application as BeetupApplication).repository, this)
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +49,9 @@ class MainActivity : ComponentActivity() {
             composable<Home> { BeetHome(navController, viewModel, drawerState) }
             composable<ExerciseManager> {
               BeetExerciseManager(navController, viewModel, drawerState)
+            }
+            composable<ScheduleManager> {
+              BeetScheduleManager(navController, viewModel, drawerState)
             }
             composable<BeetRaw> { BeetRawView(navController, viewModel, drawerState) }
             composable<History> { BeetHistory() }

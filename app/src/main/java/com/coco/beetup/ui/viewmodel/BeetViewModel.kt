@@ -9,8 +9,10 @@ import com.coco.beetup.core.data.ActivityGroupFlatRow
 import com.coco.beetup.core.data.BeetActivityResistance
 import com.coco.beetup.core.data.BeetExercise
 import com.coco.beetup.core.data.BeetExerciseLog
+import com.coco.beetup.core.data.BeetExerciseSchedule
 import com.coco.beetup.core.data.BeetRepository
 import com.coco.beetup.core.data.ExerciseNote
+import com.coco.beetup.service.ExerciseNotificationManager
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,6 +20,7 @@ import kotlinx.coroutines.withContext
 
 class BeetViewModel(
     private val repository: BeetRepository,
+    private val context: Context,
 ) : ViewModel() {
   val profile = repository.getProfile()
   val allExercises = repository.getAllExercises()
@@ -109,14 +112,50 @@ class BeetViewModel(
       viewModelScope.launch { repository.updateLogEntry(log) }
 
   fun getBannerDates() = repository.getBannerDates()
+
+  // Schedule operations
+  val allSchedules = repository.getAllSchedules()
+
+  fun getSchedule(id: Int) = repository.getSchedule(id)
+
+  fun getSchedulesForExercise(exerciseId: Int) = repository.getSchedulesForExercise(exerciseId)
+
+  fun getScheduleForExercise(exerciseId: Int) = repository.getScheduleForExercise(exerciseId)
+
+  fun insertSchedule(schedule: BeetExerciseSchedule) =
+      viewModelScope.launch {
+        val scheduleId = repository.insertSchedule(schedule)
+        ExerciseNotificationManager.scheduleNotification(
+            context, schedule.copy(id = scheduleId.toInt()))
+      }
+
+  fun updateSchedule(schedule: BeetExerciseSchedule) =
+      viewModelScope.launch {
+        repository.updateSchedule(schedule)
+        ExerciseNotificationManager.cancelNotification(context, schedule.id)
+        ExerciseNotificationManager.scheduleNotification(context, schedule)
+      }
+
+  fun deleteSchedule(schedule: BeetExerciseSchedule) =
+      viewModelScope.launch {
+        repository.deleteSchedule(schedule)
+        ExerciseNotificationManager.cancelNotification(context, schedule.id)
+      }
+
+  fun deleteSchedulesForExercise(exerciseId: Int) =
+      viewModelScope.launch {
+        repository.deleteSchedulesForExercise(exerciseId)
+        // Note: Would need to get all schedules for exercise to cancel notifications
+      }
 }
 
 class BeetViewModelFactory(
     private val repository: BeetRepository,
+    private val context: Context,
 ) : ViewModelProvider.Factory {
   override fun <T : ViewModel> create(modelClass: Class<T>): T {
     if (modelClass.isAssignableFrom(BeetViewModel::class.java)) {
-      @Suppress("UNCHECKED_CAST") return BeetViewModel(repository) as T
+      @Suppress("UNCHECKED_CAST") return BeetViewModel(repository, context) as T
     }
     throw IllegalArgumentException("Unknown ViewModel class")
   }

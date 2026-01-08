@@ -20,4 +20,24 @@ class Converters {
   fun localDateTimeToTimestamp(date: LocalDateTime?): Long? {
     return date?.atZone(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
   }
+
+  @TypeConverter
+  fun fromScheduleKind(value: String?): ScheduleKind? {
+    return value?.let { ScheduleKind.valueOf(it) }
+  }
+
+  @TypeConverter
+  fun scheduleKindToString(value: ScheduleKind?): String? {
+    return value?.name
+  }
+
+  @TypeConverter
+  fun fromReminderStrength(value: String?): ReminderStrength? {
+    return value?.let { ReminderStrength.valueOf(it) }
+  }
+
+  @TypeConverter
+  fun reminderStrengthToString(value: ReminderStrength?): String? {
+    return value?.name
+  }
 }

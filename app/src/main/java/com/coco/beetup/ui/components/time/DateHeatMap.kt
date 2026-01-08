@@ -1,7 +1,7 @@
 package com.coco.beetup.ui.components.time
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.Icon
@@ -18,13 +19,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.CircleShape
 import com.coco.beetup.core.data.ActivityOverview
 import com.coco.beetup.ui.components.grain.PulsingSunnyShape
 import java.time.DayOfWeek
@@ -172,19 +171,15 @@ private fun HeatmapCell(
         Icon(Icons.Default.Today, contentDescription = "TodayIcon")
       }
     }
-    
+
     // Show banner indicator when not selected
     if (!selected && bannerDates.contains(day.date)) {
       Box(
-          modifier = Modifier
-              .padding(2.dp)
-              .size(8.dp)
-              .background(
-                  color = MaterialTheme.colorScheme.error,
-                  shape = CircleShape
-              )
-              .align(Alignment.TopEnd)
-      )
+          modifier =
+              Modifier.padding(2.dp)
+                  .size(8.dp)
+                  .background(color = MaterialTheme.colorScheme.error, shape = CircleShape)
+                  .align(Alignment.TopEnd))
     }
   }
 }

@@ -59,6 +59,7 @@ dependencies {
   implementation(libs.androidx.room.ktx)
   implementation(libs.androidx.room.runtime)
   implementation(libs.kotlinx.serialization.json)
+  implementation(libs.androidx.work.runtime.ktx)
   ksp(libs.androidx.room.compiler)
 
   // extra

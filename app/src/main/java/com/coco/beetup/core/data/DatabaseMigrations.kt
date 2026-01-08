@@ -34,5 +34,29 @@ object DatabaseMigrations {
         }
       }
 
-  val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+  val MIGRATION_4_5 =
+      object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+          // Create the new BeetExerciseSchedule table
+          db.execSQL(
+              "CREATE TABLE IF NOT EXISTS `BeetExerciseSchedule` (" +
+                  "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                  "`exercise_id` INTEGER NOT NULL, " +
+                  "`kind` TEXT NOT NULL, " +
+                  "`reminder` TEXT, " +
+                  "`follows_exercise` INTEGER, " +
+                  "`day_of_week` INTEGER, " +
+                  "`monotonic_days` INTEGER, " +
+                  "`message` TEXT, " +
+                  "FOREIGN KEY(`exercise_id`) REFERENCES `BeetExercise`(`id`) ON DELETE CASCADE, " +
+                  "FOREIGN KEY(`follows_exercise`) REFERENCES `BeetExercise`(`id`) ON DELETE CASCADE" +
+                  ")")
+
+          // Create index for exercise_id column for better query performance
+          db.execSQL(
+              "CREATE INDEX IF NOT EXISTS `index_BeetExerciseSchedule_exercise_id` ON `BeetExerciseSchedule` (`exercise_id`)")
+        }
+      }
+
+  val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
 }

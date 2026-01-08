@@ -35,6 +35,8 @@ data class ActivityGroup(
           magValue = magnitude.id,
           resistances =
               logs.first().resistances.map { Pair(it.extra.id, it.entry.resistanceValue) })
+
+  val banner: Boolean = logs.any { it.log.banner }
 }
 
 data class ActivityGroupFlatRow(

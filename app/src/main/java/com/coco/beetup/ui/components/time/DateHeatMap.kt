@@ -1,12 +1,14 @@
 package com.coco.beetup.ui.components.time
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.Icon
@@ -16,11 +18,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.shape.CircleShape
 import com.coco.beetup.core.data.ActivityOverview
 import com.coco.beetup.ui.components.grain.PulsingSunnyShape
 import java.time.DayOfWeek
@@ -37,6 +41,7 @@ import kotlin.math.absoluteValue
 fun DateHeatMap(
     selectedDates: Set<LocalDate>,
     activeDates: List<ActivityOverview>,
+    bannerDates: Set<LocalDate> = emptySet(),
     modifier: Modifier = Modifier,
     activeColor: Color = MaterialTheme.colorScheme.primaryContainer,
     onDatePositioned: (id: Any, coordinates: LayoutCoordinates) -> Unit,
@@ -70,6 +75,7 @@ fun DateHeatMap(
           days = days,
           activeColor = activeColor,
           maxActivity = maxActivity,
+          bannerDates = bannerDates,
           onDatePositioned = onDatePositioned,
           selectedDates = selectedDates,
           onDateSelected = onDateSelected,
@@ -86,6 +92,7 @@ private fun MonthSection(
     days: List<ActivityOverview>,
     activeColor: Color,
     maxActivity: Int,
+    bannerDates: Set<LocalDate>,
     onDatePositioned: (id: Any, coordinates: LayoutCoordinates) -> Unit,
     onDateSelected: (LocalDate) -> Unit
 ) {
@@ -122,6 +129,7 @@ private fun MonthSection(
           day = day,
           activeColor = activeColor,
           maxActivity = maxActivity,
+          bannerDates = bannerDates,
           onDatePositioned = onDatePositioned,
           selected = selectedDates.contains(day.date),
           onClick = { onDateSelected(day.date) })
@@ -135,6 +143,7 @@ private fun HeatmapCell(
     day: ActivityOverview,
     activeColor: Color,
     maxActivity: Int,
+    bannerDates: Set<LocalDate>,
     onDatePositioned: (id: Any, coordinates: LayoutCoordinates) -> Unit,
     selected: Boolean = false,
     onClick: () -> Unit
@@ -146,20 +155,36 @@ private fun HeatmapCell(
         else -> activeColor.copy(alpha = day.count.toFloat() / maxActivity)
       }
 
-  PulsingSunnyShape(
-      selected,
-      day.count,
-      color = if (selected) MaterialTheme.colorScheme.secondary else color,
-      modifier =
-          Modifier.padding(2.dp).aspectRatio(1f).onGloballyPositioned { coordinates ->
-            if (coordinates.isAttached) {
-              onDatePositioned(day.date, coordinates)
-            }
-          },
-      onClick = onClick,
-  ) {
-    if (day.date == LocalDate.now()) {
-      Icon(Icons.Default.Today, contentDescription = "TodayIcon")
+  Box {
+    PulsingSunnyShape(
+        selected,
+        day.count,
+        color = if (selected) MaterialTheme.colorScheme.secondary else color,
+        modifier =
+            Modifier.padding(2.dp).aspectRatio(1f).onGloballyPositioned { coordinates ->
+              if (coordinates.isAttached) {
+                onDatePositioned(day.date, coordinates)
+              }
+            },
+        onClick = onClick,
+    ) {
+      if (day.date == LocalDate.now()) {
+        Icon(Icons.Default.Today, contentDescription = "TodayIcon")
+      }
+    }
+    
+    // Show banner indicator when not selected
+    if (!selected && bannerDates.contains(day.date)) {
+      Box(
+          modifier = Modifier
+              .padding(2.dp)
+              .size(8.dp)
+              .background(
+                  color = MaterialTheme.colorScheme.error,
+                  shape = CircleShape
+              )
+              .align(Alignment.TopEnd)
+      )
     }
   }
 }

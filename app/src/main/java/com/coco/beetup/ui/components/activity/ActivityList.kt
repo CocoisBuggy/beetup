@@ -54,6 +54,7 @@ fun ActivityList(
     selectedItems: Set<ActivityKey>,
     activityDates: List<ActivityOverview>?,
     exerciseDates: Map<Int, List<LocalDate>>?,
+    bannerDates: Set<LocalDate> = emptySet(),
     onToggleSelection: (ActivityKey) -> Unit,
     onToggleMultiSelection: () -> Unit,
     viewModel: BeetViewModel,
@@ -82,6 +83,7 @@ fun ActivityList(
               DateHeatMap(
                   selectedDates = setOf(date),
                   activeDates = activityDates,
+                  bannerDates = bannerDates,
                   onDatePositioned = { id, pos -> nodePositionState.onNodePositioned(id, pos) },
                   onDateSelected = {
                     if (selectedItems.isEmpty()) {

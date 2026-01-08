@@ -8,10 +8,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.CallSplit
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.RemoveCircleOutline
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -28,6 +30,7 @@ fun FloatingActivityToolbar(
     onDeleteSelected: () -> Unit,
     onBifurcate: () -> Unit,
     onMinus: () -> Unit,
+    onBannerToggle: () -> Unit,
 ) {
   Row(verticalAlignment = Alignment.CenterVertically) {
     if (editMode) {
@@ -39,6 +42,13 @@ fun FloatingActivityToolbar(
     IconButton(onClick = onMinus, enabled = (item?.logs?.size ?: 0) > 1) {
       Icon(Icons.Default.RemoveCircleOutline, "Remove")
     }
+    IconToggleButton(checked = item?.banner == true, onCheckedChange = { onBannerToggle() }) {
+      Icon(
+          if (item?.banner == true) Icons.Default.Flag else Icons.Default.Flag,
+          "Toggle Banner",
+      )
+    }
+
     Spacer(Modifier.width(16.dp))
     VerticalDivider(
         modifier = Modifier.height(32.dp).width(1.dp),

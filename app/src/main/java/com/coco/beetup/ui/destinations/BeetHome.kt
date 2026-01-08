@@ -36,6 +36,7 @@ fun BeetHome(
       viewModel.activityGroupsForDay(state.date.unixDay()).collectAsState(initial = emptyList())
   val activityOverview by viewModel.activityOverview().collectAsState(initial = null)
   val exerciseDateOverview by viewModel.exerciseDateOverview().collectAsState(initial = null)
+  val bannerDates by viewModel.getBannerDates().collectAsState(initial = emptyList())
 
   val selectedActivityGroups by
       remember(activityGroups, state.selectedItems) {
@@ -85,6 +86,12 @@ fun BeetHome(
                   it.logs.lastOrNull()?.let { last -> viewModel.deleteActivity(listOf(last.log)) }
                 }
               },
+              onBannerToggle = {
+                selectedActivityGroups.firstOrNull()?.logs?.firstOrNull()?.let { firstLog ->
+                  val updatedLog = firstLog.log.copy(banner = !firstLog.log.banner)
+                  viewModel.updateLogEntry(updatedLog)
+                }
+              },
           )
         }
       },
@@ -95,6 +102,7 @@ fun BeetHome(
         todaysActivity = activityGroups,
         activityDates = activityOverview,
         exerciseDates = exerciseDateOverview,
+        bannerDates = bannerDates.map { java.time.LocalDate.ofEpochDay(it.toLong()) }.toSet(),
         selectedItems = state.selectedItems,
         onToggleSelection = state::toggleSelection,
         onToggleMultiSelection = state::toggleMultiSelection,

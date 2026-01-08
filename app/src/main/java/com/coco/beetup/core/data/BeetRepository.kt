@@ -259,4 +259,10 @@ class BeetRepository(
   suspend fun deleteNote(note: ExerciseNote) = exerciseNoteDao.deleteNote(note)
 
   suspend fun deleteNoteForDay(day: Int) = exerciseNoteDao.deleteNoteForDay(day)
+
+  suspend fun updateLogEntry(log: BeetExerciseLog) {
+    exerciseLogDao.update(log)
+  }
+
+  fun getBannerDates(): Flow<List<Int>> = exerciseLogDao.getBannerDates()
 }

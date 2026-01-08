@@ -27,5 +27,12 @@ object DatabaseMigrations {
         }
       }
 
-  val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
+  val MIGRATION_3_4 =
+      object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+          db.execSQL("ALTER TABLE BeetExerciseLog ADD COLUMN banner INTEGER NOT NULL DEFAULT 0")
+        }
+      }
+
+  val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
 }

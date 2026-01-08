@@ -94,6 +94,7 @@ data class BeetExerciseLog(
     @ColumnInfo(name = "difficulty") val difficulty: Difficulty? = null,
     @ColumnInfo(name = "comment") val comment: String? = null,
     @ColumnInfo(name = "rest_seconds") val rest: Int? = null,
+    @ColumnInfo(name = "banner", defaultValue = "0") val banner: Boolean = false,
 )
 
 @Entity
@@ -129,3 +130,5 @@ data class BeetActivityResistance(
     @ColumnInfo(name = "resistance_kind") val resistanceKind: Int,
     @ColumnInfo(name = "resistance_value") val resistanceValue: Int,
 )
+
+

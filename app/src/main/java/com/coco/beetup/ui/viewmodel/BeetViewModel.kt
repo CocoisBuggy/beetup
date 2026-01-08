@@ -104,6 +104,11 @@ class BeetViewModel(
   fun deleteNote(note: ExerciseNote) = viewModelScope.launch { repository.deleteNote(note) }
 
   fun deleteNoteForDay(day: Int) = viewModelScope.launch { repository.deleteNoteForDay(day) }
+
+  fun updateLogEntry(log: BeetExerciseLog) =
+      viewModelScope.launch { repository.updateLogEntry(log) }
+
+  fun getBannerDates() = repository.getBannerDates()
 }
 
 class BeetViewModelFactory(

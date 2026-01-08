@@ -28,6 +28,7 @@ fun MorphFab(
     onDeleteSelected: () -> Unit,
     onBifurcate: () -> Unit,
     onMinus: () -> Unit,
+    onBannerToggle: () -> Unit,
 ) {
   FloatingActionButton({
     // The add action only fires when there are no items selected
@@ -49,6 +50,7 @@ fun MorphFab(
                 onDeleteSelected = onDeleteSelected,
                 onBifurcate = onBifurcate,
                 onMinus = onMinus,
+                onBannerToggle = onBannerToggle,
             )
           } else {
             Icon(

@@ -182,6 +182,9 @@ interface ExerciseLogDao {
   @Query(
       "SELECT exerciseId, COUNT(*) as count, MAX(log_date) as lastDate FROM BeetExerciseLog GROUP BY exerciseId")
   fun getExerciseUsageCounts(): Flow<List<ExerciseUsagePrimitive>>
+
+  @Query("SELECT DISTINCT log_day FROM BeetExerciseLog WHERE banner = 1")
+  fun getBannerDates(): Flow<List<Int>>
 }
 
 @Dao

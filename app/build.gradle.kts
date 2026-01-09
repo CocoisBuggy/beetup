@@ -12,7 +12,7 @@ android {
 
   defaultConfig {
     applicationId = "com.coco.beetup"
-    minSdk = 30
+    minSdk = 33
     targetSdk = 36
 
     versionCode = 13

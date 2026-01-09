@@ -117,31 +117,31 @@ fun ExerciseHistory(
                               selected.exerciseName,
                               style = MaterialTheme.typography.headlineSmall,
                               fontWeight = FontWeight.Bold)
-                           Text(
-                               "${historyData.size} records in last ${timePeriod.displayName}",
-                               style = MaterialTheme.typography.bodySmall,
-                               color = MaterialTheme.colorScheme.onSurfaceVariant)
+                          Text(
+                              "${historyData.size} records in last ${timePeriod.displayName}",
+                              style = MaterialTheme.typography.bodySmall,
+                              color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                         Button(onClick = { selectedExercise = null }) { Text("Change") }
-                       }
+                        Button(onClick = { selectedExercise = null }) { Text("Change") }
+                      }
 
-                   // Time Period Selector
-                   ButtonGroup(
-                       overflowIndicator = { menuState ->
-                         ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
-                       },
-                   ) {
-                     TimePeriod.entries.forEach { period ->
-                       toggleableItem(
-                           checked = timePeriod == period,
-                           label = period.displayName,
-                           onCheckedChange = { timePeriod = period },
-                           weight = 1f,
-                       )
-                     }
-                   }
+                  // Time Period Selector
+                  ButtonGroup(
+                      overflowIndicator = { menuState ->
+                        ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
+                      },
+                  ) {
+                    TimePeriod.entries.forEach { period ->
+                      toggleableItem(
+                          checked = timePeriod == period,
+                          label = period.displayName,
+                          onCheckedChange = { timePeriod = period },
+                          weight = 1f,
+                      )
+                    }
+                  }
 
-                   // View Mode Selector
+                  // View Mode Selector
                   ButtonGroup(
                       overflowIndicator = { menuState ->
                         ButtonGroupDefaults.OverflowIndicator(menuState = menuState)

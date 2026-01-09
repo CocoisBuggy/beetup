@@ -5,11 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.material3.AlertDialog
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
@@ -127,7 +125,8 @@ fun BeetSettings(
         } else {
           // Mark that permission was denied
           prefs.edit { putBoolean("notification_permission_denied", true) }
-          Toast.makeText(context, "Notifications require permission to work", Toast.LENGTH_LONG).show()
+          Toast.makeText(context, "Notifications require permission to work", Toast.LENGTH_LONG)
+              .show()
         }
       }
 
@@ -142,30 +141,33 @@ fun BeetSettings(
     AlertDialog(
         onDismissRequest = { showPermissionRationaleDialog = false },
         title = { Text("Permission Required") },
-        text = { 
-          Text("You've permanently denied notification permission. To enable notifications, go to Settings > Apps > Beetup > Permissions and enable Notifications.") 
+        text = {
+          Text(
+              "You've permanently denied notification permission. To enable notifications, go to Settings > Apps > Beetup > Permissions and enable Notifications.")
         },
         confirmButton = {
           TextButton(
               onClick = {
                 showPermissionRationaleDialog = false
                 // Open app settings
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                  data = Uri.fromParts("package", context.packageName, null)
-                }
+                val intent =
+                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                      data = Uri.fromParts("package", context.packageName, null)
+                    }
                 context.startActivity(intent)
               }) {
                 Text("Open Settings")
               }
         },
-        dismissButton = { 
-          TextButton(onClick = { 
-            showPermissionRationaleDialog = false
-            prefs.edit { putBoolean("notifications_enabled", false) }
-            notificationsEnabled = false
-          }) { 
-            Text("Cancel") 
-          } 
+        dismissButton = {
+          TextButton(
+              onClick = {
+                showPermissionRationaleDialog = false
+                prefs.edit { putBoolean("notifications_enabled", false) }
+                notificationsEnabled = false
+              }) {
+                Text("Cancel")
+              }
         })
   }
 
@@ -199,7 +201,8 @@ fun BeetSettings(
               onClick = {
                 showTimePicker = false
                 Toast.makeText(context, "Reminder time updated", Toast.LENGTH_SHORT).show()
-                  // TODO: Update notification time, and reschedule existing notifications that are now scheduled for the wrong time
+                // TODO: Update notification time, and reschedule existing notifications that are
+                // now scheduled for the wrong time
               }) {
                 Text("OK")
               }
@@ -263,16 +266,17 @@ fun BeetSettings(
                         Log.d(
                             "BeetSettings",
                             "User is missing the POST_NOTIFICATIONS permission, we will ask for it")
-                        
+
                         // Check if user has previously denied this permission
                         val wasDenied = prefs.getBoolean("notification_permission_denied", false)
-                        
+
                         if (wasDenied) {
                           // User has denied before, show rationale dialog
                           showPermissionRationaleDialog = true
                         } else {
                           // First time asking, request permission
-                          notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                          notificationPermissionLauncher.launch(
+                              Manifest.permission.POST_NOTIFICATIONS)
                         }
                       }
                     } else {

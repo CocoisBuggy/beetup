@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DataObject
+import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Settings
@@ -41,6 +42,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable object ScheduleManager : Screen
 
+@Serializable object ExerciseHistory : Screen
+
 @Serializable object BeetRaw : Screen
 
 @Composable
@@ -57,6 +60,7 @@ fun AppDrawer(
           Triple(Home, "Home", Icons.Default.Home),
           Triple(ExerciseManager, "Exercise Manager", Icons.Default.SportsTennis),
           Triple(ScheduleManager, "Schedule Manager", Icons.Default.Schedule),
+          Triple(ExerciseHistory, "Exercise History", Icons.Default.FitnessCenter),
           //          Triple(Stats, "Stats", Icons.Default.QueryStats),
           Triple(Settings, "Settings", Icons.Default.Settings),
           Triple(BeetRaw, "Raw", Icons.Default.DataObject),

@@ -9,7 +9,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -33,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.coco.beetup.core.data.BeetExerciseSchedule
+import com.coco.beetup.ui.components.ExerciseHistory
 import com.coco.beetup.ui.components.nav.BeetTopBar
 import com.coco.beetup.ui.components.schedule.CreateScheduleDialog
 import com.coco.beetup.ui.components.schedule.ScheduleListItem
@@ -77,6 +80,14 @@ fun BeetScheduleManager(
         Modifier.fillMaxSize().padding(innerPadding).padding(12.dp).verticalScroll(scrollState),
     ) {
       Text("Schedule Manager", style = MaterialTheme.typography.headlineMedium)
+
+      Button(onClick = { nav.navigate(ExerciseHistory) }, modifier = Modifier.fillMaxWidth()) {
+        Icon(
+            Icons.Default.FitnessCenter,
+            contentDescription = null,
+            modifier = Modifier.padding(end = 8.dp))
+        Text("View Exercise History")
+      }
 
       OutlinedTextField(
           value = searchQuery,

@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.coco.beetup.ui.components.AppDrawer
 import com.coco.beetup.ui.components.BeetRaw
+import com.coco.beetup.ui.components.ExerciseHistory
 import com.coco.beetup.ui.components.ExerciseManager
 import com.coco.beetup.ui.components.History
 import com.coco.beetup.ui.components.Home
@@ -24,6 +25,7 @@ import com.coco.beetup.ui.destinations.BeetHome
 import com.coco.beetup.ui.destinations.BeetRawView
 import com.coco.beetup.ui.destinations.BeetScheduleManager
 import com.coco.beetup.ui.destinations.BeetSettings
+import com.coco.beetup.ui.destinations.history.ExerciseHistory as ExerciseHistoryDestination
 import com.coco.beetup.ui.theme.AppTheme
 import com.coco.beetup.ui.viewmodel.BeetViewModel
 import com.coco.beetup.ui.viewmodel.BeetViewModelFactory
@@ -52,6 +54,9 @@ class MainActivity : ComponentActivity() {
             }
             composable<ScheduleManager> {
               BeetScheduleManager(navController, viewModel, drawerState)
+            }
+            composable<ExerciseHistory> {
+              ExerciseHistoryDestination(navController, viewModel, drawerState)
             }
             composable<BeetRaw> { BeetRawView(navController, viewModel, drawerState) }
             composable<History> { BeetHistory() }

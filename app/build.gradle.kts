@@ -65,6 +65,8 @@ dependencies {
   // extra
   coreLibraryDesugaring(libs.desugar)
   implementation(libs.datetime.names)
+  implementation(libs.vico.compose)
+  implementation(libs.vico.compose.m3)
 
   testImplementation(libs.junit)
   androidTestImplementation(libs.androidx.junit)

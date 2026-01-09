@@ -1,17 +1,12 @@
 package com.coco.beetup
 
-import android.Manifest
-import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -40,12 +35,7 @@ class MainActivity : ComponentActivity() {
     BeetViewModelFactory((application as BeetupApplication).repository, this)
   }
 
-  private val notificationPermissionLauncher =
-      registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        // Update settings based on permission result
-        val prefs = getSharedPreferences("app_settings", Context.MODE_PRIVATE)
-        prefs.edit().putBoolean("notifications_enabled", isGranted).apply()
-      }
+
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -58,19 +48,7 @@ class MainActivity : ComponentActivity() {
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
 
-        // Request notification permission on app start (only if not previously denied)
-        LaunchedEffect(Unit) {
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val prefs = getSharedPreferences("app_settings", Context.MODE_PRIVATE)
-            val notificationsEnabled = prefs.getBoolean("notifications_enabled", true)
-            val hasAskedBefore = prefs.getBoolean("has_asked_notification_permission", false)
 
-            if (notificationsEnabled && !hasAskedBefore) {
-              notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-              prefs.edit().putBoolean("has_asked_notification_permission", true).apply()
-            }
-          }
-        }
 
         AppDrawer(drawerState = drawerState, scope = scope, navController = navController) {
           NavHost(navController = navController, startDestination = Home) {

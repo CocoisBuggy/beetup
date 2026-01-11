@@ -3,7 +3,6 @@ package com.coco.beetup.ui.components.schedule
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.content.SharedPreferences
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
@@ -31,9 +30,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
-import androidx.core.content.edit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -42,8 +38,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import com.coco.beetup.core.data.BeetExerciseSchedule
 import com.coco.beetup.core.data.ReminderStrength
 import com.coco.beetup.core.data.ScheduleKind
@@ -83,17 +82,18 @@ fun CreateScheduleDialog(
   val context = LocalContext.current
   val prefs = remember { context.getSharedPreferences("app_settings", Context.MODE_PRIVATE) }
   var showPermissionRationaleDialog by remember { mutableStateOf(false) }
-  
+
   val notificationPermissionLauncher =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         prefs.edit { putBoolean("notifications_enabled", isGranted) }
-        
+
         if (isGranted) {
           prefs.edit { remove("notification_permission_denied") }
           Toast.makeText(context, "Notifications enabled", Toast.LENGTH_SHORT).show()
         } else {
           prefs.edit { putBoolean("notification_permission_denied", true) }
-          Toast.makeText(context, "Notifications require permission to work", Toast.LENGTH_LONG).show()
+          Toast.makeText(context, "Notifications require permission to work", Toast.LENGTH_LONG)
+              .show()
         }
       }
 
@@ -107,27 +107,25 @@ fun CreateScheduleDialog(
     AlertDialog(
         onDismissRequest = { showPermissionRationaleDialog = false },
         title = { Text("Permission Required") },
-        text = { 
-          Text("To create a schedule with notifications, you need to grant notification permission. Go to Settings > Apps > Beetup > Permissions and enable Notifications.") 
+        text = {
+          Text(
+              "To create a schedule with notifications, you need to grant notification permission. Go to Settings > Apps > Beetup > Permissions and enable Notifications.")
         },
         confirmButton = {
           TextButton(
               onClick = {
                 showPermissionRationaleDialog = false
-                val intent = android.content.Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                  data = android.net.Uri.fromParts("package", context.packageName, null)
-                }
+                val intent =
+                    android.content.Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                      data = android.net.Uri.fromParts("package", context.packageName, null)
+                    }
                 context.startActivity(intent)
               }) {
                 Text("Open Settings")
               }
         },
-        dismissButton = { 
-          TextButton(onClick = { 
-            showPermissionRationaleDialog = false
-          }) { 
-            Text("Cancel") 
-          } 
+        dismissButton = {
+          TextButton(onClick = { showPermissionRationaleDialog = false }) { Text("Cancel") }
         })
   }
 
@@ -301,13 +299,15 @@ fun CreateScheduleDialog(
               try {
                 // Check for notification permission if needed
                 if (requiresNotificationPermission) {
-                  val hasPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    ContextCompat.checkSelfPermission(
-                        context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
-                  } else {
-                    true // Android < 13 doesn't need this permission
-                  }
-                  
+                  val hasPermission =
+                      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        ContextCompat.checkSelfPermission(
+                            context, Manifest.permission.POST_NOTIFICATIONS) ==
+                            PackageManager.PERMISSION_GRANTED
+                      } else {
+                        true // Android < 13 doesn't need this permission
+                      }
+
                   if (!hasPermission) {
                     val wasDenied = prefs.getBoolean("notification_permission_denied", false)
                     if (wasDenied) {
@@ -349,8 +349,8 @@ fun CreateScheduleDialog(
                 Log.e("CreateScheduleDialog", "Validation error in schedule creation: $e")
               }
             }) {
-          Text(if (scheduleToEdit != null) "Update" else "Create")
-        }
+              Text(if (scheduleToEdit != null) "Update" else "Create")
+            }
       },
       dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } })
 }

@@ -4,6 +4,7 @@ plugins {
   alias(libs.plugins.kotlin.compose)
   alias(libs.plugins.ksp)
   alias(libs.plugins.kotlin.serialization)
+  alias(libs.plugins.roborazzi)
 }
 
 android {
@@ -41,6 +42,8 @@ android {
   }
   kotlinOptions { jvmTarget = "11" }
   buildFeatures { compose = true }
+
+  testOptions { unitTests { isIncludeAndroidResources = true } }
 }
 
 dependencies {
@@ -69,6 +72,15 @@ dependencies {
   implementation(libs.vico.compose.m3)
 
   testImplementation(libs.junit)
+  testImplementation(libs.ui.test.junit4)
+  testImplementation(libs.robolectric)
+  testImplementation(libs.roborazzi)
+  testImplementation(libs.roborazzi.compose)
+  testImplementation(libs.roborazzi.rule)
+  testImplementation(libs.androidx.espresso.core)
+  testImplementation(libs.androidx.junit)
+
+  androidTestImplementation(libs.robolectric)
   androidTestImplementation(libs.androidx.junit)
   androidTestImplementation(libs.androidx.espresso.core)
   androidTestImplementation(platform(libs.androidx.compose.bom))

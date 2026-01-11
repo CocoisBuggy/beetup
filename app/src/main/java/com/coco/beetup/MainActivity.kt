@@ -35,8 +35,6 @@ class MainActivity : ComponentActivity() {
     BeetViewModelFactory((application as BeetupApplication).repository, this)
   }
 
-
-
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     viewModel.installDefaults(this)
@@ -47,8 +45,6 @@ class MainActivity : ComponentActivity() {
         val navController = rememberNavController()
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
-
-
 
         AppDrawer(drawerState = drawerState, scope = scope, navController = navController) {
           NavHost(navController = navController, startDestination = Home) {

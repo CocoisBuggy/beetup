@@ -185,6 +185,9 @@ interface ExerciseLogDao {
 
   @Query("SELECT DISTINCT log_day FROM BeetExerciseLog WHERE banner = 1")
   fun getBannerDates(): Flow<List<Int>>
+
+  @Query("SELECT * FROM BeetExerciseLog WHERE exerciseId = :exerciseId ORDER BY log_date DESC LIMIT 1")
+  suspend fun getLatestLogForExercise(exerciseId: Int): BeetExerciseLog?
 }
 
 @Dao

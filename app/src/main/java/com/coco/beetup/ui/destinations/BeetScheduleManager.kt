@@ -150,7 +150,8 @@ fun BeetScheduleManager(
                   scheduleToEdit = schedule
                   showScheduleDialog = true
                 },
-                onDelete = { viewModel.deleteSchedule(schedule) })
+                onDelete = { viewModel.deleteSchedule(schedule) },
+                context = LocalContext.current)
           }
         }
       }

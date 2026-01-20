@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.navigation.NavHostController
+import com.coco.beetup.core.data.BeetExerciseSchedule
 import com.coco.beetup.service.ExerciseNotificationManager
 import com.coco.beetup.ui.components.nav.BeetTopBar
 import com.coco.beetup.ui.viewmodel.BeetViewModel
@@ -201,8 +202,17 @@ fun BeetSettings(
               onClick = {
                 showTimePicker = false
                 Toast.makeText(context, "Reminder time updated", Toast.LENGTH_SHORT).show()
-                // TODO: Update notification time, and reschedule existing notifications that are
-                // now scheduled for the wrong time
+                // Reschedule all existing notifications with the new time
+                scope.launch {
+                  // Cancel all current notifications
+                  ExerciseNotificationManager.cancelAllNotifications(context)
+                  // Reschedule all notifications from database
+                  viewModel.allSchedules.collect { schedules: List<BeetExerciseSchedule> ->
+                    schedules.forEach { schedule: BeetExerciseSchedule ->
+                      ExerciseNotificationManager.scheduleNotification(context, schedule)
+                    }
+                  }
+                }
               }) {
                 Text("OK")
               }

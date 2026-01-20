@@ -290,4 +290,9 @@ class BeetRepository(
 
   suspend fun deleteSchedulesForExercise(exerciseId: Int) =
       beetExerciseScheduleDao.deleteSchedulesForExercise(exerciseId)
+
+  suspend fun getLastExerciseDate(exerciseId: Int): LocalDate? {
+    val latestLog = exerciseLogDao.getLatestLogForExercise(exerciseId)
+    return latestLog?.logDate?.toLocalDate()
+  }
 }

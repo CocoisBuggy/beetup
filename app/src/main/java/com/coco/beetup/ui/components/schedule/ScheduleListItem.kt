@@ -1,5 +1,6 @@
 package com.coco.beetup.ui.components.schedule
 
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -24,13 +30,18 @@ import com.coco.beetup.core.data.BeetExercise
 import com.coco.beetup.core.data.BeetExerciseSchedule
 import com.coco.beetup.core.data.ReminderStrength
 import com.coco.beetup.core.data.ScheduleKind
+import com.coco.beetup.service.ExerciseNotificationManager
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 @Composable
 fun ScheduleListItem(
     schedule: BeetExerciseSchedule,
     exercise: BeetExercise,
     onClick: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    context: Context? = null
 ) {
   Card(
       modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
@@ -71,13 +82,60 @@ fun ScheduleListItem(
                       color = MaterialTheme.colorScheme.primary)
                 }
 
-                schedule.message?.let { message ->
-                  Spacer(modifier = Modifier.height(4.dp))
-                  Text(
-                      text = "\"$message\"",
-                      style = MaterialTheme.typography.bodySmall,
-                      color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
+                 schedule.message?.let { message ->
+                   Spacer(modifier = Modifier.height(4.dp))
+                   Text(
+                       text = "\"$message\"",
+                       style = MaterialTheme.typography.bodySmall,
+                       color = MaterialTheme.colorScheme.onSurfaceVariant)
+                 }
+
+                 // Show next notification time if notifications are enabled
+                 context?.let { ctx ->
+                   val prefs = ctx.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+                   val notificationsEnabled = prefs.getBoolean("notifications_enabled", true)
+                   var scheduledTime by remember { mutableStateOf<LocalDateTime?>(null) }
+                   
+                   // Load actual scheduled time from WorkManager
+                   LaunchedEffect(schedule.id) {
+                     scheduledTime = try {
+                       com.coco.beetup.service.ExerciseNotificationManager.getScheduledNotificationTime(ctx, schedule.id)
+                     } catch (e: Exception) {
+                       null
+                     }
+                   }
+                   
+                   when {
+                     schedule.reminder == ReminderStrength.IN_APP -> {
+                       Spacer(modifier = Modifier.height(4.dp))
+                       Text(
+                           text = "In-app reminder only",
+                           style = MaterialTheme.typography.bodySmall,
+                           color = MaterialTheme.colorScheme.onSurfaceVariant)
+                     }
+                     !notificationsEnabled -> {
+                       Spacer(modifier = Modifier.height(4.dp))
+                       Text(
+                           text = "Notifications disabled",
+                           style = MaterialTheme.typography.bodySmall,
+                           color = MaterialTheme.colorScheme.onSurfaceVariant)
+                     }
+                     scheduledTime != null -> {
+                       Spacer(modifier = Modifier.height(4.dp))
+                       Text(
+                           text = "Next: ${formatNextNotificationTime(scheduledTime!!)}",
+                           style = MaterialTheme.typography.bodySmall,
+                           color = MaterialTheme.colorScheme.secondary)
+                     }
+                     else -> {
+                       Spacer(modifier = Modifier.height(4.dp))
+                       Text(
+                           text = "No notification scheduled",
+                           style = MaterialTheme.typography.bodySmall,
+                           color = MaterialTheme.colorScheme.onSurfaceVariant)
+                     }
+                   }
+                 }
               }
 
               Spacer(modifier = Modifier.width(8.dp))
@@ -87,4 +145,17 @@ fun ScheduleListItem(
               }
             }
       }
+}
+
+fun formatNextNotificationTime(nextTime: LocalDateTime): String {
+  val now = LocalDateTime.now()
+  val daysUntil = ChronoUnit.DAYS.between(now.toLocalDate(), nextTime.toLocalDate())
+  val formatter = DateTimeFormatter.ofPattern("MMM d 'at' h:mm a")
+  
+  return when {
+    daysUntil == 0L -> "Today at ${nextTime.format(DateTimeFormatter.ofPattern("h:mm a"))}"
+    daysUntil == 1L -> "Tomorrow at ${nextTime.format(DateTimeFormatter.ofPattern("h:mm a"))}"
+    daysUntil <= 7L -> nextTime.format(formatter)
+    else -> nextTime.format(DateTimeFormatter.ofPattern("MMM d"))
+  }
 }

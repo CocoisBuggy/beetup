@@ -51,6 +51,7 @@ class BeetRepositorySimpleTest {
     `when`(exerciseLogDao.getAllFlatActivityDataForDay(testDay)).thenReturn(flowOf(emptyList()))
     `when`(beetExerciseDao.getAllResistances()).thenReturn(flowOf(emptyList()))
     `when`(beetExerciseDao.getAllMagnitudes()).thenReturn(flowOf(emptyList()))
+    `when`(beetExerciseDao.getAllExercises()).thenReturn(flowOf(emptyList()))
 
     // Act
     val result = repository.activityGroupsForDay(testDay).first()

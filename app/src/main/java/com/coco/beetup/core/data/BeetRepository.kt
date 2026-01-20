@@ -67,70 +67,79 @@ class BeetRepository(
           exerciseLogDao.getAllFlatActivityDataForDay(day),
           beetExerciseDao.getAllResistances(),
           beetExerciseDao.getAllMagnitudes(),
-          beetExerciseDao.getAllExercises()
-      ) { flatRows, allResistances, allMagnitudes, allExercises ->
-        val extraResistancesMap = allResistances.toMap()
-        val extraMagnitudes = allMagnitudes.toMagMap()
-          val exerciseToMagnitude = allExercises.associate { it.id to it.magnitudeKind }
+          beetExerciseDao.getAllExercises()) { flatRows, allResistances, allMagnitudes, allExercises
+            ->
+            val extraResistancesMap = allResistances.toMap()
+            val extraMagnitudes = allMagnitudes.toMagMap()
+            val exerciseToMagnitude = allExercises.associate { it.id to it.magnitudeKind }
 
-        val groupedByExercise =
-            flatRows.groupBy { flat ->
-              Triple(
-                  flat.exercise.id,
-                  flat.log.magnitude,
-                  flat.resistanceEntry
-                      .map { Pair(it.resistanceKind, it.resistanceValue) }
-                      .sortedBy { it.first }
-                      .distinct())
+            val groupedByExercise =
+                flatRows.groupBy { flat ->
+                  Triple(
+                      flat.exercise.id,
+                      flat.log.magnitude,
+                      flat.resistanceEntry
+                          .map { Pair(it.resistanceKind, it.resistanceValue) }
+                          .sortedBy { it.first }
+                          .distinct())
+                }
+
+            val exerciseByKey: MutableMap<ActivityKey, BeetExercise> = mutableMapOf()
+            val activityGroups: MutableMap<ActivityKey, List<BeetExerciseLogWithResistances>> =
+                mutableMapOf()
+
+            groupedByExercise.values.forEach { rowsForExercise ->
+              // This gives us logs collected by exercise and magnitude.
+              // from here, we need to collect all resistances for each log.
+              val exercise = rowsForExercise.first().exercise
+
+              val key =
+                  ActivityKey(
+                      exerciseId = exercise.id,
+                      magValue = rowsForExercise.first().log.magnitude,
+                      resistances =
+                          rowsForExercise
+                              .flatMap { it.resistanceEntry }
+                              .map { Pair(it.resistanceKind, it.resistanceValue) }
+                              .distinct(),
+                  )
+
+              activityGroups[key] =
+                  activityGroups.getOrDefault(key, emptyList()) +
+                      rowsForExercise.map { row ->
+                        BeetExerciseLogWithResistances(
+                            log = row.log,
+                            resistances =
+                                rowsForExercise
+                                    .flatMap { it.resistanceEntry }
+                                    .mapNotNull { flatRow ->
+                                      val extra = extraResistancesMap[flatRow.resistanceKind]
+                                      if (extra != null) {
+                                        BeetExpandedResistance(
+                                            entry = flatRow,
+                                            extra = extra,
+                                        )
+                                      } else null
+                                    }
+                                    .distinctBy { Pair(it.extra.id, it.entry.resistanceValue) })
+                      }
+              exerciseByKey[key] = exercise
             }
 
-        val exerciseByKey: MutableMap<ActivityKey, BeetExercise> = mutableMapOf()
-        val activityGroups: MutableMap<ActivityKey, List<BeetExerciseLogWithResistances>> =
-            mutableMapOf()
+            activityGroups.mapNotNull { (key, value) ->
+              val exercise = exerciseByKey[key]
+              val magnitudeId = exerciseToMagnitude[key.exerciseId]
+              val magnitude = magnitudeId?.let { extraMagnitudes[it] }
 
-        groupedByExercise.values.forEach { rowsForExercise ->
-          // This gives us logs collected by exercise and magnitude.
-          // from here, we need to collect all resistances for each log.
-          val exercise = rowsForExercise.first().exercise
-
-          val key =
-              ActivityKey(
-                  exerciseId = exercise.id,
-                  magValue = rowsForExercise.first().log.magnitude,
-                  resistances =
-                      rowsForExercise
-                          .flatMap { it.resistanceEntry }
-                          .map { Pair(it.resistanceKind, it.resistanceValue) }
-                          .distinct(),
-              )
-
-          activityGroups[key] =
-              activityGroups.getOrDefault(key, emptyList()) +
-                  rowsForExercise.map { row ->
-                    BeetExerciseLogWithResistances(
-                        log = row.log,
-                        resistances =
-                            rowsForExercise
-                                .flatMap { it.resistanceEntry }
-                                .map { flatRow ->
-                                  BeetExpandedResistance(
-                                      entry = flatRow,
-                                      extra = extraResistancesMap[flatRow.resistanceKind]!!,
-                                  )
-                                }
-                                .distinctBy { Pair(it.extra.id, it.entry.resistanceValue) })
-                  }
-          exerciseByKey[key] = exercise
-        }
-
-        activityGroups.map { (key, value) ->
-          ActivityGroup(
-              exercise = exerciseByKey[key]!!,
-              magnitude = extraMagnitudes[exerciseToMagnitude[key.exerciseId]!!]!!,
-              logs = value.distinctBy { it.log.id },
-          )
-        }
-      }
+              if (exercise != null && magnitude != null) {
+                ActivityGroup(
+                    exercise = exercise,
+                    magnitude = magnitude,
+                    logs = value.distinctBy { it.log.id },
+                )
+              } else null
+            }
+          }
 
   fun allResistances() = beetExerciseDao.getAllResistances()
 

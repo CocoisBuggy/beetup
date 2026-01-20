@@ -1,12 +1,16 @@
 package com.coco.beetup.service
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Build
+import android.content.pm.PackageManager
+import android.util.Log
+import androidx.annotation.RequiresPermission
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.Data
@@ -29,14 +33,22 @@ import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 
 class NotificationScheduler : BroadcastReceiver() {
+  val channelId = "exercise_reminders"
 
   override fun onReceive(context: Context, intent: Intent) {
     val scheduleId = intent.getIntExtra("schedule_id", -1)
     val exerciseId = intent.getIntExtra("exercise_id", -1)
     val message = intent.getStringExtra("message") ?: "Time to exercise!"
     val reminderType = intent.getStringExtra("reminder_type")
+    val permitted =
+        ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
+            PackageManager.PERMISSION_GRANTED
 
-    if (reminderType != ReminderStrength.IN_APP.name) {
+    if (!permitted) {
+      Log.d("NotificationScheduler", "Notification permission not granted")
+    }
+
+    if (reminderType != ReminderStrength.IN_APP.name && permitted) {
       showNotification(context, exerciseId, message)
     }
 
@@ -44,27 +56,19 @@ class NotificationScheduler : BroadcastReceiver() {
     scheduleNextNotification(context, scheduleId)
   }
 
+  @RequiresPermission("android.permission.POST_NOTIFICATIONS")
   fun showNotification(context: Context, exerciseId: Int, message: String) {
     // Check for notification permission on Android 13+
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      val notificationManager = NotificationManagerCompat.from(context)
-      if (!notificationManager.areNotificationsEnabled()) {
-        return // Don't show notification if permission is denied
-      }
+    val notificationManager = NotificationManagerCompat.from(context)
+    if (!notificationManager.areNotificationsEnabled()) {
+      return // Don't show notification if permission is denied
     }
 
-    val channelId = "exercise_reminders"
+    val channel =
+        NotificationChannel(channelId, "Exercise Reminders", NotificationManager.IMPORTANCE_DEFAULT)
+            .apply { description = "Reminders for scheduled exercises" }
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      val channel =
-          NotificationChannel(
-                  channelId, "Exercise Reminders", NotificationManager.IMPORTANCE_DEFAULT)
-              .apply { description = "Reminders for scheduled exercises" }
-
-      val notificationManager =
-          context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-      notificationManager.createNotificationChannel(channel)
-    }
+    notificationManager.createNotificationChannel(channel)
 
     val intent =
         Intent(context, MainActivity::class.java).apply {
@@ -108,8 +112,11 @@ class ScheduleNotificationWorker(appContext: Context, workerParams: WorkerParame
     val exerciseId = inputData.getInt("exercise_id", -1)
     val message = inputData.getString("message") ?: "Time to exercise!"
     val reminderType = inputData.getString("reminder_type")
+    val permitted =
+        ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
+            PackageManager.PERMISSION_GRANTED
 
-    if (reminderType != ReminderStrength.IN_APP.name) {
+    if (reminderType != ReminderStrength.IN_APP.name && permitted) {
       NotificationScheduler().showNotification(context, exerciseId, message)
     }
 
@@ -274,7 +281,7 @@ object ExerciseNotificationManager {
                     work.state != WorkInfo.State.SUCCEEDED &&
                     work.state != WorkInfo.State.FAILED
               }
-              .minByOrNull { work -> work.nextScheduleTimeMillis ?: Long.MAX_VALUE }
+              .minByOrNull { work -> work.nextScheduleTimeMillis }
 
       nextWork?.nextScheduleTimeMillis?.let { timestamp ->
         val instant = java.time.Instant.ofEpochMilli(timestamp)

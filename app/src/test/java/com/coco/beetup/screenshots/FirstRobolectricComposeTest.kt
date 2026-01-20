@@ -14,7 +14,7 @@ import org.robolectric.annotation.GraphicsMode
 
 @Composable
 fun Greeting(name: String) {
-    Text("Hello $name!")
+  Text("Hello $name!")
 }
 
 @GraphicsMode(GraphicsMode.Mode.NATIVE)

@@ -82,60 +82,62 @@ fun ScheduleListItem(
                       color = MaterialTheme.colorScheme.primary)
                 }
 
-                 schedule.message?.let { message ->
-                   Spacer(modifier = Modifier.height(4.dp))
-                   Text(
-                       text = "\"$message\"",
-                       style = MaterialTheme.typography.bodySmall,
-                       color = MaterialTheme.colorScheme.onSurfaceVariant)
-                 }
+                schedule.message?.let { message ->
+                  Spacer(modifier = Modifier.height(4.dp))
+                  Text(
+                      text = "\"$message\"",
+                      style = MaterialTheme.typography.bodySmall,
+                      color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
 
-                 // Show next notification time if notifications are enabled
-                 context?.let { ctx ->
-                   val prefs = ctx.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
-                   val notificationsEnabled = prefs.getBoolean("notifications_enabled", true)
-                   var scheduledTime by remember { mutableStateOf<LocalDateTime?>(null) }
-                   
-                   // Load actual scheduled time from WorkManager
-                   LaunchedEffect(schedule.id) {
-                     scheduledTime = try {
-                       com.coco.beetup.service.ExerciseNotificationManager.getScheduledNotificationTime(ctx, schedule.id)
-                     } catch (e: Exception) {
-                       null
-                     }
-                   }
-                   
-                   when {
-                     schedule.reminder == ReminderStrength.IN_APP -> {
-                       Spacer(modifier = Modifier.height(4.dp))
-                       Text(
-                           text = "In-app reminder only",
-                           style = MaterialTheme.typography.bodySmall,
-                           color = MaterialTheme.colorScheme.onSurfaceVariant)
-                     }
-                     !notificationsEnabled -> {
-                       Spacer(modifier = Modifier.height(4.dp))
-                       Text(
-                           text = "Notifications disabled",
-                           style = MaterialTheme.typography.bodySmall,
-                           color = MaterialTheme.colorScheme.onSurfaceVariant)
-                     }
-                     scheduledTime != null -> {
-                       Spacer(modifier = Modifier.height(4.dp))
-                       Text(
-                           text = "Next: ${formatNextNotificationTime(scheduledTime!!)}",
-                           style = MaterialTheme.typography.bodySmall,
-                           color = MaterialTheme.colorScheme.secondary)
-                     }
-                     else -> {
-                       Spacer(modifier = Modifier.height(4.dp))
-                       Text(
-                           text = "No notification scheduled",
-                           style = MaterialTheme.typography.bodySmall,
-                           color = MaterialTheme.colorScheme.onSurfaceVariant)
-                     }
-                   }
-                 }
+                // Show next notification time if notifications are enabled
+                context?.let { ctx ->
+                  val prefs = ctx.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+                  val notificationsEnabled = prefs.getBoolean("notifications_enabled", true)
+                  var scheduledTime by remember { mutableStateOf<LocalDateTime?>(null) }
+
+                  // Load actual scheduled time from WorkManager
+                  LaunchedEffect(schedule.id) {
+                    scheduledTime =
+                        try {
+                          com.coco.beetup.service.ExerciseNotificationManager
+                              .getScheduledNotificationTime(ctx, schedule.id)
+                        } catch (e: Exception) {
+                          null
+                        }
+                  }
+
+                  when {
+                    schedule.reminder == ReminderStrength.IN_APP -> {
+                      Spacer(modifier = Modifier.height(4.dp))
+                      Text(
+                          text = "In-app reminder only",
+                          style = MaterialTheme.typography.bodySmall,
+                          color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    !notificationsEnabled -> {
+                      Spacer(modifier = Modifier.height(4.dp))
+                      Text(
+                          text = "Notifications disabled",
+                          style = MaterialTheme.typography.bodySmall,
+                          color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    scheduledTime != null -> {
+                      Spacer(modifier = Modifier.height(4.dp))
+                      Text(
+                          text = "Next: ${formatNextNotificationTime(scheduledTime!!)}",
+                          style = MaterialTheme.typography.bodySmall,
+                          color = MaterialTheme.colorScheme.secondary)
+                    }
+                    else -> {
+                      Spacer(modifier = Modifier.height(4.dp))
+                      Text(
+                          text = "No notification scheduled",
+                          style = MaterialTheme.typography.bodySmall,
+                          color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                  }
+                }
               }
 
               Spacer(modifier = Modifier.width(8.dp))
@@ -151,7 +153,7 @@ fun formatNextNotificationTime(nextTime: LocalDateTime): String {
   val now = LocalDateTime.now()
   val daysUntil = ChronoUnit.DAYS.between(now.toLocalDate(), nextTime.toLocalDate())
   val formatter = DateTimeFormatter.ofPattern("MMM d 'at' h:mm a")
-  
+
   return when {
     daysUntil == 0L -> "Today at ${nextTime.format(DateTimeFormatter.ofPattern("h:mm a"))}"
     daysUntil == 1L -> "Tomorrow at ${nextTime.format(DateTimeFormatter.ofPattern("h:mm a"))}"

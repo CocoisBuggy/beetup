@@ -16,7 +16,6 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import kotlinx.coroutines.runBlocking
 import com.coco.beetup.MainActivity
 import com.coco.beetup.R
 import com.coco.beetup.core.data.BeetExerciseSchedule
@@ -27,6 +26,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.runBlocking
 
 class NotificationScheduler : BroadcastReceiver() {
 
@@ -212,21 +212,26 @@ object ExerciseNotificationManager {
         "exercise_schedule_${schedule.id}", ExistingWorkPolicy.REPLACE, workRequest)
   }
 
-  private suspend fun calculateMonotonicDelay(context: Context, exerciseId: Int, daysBetween: Int): Long {
+  private suspend fun calculateMonotonicDelay(
+      context: Context,
+      exerciseId: Int,
+      daysBetween: Int
+  ): Long {
     val application = context.applicationContext as com.coco.beetup.BeetupApplication
     val repository = application.repository
-    
+
     // Get the last exercise date for this exercise
     val lastExerciseDate = repository.getLastExerciseDate(exerciseId)
-    val nextExerciseDate = if (lastExerciseDate != null) {
-      lastExerciseDate.plusDays(daysBetween.toLong())
-    } else {
-      LocalDate.now().plusDays(daysBetween.toLong())
-    }
-    
+    val nextExerciseDate =
+        if (lastExerciseDate != null) {
+          lastExerciseDate.plusDays(daysBetween.toLong())
+        } else {
+          LocalDate.now().plusDays(daysBetween.toLong())
+        }
+
     val targetTime = LocalTime.of(9, 0) // Default to 9 AM
     val targetDateTime = nextExerciseDate.atTime(targetTime)
-    
+
     return ChronoUnit.MILLIS.between(LocalDateTime.now(), targetDateTime)
   }
 
@@ -260,12 +265,17 @@ object ExerciseNotificationManager {
     val workManager = WorkManager.getInstance(context)
     return try {
       val workInfos = workManager.getWorkInfosByTag("exercise_schedule_$scheduleId").get()
-      
+
       // Find the next scheduled work that is not finished
-      val nextWork = workInfos
-        .filter { work -> work.state != WorkInfo.State.CANCELLED && work.state != WorkInfo.State.SUCCEEDED && work.state != WorkInfo.State.FAILED }
-        .minByOrNull { work -> work.nextScheduleTimeMillis ?: Long.MAX_VALUE }
-      
+      val nextWork =
+          workInfos
+              .filter { work ->
+                work.state != WorkInfo.State.CANCELLED &&
+                    work.state != WorkInfo.State.SUCCEEDED &&
+                    work.state != WorkInfo.State.FAILED
+              }
+              .minByOrNull { work -> work.nextScheduleTimeMillis ?: Long.MAX_VALUE }
+
       nextWork?.nextScheduleTimeMillis?.let { timestamp ->
         val instant = java.time.Instant.ofEpochMilli(timestamp)
         LocalDateTime.ofInstant(instant, java.time.ZoneId.systemDefault())
@@ -275,15 +285,18 @@ object ExerciseNotificationManager {
     }
   }
 
-  suspend fun getNextNotificationTime(context: Context, schedule: BeetExerciseSchedule): LocalDateTime? {
+  suspend fun getNextNotificationTime(
+      context: Context,
+      schedule: BeetExerciseSchedule
+  ): LocalDateTime? {
     // Check if notifications are enabled
     val prefs = context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
     val notificationsEnabled = prefs.getBoolean("notifications_enabled", true)
-    
+
     if (!notificationsEnabled || schedule.reminder == ReminderStrength.IN_APP) {
       return null
     }
-    
+
     return when (schedule.kind) {
       ScheduleKind.MONOTONIC -> getNextMonotonicTime(context, schedule)
       ScheduleKind.DAY_OF_WEEK -> getNextDayOfWeekTime(schedule)
@@ -291,17 +304,21 @@ object ExerciseNotificationManager {
     }
   }
 
-  private suspend fun getNextMonotonicTime(context: Context, schedule: BeetExerciseSchedule): LocalDateTime? {
+  private suspend fun getNextMonotonicTime(
+      context: Context,
+      schedule: BeetExerciseSchedule
+  ): LocalDateTime? {
     val application = context.applicationContext as com.coco.beetup.BeetupApplication
     val repository = application.repository
-    
+
     val lastExerciseDate = repository.getLastExerciseDate(schedule.activityId)
-    val nextExerciseDate = if (lastExerciseDate != null) {
-      lastExerciseDate.plusDays(schedule.monotonicDays?.toLong() ?: 1L)
-    } else {
-      LocalDate.now().plusDays(schedule.monotonicDays?.toLong() ?: 1L)
-    }
-    
+    val nextExerciseDate =
+        if (lastExerciseDate != null) {
+          lastExerciseDate.plusDays(schedule.monotonicDays?.toLong() ?: 1L)
+        } else {
+          LocalDate.now().plusDays(schedule.monotonicDays?.toLong() ?: 1L)
+        }
+
     val targetTime = LocalTime.of(9, 0) // Default to 9 AM
     return nextExerciseDate.atTime(targetTime)
   }
@@ -309,24 +326,27 @@ object ExerciseNotificationManager {
   private fun getNextDayOfWeekTime(schedule: BeetExerciseSchedule): LocalDateTime? {
     val now = LocalDate.now()
     val currentDay = now.dayOfWeek.value % 7 // Convert to 0-6 format where 0=Sunday
-    
+
     var daysUntilTarget = (schedule.dayOfWeek ?: 1) - currentDay
     if (daysUntilTarget <= 0) {
       daysUntilTarget += 7
     }
-    
+
     val targetDate = now.plusDays(daysUntilTarget.toLong())
     val targetTime = LocalTime.of(9, 0) // Default to 9 AM
     return targetDate.atTime(targetTime)
   }
 
-  private suspend fun getNextFollowsExerciseTime(context: Context, schedule: BeetExerciseSchedule): LocalDateTime? {
+  private suspend fun getNextFollowsExerciseTime(
+      context: Context,
+      schedule: BeetExerciseSchedule
+  ): LocalDateTime? {
     val application = context.applicationContext as com.coco.beetup.BeetupApplication
     val repository = application.repository
-    
+
     val followsExerciseId = schedule.followsExercise ?: return null
     val lastTargetExerciseDate = repository.getLastExerciseDate(followsExerciseId)
-    
+
     return if (lastTargetExerciseDate != null) {
       val nextNotificationDate = lastTargetExerciseDate.plusDays(1) // Day after target exercise
       val targetTime = LocalTime.of(10, 0) // 10 AM to give time for exercise completion

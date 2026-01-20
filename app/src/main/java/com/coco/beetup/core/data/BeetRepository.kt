@@ -67,9 +67,12 @@ class BeetRepository(
           exerciseLogDao.getAllFlatActivityDataForDay(day),
           beetExerciseDao.getAllResistances(),
           beetExerciseDao.getAllMagnitudes(),
-      ) { flatRows, allResistances, allMagnitudes ->
+          beetExerciseDao.getAllExercises()
+      ) { flatRows, allResistances, allMagnitudes, allExercises ->
         val extraResistancesMap = allResistances.toMap()
         val extraMagnitudes = allMagnitudes.toMagMap()
+          val exerciseToMagnitude = allExercises.associate { it.id to it.magnitudeKind }
+
         val groupedByExercise =
             flatRows.groupBy { flat ->
               Triple(
@@ -93,7 +96,7 @@ class BeetRepository(
           val key =
               ActivityKey(
                   exerciseId = exercise.id,
-                  magValue = exercise.magnitudeKind,
+                  magValue = rowsForExercise.first().log.magnitude,
                   resistances =
                       rowsForExercise
                           .flatMap { it.resistanceEntry }
@@ -123,7 +126,7 @@ class BeetRepository(
         activityGroups.map { (key, value) ->
           ActivityGroup(
               exercise = exerciseByKey[key]!!,
-              magnitude = extraMagnitudes[key.magValue]!!,
+              magnitude = extraMagnitudes[exerciseToMagnitude[key.exerciseId]!!]!!,
               logs = value.distinctBy { it.log.id },
           )
         }

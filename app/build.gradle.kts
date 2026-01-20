@@ -79,12 +79,21 @@ dependencies {
   testImplementation(libs.roborazzi.rule)
   testImplementation(libs.androidx.espresso.core)
   testImplementation(libs.androidx.junit)
+  // Additional test dependencies
+  testImplementation("org.mockito:mockito-core:5.14.2")
+  testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
+  testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+  testImplementation("androidx.arch.core:core-testing:2.2.0")
+  testImplementation("androidx.room:room-testing:2.8.4")
 
   androidTestImplementation(libs.robolectric)
   androidTestImplementation(libs.androidx.junit)
   androidTestImplementation(libs.androidx.espresso.core)
   androidTestImplementation(platform(libs.androidx.compose.bom))
   androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+  // Additional Android test dependencies
+  androidTestImplementation("androidx.room:room-testing:2.8.4")
+  androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
   debugImplementation(libs.androidx.compose.ui.tooling)
   debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

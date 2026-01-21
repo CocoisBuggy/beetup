@@ -47,6 +47,7 @@ import com.coco.beetup.core.data.BeetExerciseSchedule
 import com.coco.beetup.core.data.ReminderStrength
 import com.coco.beetup.core.data.ScheduleKind
 import com.coco.beetup.ui.viewmodel.BeetViewModel
+import java.time.DayOfWeek
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +60,7 @@ fun CreateScheduleDialog(
   val exercises by viewModel.allExercises.collectAsState(initial = emptyList())
 
   var selectedExercise by
-      remember(scheduleToEdit) { mutableStateOf(scheduleToEdit?.activityId ?: 0) }
+      remember(scheduleToEdit) { mutableStateOf(scheduleToEdit?.exerciseId ?: 0) }
   var scheduleKind by
       remember(scheduleToEdit) { mutableStateOf(scheduleToEdit?.kind ?: ScheduleKind.MONOTONIC) }
   var reminderStrength by
@@ -322,7 +323,7 @@ fun CreateScheduleDialog(
                 val schedule =
                     BeetExerciseSchedule(
                         id = scheduleToEdit?.id ?: 0,
-                        activityId = selectedExercise,
+                        exerciseId = selectedExercise,
                         kind = scheduleKind,
                         reminder = reminderStrength,
                         followsExercise =
@@ -330,7 +331,7 @@ fun CreateScheduleDialog(
                             else null,
                         dayOfWeek =
                             if (scheduleKind == ScheduleKind.DAY_OF_WEEK)
-                                dayOfWeek.toIntOrNull() ?: 1
+                                DayOfWeek.of(dayOfWeek.toIntOrNull() ?: 1)
                             else null,
                         monotonicDays =
                             if (scheduleKind == ScheduleKind.MONOTONIC)

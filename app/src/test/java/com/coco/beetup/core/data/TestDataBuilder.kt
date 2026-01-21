@@ -152,7 +152,7 @@ object TestDataBuilder {
   ) =
       BeetExerciseSchedule(
           id = id,
-          activityId = activityId,
+          exerciseId = activityId,
           kind = kind,
           reminder = reminder,
           followsExercise = followsExercise,

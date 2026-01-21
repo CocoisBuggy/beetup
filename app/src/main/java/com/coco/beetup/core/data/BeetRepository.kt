@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.coco.beetup.R
+import com.coco.beetup.core.repo.BeetNotificationManager
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.time.LocalDate
@@ -49,6 +50,8 @@ class BeetRepository(
     private val exerciseNoteDao: ExerciseNoteDao,
     private val beetExerciseScheduleDao: BeetExerciseScheduleDao,
 ) {
+  val notifications = BeetNotificationManager(exerciseLogDao, beetExerciseScheduleDao)
+
   fun getProfile(): Flow<BeetProfile> = beetProfileDao.getProfile()
 
   fun getAllExercises(): Flow<List<BeetExercise>> = beetExerciseDao.getAllExercises()
@@ -172,6 +175,8 @@ class BeetRepository(
       selectedResistances: List<BeetActivityResistance>
   ) {
     exerciseLogDao.insertActivityAndResistances(newExercise, selectedResistances)
+    // Whenever we add a new exercise log we can run a side-effect for notifications
+    notifications.reschedule(newExercise.id)
   }
 
   fun activityOverview(untilDate: Date = Date(), daysAgo: Int = 30): Flow<List<ActivityOverview>> {

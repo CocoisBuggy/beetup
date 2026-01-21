@@ -138,7 +138,7 @@ fun BeetScheduleManager(
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
           for (schedule in schedules) {
-            val exercise = exerciseMap[schedule.activityId]
+            val exercise = exerciseMap[schedule.exerciseId]
             if (exercise == null) continue
 
             if (exercise.exerciseName.contains(searchQuery, ignoreCase = true).not()) continue

@@ -209,31 +209,3 @@ interface ExerciseNoteDao {
 
   @Query("DELETE FROM ExerciseNote WHERE note_day = :day") suspend fun deleteNoteForDay(day: Int)
 }
-
-@Dao
-interface BeetExerciseScheduleDao {
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  suspend fun insertSchedule(schedule: BeetExerciseSchedule): Long
-
-  @Update suspend fun updateSchedule(schedule: BeetExerciseSchedule)
-
-  @Delete suspend fun deleteSchedule(schedule: BeetExerciseSchedule)
-
-  @Query("SELECT * FROM BeetExerciseSchedule WHERE id = :id")
-  fun getSchedule(id: Int): Flow<BeetExerciseSchedule>
-
-  @Query("SELECT * FROM BeetExerciseSchedule ORDER BY id")
-  fun getAllSchedules(): Flow<List<BeetExerciseSchedule>>
-
-  @Query("SELECT * FROM BeetExerciseSchedule WHERE exercise_id = :exerciseId")
-  fun getSchedulesForExercise(exerciseId: Int): Flow<List<BeetExerciseSchedule>>
-
-  @Query("SELECT * FROM BeetExerciseSchedule WHERE exercise_id = :exerciseId LIMIT 1")
-  fun getScheduleForExercise(exerciseId: Int): Flow<BeetExerciseSchedule?>
-
-  @Query("SELECT * FROM BeetExerciseSchedule WHERE kind = :kind")
-  fun getSchedulesByKind(kind: ScheduleKind): Flow<List<BeetExerciseSchedule>>
-
-  @Query("DELETE FROM BeetExerciseSchedule WHERE exercise_id = :exerciseId")
-  suspend fun deleteSchedulesForExercise(exerciseId: Int)
-}

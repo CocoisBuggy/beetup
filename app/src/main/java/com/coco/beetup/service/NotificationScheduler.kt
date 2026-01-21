@@ -144,14 +144,14 @@ object ExerciseNotificationManager {
     val data =
         Data.Builder()
             .putInt("schedule_id", schedule.id)
-            .putInt("exercise_id", schedule.activityId)
+            .putInt("exercise_id", schedule.exerciseId)
             .putString("message", schedule.message ?: "Time to exercise!")
             .putString("reminder_type", schedule.reminder?.name)
             .build()
 
     // Calculate delay until next notification
     val delay = runBlocking {
-      calculateMonotonicDelay(context, schedule.activityId, schedule.monotonicDays ?: 1)
+      calculateMonotonicDelay(context, schedule.exerciseId, schedule.monotonicDays ?: 1)
     }
 
     val workRequest =
@@ -171,13 +171,13 @@ object ExerciseNotificationManager {
     val data =
         Data.Builder()
             .putInt("schedule_id", schedule.id)
-            .putInt("exercise_id", schedule.activityId)
+            .putInt("exercise_id", schedule.exerciseId)
             .putString("message", schedule.message ?: "Time to exercise!")
             .putString("reminder_type", schedule.reminder?.name)
             .build()
 
     // Calculate delay until next occurrence of the specified day
-    val delay = calculateDayOfWeekDelay(schedule.dayOfWeek ?: 1)
+    val delay = calculateDayOfWeekDelay(schedule.dayOfWeek?.value ?: 1)
 
     val workRequest =
         OneTimeWorkRequest.Builder(ScheduleNotificationWorker::class.java)
@@ -199,7 +199,7 @@ object ExerciseNotificationManager {
     val data =
         Data.Builder()
             .putInt("schedule_id", schedule.id)
-            .putInt("exercise_id", schedule.activityId)
+            .putInt("exercise_id", schedule.exerciseId)
             .putString("message", schedule.message ?: "Time to exercise!")
             .putString("reminder_type", schedule.reminder?.name)
             .putInt("follows_exercise", schedule.followsExercise ?: -1)
@@ -318,7 +318,7 @@ object ExerciseNotificationManager {
     val application = context.applicationContext as com.coco.beetup.BeetupApplication
     val repository = application.repository
 
-    val lastExerciseDate = repository.getLastExerciseDate(schedule.activityId)
+    val lastExerciseDate = repository.getLastExerciseDate(schedule.exerciseId)
     val nextExerciseDate =
         if (lastExerciseDate != null) {
           lastExerciseDate.plusDays(schedule.monotonicDays?.toLong() ?: 1L)
@@ -334,7 +334,7 @@ object ExerciseNotificationManager {
     val now = LocalDate.now()
     val currentDay = now.dayOfWeek.value % 7 // Convert to 0-6 format where 0=Sunday
 
-    var daysUntilTarget = (schedule.dayOfWeek ?: 1) - currentDay
+    var daysUntilTarget = (schedule.dayOfWeek?.value ?: 1) - currentDay
     if (daysUntilTarget <= 0) {
       daysUntilTarget += 7
     }
